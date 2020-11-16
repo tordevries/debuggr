@@ -18,14 +18,14 @@ Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
 
 // CONFIGURATION -- edit these variables as needed
 
-$userName = ""; // put in your own name
-$userEmail = ""; // put in your own email address
+$userName = "Your Name"; // put in your own name
+$userEmail = "your@email.com"; // put in your own email address
 
 $pagePassword = "477demo"; // set a password
 $passwordRequired = true; // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 
-$accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
+$accessCurrentDirectoryOnly = true; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
 
 $showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
