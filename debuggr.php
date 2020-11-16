@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.96 by Tor de Vries -- verbose version
+Debuggr version 0.96 by Tor de Vries -- minified version
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
 If you set a password below -- and you really, really should -- don't forget to tell your instructor.
