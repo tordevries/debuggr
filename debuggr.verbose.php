@@ -183,6 +183,8 @@ if (!$foutput || ($preventAccessToThisFile && ($fpassed == basename(__FILE__))))
 	$foutput = $noFile; // no file there, or it's completely empty
 	
 } else if ($isImage == false) { 
+	
+	// add line numbers to the beginning of each line, in span tags
 	$x = 1;
 	$fx = explode("\n", trim( htmlspecialchars( $foutput ) ) );
 	$fcount = count($fx);

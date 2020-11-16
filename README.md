@@ -1,13 +1,13 @@
 # debuggr
 A single self-contained PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students. 
 
-The code includes very basic security options, such as simple password protection, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie.
+The code includes very basic security options, such as simple password protection, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
-
+---
 ## Installation and Use
 Whether you use the verbose or minified versions, installation is the same: upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
 
-Then, when you access file, add a parameter named "file" set to the filename (or pathname) of the file you want to read.Then
+Then, when you access file, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
 
 For example: this URL...
 
@@ -15,7 +15,7 @@ https://yourdomain.com/debuggr.php?file=readme.txt
 
 ...would read the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.)
 
-
+---
 ## Options
 There are several PHP variables to configure access and output.
 
