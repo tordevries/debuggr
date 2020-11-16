@@ -1,9 +1,10 @@
 <? 
 /*
 
-Debuggr version 0.94 by Tor de Vries -- verbose version
+Debuggr version 0.95 by Tor de Vries -- verbose version
 Updated 16 November 2020
 - Introduced verbose vs minified versions
+- Added $forceSSL option
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
 If you set a password below -- and you really, really should -- don't forget to tell your instructor.
@@ -22,6 +23,7 @@ $userEmail = ""; // put in your own email address
 
 $pagePassword = "477demo"; // set a password
 $passwordRequired = true; // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
+$forceSSL = true; // if true, redirects HTTP requests to HTTPS
 
 $accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
@@ -79,7 +81,7 @@ function fileMenu($dir = '.') {
 
 
 // for security, redirect to HTTPS if it's not HTTPS
-if (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], true, 301);
     die();
 }
