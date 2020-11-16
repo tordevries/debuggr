@@ -50,7 +50,7 @@ function findAllFiles($dir = '.') {
 	foreach ($cdir as $key => $value) {
 		if ( !in_array( $value, array(".", "..") ) ) {
 			 if ( is_dir($dir . DIRECTORY_SEPARATOR . $value) ) $result[$value] = findAllFiles( $dir . DIRECTORY_SEPARATOR . $value );
-			 else$result[] = $value;
+			 else $result[] = $value;
 		}
 	}
 	return $result;
