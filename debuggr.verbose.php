@@ -1,18 +1,19 @@
 <? 
 /*
 
-Debuggr version 0.95 by Tor de Vries -- verbose version
-Updated 16 November 2020
-- Introduced verbose vs minified versions
-- Added $forceSSL option
+Debuggr version 0.96 by Tor de Vries -- verbose version
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
 If you set a password below -- and you really, really should -- don't forget to tell your instructor.
 
 Copy this PHP code into a "debuggr.php" file in the root directory of your PHP coding, so your instructor can study your code.
-Then, just add "file=" and the name of a file to view its source code. 
+Then, just add "?file=" and the name of a file to view its source code. 
 
 Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
+
+Version 0.95 introduced minified vs. verbose versions.  The minified version uses these sites to minify the HTML, CSS, JS, and PHP:
+- https://www.willpeavy.com/tools/minifier/
+- https://php-minify.com 
 
 */
 
@@ -27,6 +28,7 @@ $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 
 $accessCurrentDirectoryOnly = true; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
+$preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
 $showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
@@ -80,6 +82,7 @@ function fileMenu($dir = '.') {
 }
 
 
+
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], true, 301);
@@ -90,6 +93,7 @@ if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 if ($passwordRequired && ($pagePassword == "")) {
 	die("ERROR: No password set.");
 }
+
 
 session_start();
 
@@ -175,7 +179,7 @@ else $foutput = file_get_contents( $fpassed );
 
 $c = 2; // indent
 
-if (!$foutput) {
+if (!$foutput || ($preventAccessToThisFile && ($fpassed == basename(__FILE__)))) {
 	$foutput = $noFile; // no file there, or it's completely empty
 	
 } else if ($isImage == false) { 
