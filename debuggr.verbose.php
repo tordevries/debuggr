@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.96 by Tor de Vries -- verbose version
+Debuggr version 0.961 by Tor de Vries -- verbose version
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
 If you set a password below -- and you really, really should -- don't forget to tell your instructor.
@@ -210,7 +210,7 @@ if ($_REQUEST["method"] == "ajax") {
 	<script>
 		
 		darkModeOn = <?= $startInDarkMode; ?>;
-		baseFile = "<?= $_REQUEST["file"] ?>";
+		baseFile = "<?= $fpassed; ?>";
 		
 		function toggleNums() {
 			document.getElementById('code').classList.toggle('gone');
@@ -224,9 +224,9 @@ if ($_REQUEST["method"] == "ajax") {
 		function selectCode() {
 			if (document.getElementById('btnToggle').innerHTML == "HIDE #s") toggleNums();
 			var r = document.createRange();
-			var w=document.getElementById("code");  
+			var w = document.getElementById("code");  
 			r.selectNodeContents(w);  
-			var sel=window.getSelection(); 
+			var sel = window.getSelection(); 
 			sel.removeAllRanges(); 
 			sel.addRange(r);
 		}
