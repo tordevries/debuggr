@@ -4,7 +4,7 @@
 Debuggr version 0.961 by Tor de Vries -- verbose version
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
-If you set a password below -- and you really, really should -- don't forget to tell your instructor.
+If you set a password below -- and you really, really should -- don't forget to tell your instructor!!!
 
 Copy this PHP code into a "debuggr.php" file in the root directory of your PHP coding, so your instructor can study your code.
 Then, just add "?file=" and the name of a file to view its source code. 
@@ -214,11 +214,8 @@ if ($_REQUEST["method"] == "ajax") {
 		
 		function toggleNums() {
 			document.getElementById('code').classList.toggle('gone');
-			if (document.getElementById('btnToggle').innerHTML == "Show Line #s") {
-				document.getElementById('btnToggle').innerHTML = "Hide Line #s";
-			} else {
-				document.getElementById('btnToggle').innerHTML = "Show Line #s";
-			}
+			if (document.getElementById('btnToggle').innerHTML == "Show Line #s") document.getElementById('btnToggle').innerHTML = "Hide Line #s";
+			else document.getElementById('btnToggle').innerHTML = "Show Line #s";
 		}
 		
 		function selectCode() {
@@ -250,12 +247,10 @@ if ($_REQUEST["method"] == "ajax") {
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
 						document.getElementById("code").innerHTML = this.responseText;
-						
 						baseFile = fileToLoad;
 						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
 						window.history.pushState( {}, "", historyURL);
 						document.querySelector("#filename span").innerHTML = fileToLoad;
-						
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						document.getElementById("code").innerHTML = "<?= $noFile; ?>";
 						console.log("Error: " + this.responseText);
@@ -264,6 +259,20 @@ if ($_REQUEST["method"] == "ajax") {
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad + "&method=ajax";
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
+		}
+		
+		function copyLineNumbers() {
+			document.getElementById("codeNums").innerHTML = "";
+			allNo = document.querySelectorAll("#code .no");
+			for (x=0; x < allNo.length; x++) {
+				copyNo = allNo[x].cloneNode(true);
+				document.getElementById("codeNums").appendChild(copyNo);
+				allNo[x].remove();
+			}
+		}
+		
+		window.onload = function() {
+			copyLineNumbers();
 		}
 		
 	</script>
@@ -328,7 +337,20 @@ if ($_REQUEST["method"] == "ajax") {
 			float: left;
 			width: 100vw;
 		}
-
+		
+		#codeNums {
+			position: relative;
+			width: 4rem;
+			overflow: auto;
+			z-index: 10000;
+		}
+		
+		#codeNums .no {
+			position: relative;
+			float: left;
+			clear: left;
+		}
+		
 		#code .no {
 			position: relative;
 			width: 0rem;
@@ -499,6 +521,7 @@ if ($_REQUEST["method"] == "ajax") {
 		<span id="logout"><? if ($passwordRequired) { ?><form method="POST"><input type="hidden" value="1" name="logout" id="logout"><button type="submit">Log Out</button></form><? } ?></span>
 		<span id="user"><a href="mailto:<?= $userEmail; ?>"><button>Email</button></a></span>
 	</div>
+	<div id="codeNums"></div>
 	<div id="code"><?= $foutput; ?></div>
 </body>
 </html>
