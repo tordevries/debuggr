@@ -388,20 +388,11 @@ if ($_REQUEST["method"] == "ajax") {
 
 		@media only print {
 			#nav {
-				position: relative;
-				bottom: auto;
-				top: 0;
-				width: 100%;
-				padding: 0;
-				color: #000;
-				border-bottom: 1px solid #000;
-			}
-			#nav a {
 				display: none;
 			}
-			#code {
-				position: relative;
-				display: inline;
+			#codeNums, #codeLines {
+				position: absolute;
+				overflow: visible;
 			}
 		}
 
