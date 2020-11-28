@@ -3,6 +3,8 @@ A single self-contained PHP file to support reading any text file on another's s
 
 The code includes very basic security options, such as simple password protection, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
+This is not compressed/minified. A compressed version was briefly offered, but as this was designed for use in a programming class, the verbose version is now the only version, for students interested in dissecting code.
+
 ---
 ## Installation and Use
 Whether you use the verbose or minified versions, installation is the same: upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
