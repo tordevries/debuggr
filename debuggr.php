@@ -222,14 +222,9 @@ if ($_REQUEST["method"] == "ajax") {
 		
 		// toggle visual dark/lite mode
 		function toggleVisualMode() {
-			if (darkModeOn) {
-				document.body.classList.remove("darkMode");
-				document.querySelector("#visualMode button").innerHTML = "Dark Mode";
-			} else {
-				document.body.classList.add("darkMode");
-				document.querySelector("#visualMode button").innerHTML = "Lite Mode";
-			}
-			darkMode = !darkMode;
+			if (darkModeOn) document.body.classList.remove("darkMode");
+			else document.body.classList.add("darkMode");
+			darkModeOn = !darkModeOn;
 		}
 	
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
@@ -275,17 +270,22 @@ if ($_REQUEST["method"] == "ajax") {
 			for (x=0; x<allLI.length; x++) {
 				allLI[x].classList.remove("showSub");
 			}
+			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
+		
+		<? if ($passwordRequired) { ?>
+		function logout() { document.getElementById("logoutForm").submit(); }
+		<? } ?>
 		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
 			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
 			
-			document.getElementById("codeLines").onscroll = function() {
-				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop;
-			}
+			document.getElementById("codeLines").onscroll = function() { document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; }
 			
-<? if ($showFilesMenu) { ?>			
+			document.querySelector("#optionsNav li").onclick = function() { this.closest("li").classList.toggle("showSub"); }
+			
+<? if ($showFilesMenu) { ?>
 			// set file menu to open on click, not just hover
 			allLI = document.querySelectorAll("#filenav li");
 			for (x=0; x<allLI.length; x++) {
@@ -345,14 +345,7 @@ if ($_REQUEST["method"] == "ajax") {
 
 		#nav span a {
 			color: #ddd;
-		}
-
-		#nav span#user,
-		#nav span#reload,
-		#nav span#logout,
-		#nav span#visualMode {
-			float: right;
-			margin: 0 0 0 20px;
+			text-decoration: none;
 		}
 		
 		#codeNums {
@@ -418,11 +411,46 @@ if ($_REQUEST["method"] == "ajax") {
 				overflow: visible;
 			}
 		}
+		
+		#optionsNav {
+			float: right;
+			overflow: visible;
+		}
+		
+		#optionsNav a {
+			display: block;
+			padding: 0.2rem 2rem 0.2rem 0.5rem;
+			font-size: 0.8rem;
+			text-decoration: none;
+			color: #000000;
+		}
+		
+		#optionsNav a:hover {
+			background-color: #ddd;
+		}
+		
+		#optionsNav ul {
+			display: none;
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			z-index: 100;
+			overflow: visible;
+		}
+		
+		#optionsNav li.showSub ul,
+		#optionsNav li:hover ul {
+			display: block;
+			position: absolute;
+			bottom: 35px;
+			right: 0px;
+		}
 
 <? if ($showFilesMenu) { ?>
 		
 		#filenav {
-			overflow: auto;
 			float: left;
 			z-index: 100;
 			padding-right: 1rem;
@@ -498,7 +526,7 @@ if ($_REQUEST["method"] == "ajax") {
 		#filenav li.showSub ul {
 			display: block;
 			position: absolute;
-			bottom: 30px;
+			bottom: 35px;
 		}
 
 		#filenav li:hover li:hover,
@@ -534,13 +562,19 @@ if ($_REQUEST["method"] == "ajax") {
 	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
 	<div id="nav">
 		<? if ($showFilesMenu) echo fileMenu(); ?>
-		<span id="filename"><span><?= $fpassed; ?></span> <button onclick="loadFile();">Reload</button> <button onclick="window.open(baseFile);">Open</button></span>
-		<? if ($foutput != $noFile) { ?>
-			<span id="stats"><button id="btnToggle" onclick="toggleNums();">Toggle Line #s</button> <button onclick="selectCode()">Select Code</button></span>
-		<? } ?>
-		<span id="visualMode"><button onclick="toggleVisualMode()"><? if ($startInDarkMode) { ?>Lite<? } else { ?>Dark<? } ?> Mode</button></span>
-		<span id="logout"><? if ($passwordRequired) { ?><form method="POST"><input type="hidden" value="1" name="logout" id="logout"><button type="submit">Log Out</button></form><? } ?></span>
-		<span id="user"><a href="mailto:<?= $userEmail; ?>"><button>Email</button></a></span>
+		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a title="Reload File" href="javascript:loadFile();">&#8635;</a> <a title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
+		<? if ($foutput != $noFile) { ?><span id="stats"><button id="btnToggle">Toggle Line #s</button> <button onclick="selectCode()">Select Code</button></span><? } ?>
+		<ul id="optionsNav">
+			<li>&#9776;
+				<ul>
+					<li><a href="javascript:toggleNums();">Toggle Line Numbers</a></li>
+					<li><a href="javascript:toggleVisualMode()">Toggle Dark Mode</a></li>
+					<li><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
+					<? if ($passwordRequired) { ?><li><a href="javascript:logout()">Log Out</a></li><? } ?>
+				</ul>
+			</li>
+		</ul>
 	</div>
+	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
 </html>
