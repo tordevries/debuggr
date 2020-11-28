@@ -25,7 +25,7 @@ $accessCurrentDirectoryOnly = false; // if true, restricts access to only files 
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
-$showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
+$showFilesMenu = true; // if true, will show a "Files" menu that links to files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
 
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
@@ -169,7 +169,7 @@ $fpassed = $_REQUEST["file"];
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed);
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
 
-if ($fpassed == "") {
+if (!file_exists($fpassed)) {
 	$foutput = $noFile;
 	
 } else {
@@ -202,8 +202,8 @@ if ($_REQUEST["method"] == "ajax") {
 	<script>
 		
 		// pass in some PHP variables
-		darkModeOn = <?= $startInDarkMode; ?>;
 		baseFile = "<?= $fpassed; ?>";
+		darkModeOn = <?= $startInDarkMode; ?>;
 		
 		// toggle the numbers using CSS and changing the button
 		function toggleNums() {
@@ -239,9 +239,9 @@ if ($_REQUEST["method"] == "ajax") {
 						codeLinesPre.innerHTML = this.responseText;
 						prepLineNumbers(this.responseText.split("\n").length);
 						baseFile = fileToLoad;
+						document.querySelector("#filename span").innerHTML = fileToLoad;
 						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
 						window.history.pushState( {}, "", historyURL);
-						document.querySelector("#filename span").innerHTML = fileToLoad;
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						codeLinesPre.innerHTML = "<?= $noFile; ?>";
 						console.log("AJAX error: " + this.responseText);
@@ -282,8 +282,6 @@ if ($_REQUEST["method"] == "ajax") {
 			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
 			
 			document.getElementById("codeLines").onscroll = function() { document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; }
-			
-			document.querySelector("#optionsNav li").onclick = function() { this.closest("li").classList.toggle("showSub"); }
 			
 <? if ($showFilesMenu) { ?>
 			// set file menu to open on click, not just hover
@@ -332,20 +330,25 @@ if ($_REQUEST["method"] == "ajax") {
 			bottom: 0;
 			left: 0;
 			width: 100vw;
-			font-size: 18px;
 			height: 44px;
-			padding: 8px;
+			padding: 10px;
 			z-index: 100;
 			overflow: visible;
 		}
 
 		#nav span {
-			margin-right: 50px;
+			margin-right: 10px;
 		}
 
 		#nav span a {
 			color: #ddd;
 			text-decoration: none;
+		}
+		
+		a.uicon  {
+			font-size: 24px;
+			font-weight: bold;
+			vertical-align: middle;
 		}
 		
 		#codeNums {
@@ -417,12 +420,16 @@ if ($_REQUEST["method"] == "ajax") {
 			overflow: visible;
 		}
 		
-		#optionsNav a {
+		#optionsNav li a {
 			display: block;
 			padding: 0.2rem 2rem 0.2rem 0.5rem;
 			font-size: 0.8rem;
 			text-decoration: none;
-			color: #000000;
+			color: #fff;
+		}
+		
+		#optionsNav li ul li a {
+			color: #000;
 		}
 		
 		#optionsNav a:hover {
@@ -562,9 +569,9 @@ if ($_REQUEST["method"] == "ajax") {
 	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
 	<div id="nav">
 		<? if ($showFilesMenu) echo fileMenu(); ?>
-		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a title="Reload File" href="javascript:loadFile();">&#8635;</a> <a title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
+		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload File" href="javascript:loadFile();">&#8635;</a> <a class="uicon"  title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
 		<ul id="optionsNav">
-			<li>&#9776;
+			<li><a class="uicon" href="javascript:this.closest('li').classList.toggle('showSub');">&#9776;</a>
 				<ul>
 					<? if ($foutput != $noFile) { ?><li><a href="javascript:selectCode()">Select All Code</a></li>
 					<li><a href="javascript:toggleNums();">Toggle Line Numbers</a></li><? } ?>
