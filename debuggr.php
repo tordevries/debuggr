@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.971 by Tor de Vries
+Debuggr version 0.972 by Tor de Vries
 
 For more info, see https://github.com/tordevries/debuggr
 
