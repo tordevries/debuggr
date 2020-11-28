@@ -1,12 +1,11 @@
 <? 
 /*
 
-Debuggr version 0.97 by Tor de Vries -- verbose version
+Debuggr version 0.971 by Tor de Vries
 
-A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
-If you set a password below -- and you really, really should -- don't forget to tell your instructor!!!
+For more info, see https://github.com/tordevries/debuggr
 
-Copy this PHP code into a "debuggr.php" file in the root directory of your PHP coding, so your instructor can study your code.
+Copy this PHP code into a "debuggr.php" file in the root directory of your PHP coding so others can study your code.
 Then, just add "?file=" and the name of a file to view its source code. 
 
 Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
