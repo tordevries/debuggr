@@ -21,7 +21,7 @@ $pagePassword = "477demo"; // set a password
 $passwordRequired = true; // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 
-$accessCurrentDirectoryOnly = true; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
+$accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
@@ -234,6 +234,7 @@ if ($_REQUEST["method"] == "ajax") {
 	
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
 		function loadFile(fileToLoad = baseFile) {
+			closeFileMenu();
 			codeLinesPre = document.querySelector("#codeLines pre");
 			codeLinesPre.innerHTML = "Loading...";
 			document.querySelector("#codeNums pre").innerHTML = "";
@@ -269,12 +270,35 @@ if ($_REQUEST["method"] == "ajax") {
 			codeNumsPre.innerHTML = outputLines;
 		}
 		
+		function closeFileMenu() {
+			allLI = document.querySelectorAll("#filenav li");
+			for (x=0; x<allLI.length; x++) {
+				allLI[x].classList.remove("showSub");
+			}
+		}
+		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
 			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
+			
 			document.getElementById("codeLines").onscroll = function() {
 				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop;
 			}
+			
+<? if ($showFilesMenu) { ?>			
+			// set file menu to open on click, not just hover
+			allLI = document.querySelectorAll("#filenav li");
+			for (x=0; x<allLI.length; x++) {
+				allLI[x].onclick = function(event) {
+					this.classList.toggle("showSub");
+					event.stopPropagation();
+				}
+			}
+			
+			document.getElementById("codeLines").onclick = function() { closeFileMenu(); }
+			document.getElementById("codeNums").onclick = function() { closeFileMenu(); }
+<? } // end PHP if $showFilesMenu ?>	
+			
 		}		
 		
 	</script>
@@ -404,6 +428,7 @@ if ($_REQUEST["method"] == "ajax") {
 			padding-right: 1rem;
 			margin-right: 1rem;
 			border-right: 1px solid #fff;
+			overflow: visible;
 		}
 
 		#filenav a {
@@ -425,6 +450,7 @@ if ($_REQUEST["method"] == "ajax") {
 			background-color: #fff;
 			border: 1px solid #ccc;
 			z-index: 100;
+			overflow: visible;
 		}
 		
 		#filenav ul ul {
@@ -435,6 +461,7 @@ if ($_REQUEST["method"] == "ajax") {
 			float: left;
 			width: 100%;
 			white-space: nowrap;
+			overflow: visible;
 		}
 		
 		#filenav li.hasSub::before {
@@ -461,32 +488,38 @@ if ($_REQUEST["method"] == "ajax") {
 		}
 
 		#filenav ul,
-		#filenav li:hover ul ul {
+		#filenav li:hover ul ul,
+		#filenav li.showSub ul ul {
 			display: none;
 			position: absolute;
 		}
 
-		#filenav li:hover ul {
+		#filenav li:hover ul,
+		#filenav li.showSub ul {
 			display: block;
 			position: absolute;
 			bottom: 30px;
 		}
 
-		#filenav li:hover li:hover {
+		#filenav li:hover li:hover,
+		#filenav li.showSub li.showSub {
 			position: relative;			
 		}
 		
-		#filenav li:hover li:hover ul {
+		#filenav li:hover li:hover ul,
+		#filenav li.showSub li.showSub ul {
 			display: block;
 			left: 100%;
 			bottom: 0;
 		}
 		
-		#filenav li:hover li:hover ul ul {
+		#filenav li:hover li:hover ul ul,
+		#filenav li.showSub li.showSub ul ul {
 			display: none;
 		}
 
-		#filenav li:hover li:hover li:hover ul {
+		#filenav li:hover li:hover li:hover ul,
+		#filenav li.showSub li.showSub li.showSub ul {
 			display: block;
 			left: 100%;
 			bottom: 0;
