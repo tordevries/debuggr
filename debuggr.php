@@ -563,11 +563,11 @@ if ($_REQUEST["method"] == "ajax") {
 	<div id="nav">
 		<? if ($showFilesMenu) echo fileMenu(); ?>
 		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a title="Reload File" href="javascript:loadFile();">&#8635;</a> <a title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
-		<? if ($foutput != $noFile) { ?><span id="stats"><button id="btnToggle">Toggle Line #s</button> <button onclick="selectCode()">Select Code</button></span><? } ?>
 		<ul id="optionsNav">
 			<li>&#9776;
 				<ul>
-					<li><a href="javascript:toggleNums();">Toggle Line Numbers</a></li>
+					<? if ($foutput != $noFile) { ?><li><a href="javascript:selectCode()">Select All Code</a></li>
+					<li><a href="javascript:toggleNums();">Toggle Line Numbers</a></li><? } ?>
 					<li><a href="javascript:toggleVisualMode()">Toggle Dark Mode</a></li>
 					<li><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a href="javascript:logout()">Log Out</a></li><? } ?>
