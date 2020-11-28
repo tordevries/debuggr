@@ -1,7 +1,7 @@
 # debuggr
 A single self-contained PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students. 
 
-The code includes very basic security options, such as simple password protection, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
+The code includes very basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
 This is not compressed/minified. A compressed version was briefly offered, but as this was designed for use in a programming class, the verbose version is now the only version, for students interested in dissecting code.
 
