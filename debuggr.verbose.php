@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.961 by Tor de Vries -- verbose version
+Debuggr version 0.97 by Tor de Vries -- verbose version
 
 A self-contained file of PHP, HTML, CSS, and JavaScript to enable reading of code files remotely.
 If you set a password below -- and you really, really should -- don't forget to tell your instructor!!!
@@ -10,10 +10,6 @@ Copy this PHP code into a "debuggr.php" file in the root directory of your PHP c
 Then, just add "?file=" and the name of a file to view its source code. 
 
 Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
-
-Version 0.95 introduced minified vs. verbose versions.  The minified version uses these sites to minify the HTML, CSS, JS, and PHP:
-- https://www.willpeavy.com/tools/minifier/
-- https://php-minify.com 
 
 */
 
@@ -44,7 +40,7 @@ $startInDarkMode = true; // true to start in dark mode by default; false to star
 // ********************************************************************************
 
 
-// return multidimensional array of files/folders in local directory; 
+// a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
 function findAllFiles($dir = '.') { 
 	$result = array();
@@ -75,13 +71,12 @@ function buildFileMenu($arr, $path = "") {
 	return $result;
 }
 
+// create a file menu
 function fileMenu($dir = '.') {
 	$list = findAllFiles($dir);
-	$listHTML = "<ul id='filenav'><li>Files &Hat;" . buildFileMenu($list) . "</li></ul>";
+	$listHTML = "<ul id='filenav'><li>Files &#9650;" . buildFileMenu($list) . "</li></ul>";
 	return $listHTML;
 }
-
-
 
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
@@ -94,7 +89,7 @@ if ($passwordRequired && ($pagePassword == "")) {
 	die("ERROR: No password set.");
 }
 
-
+// we're using sessions, so let's go
 session_start();
 
 // has a logout command been passed?
@@ -106,25 +101,27 @@ if ($_POST["logout"]) {
 }
 
 // for security, if the session is not authorized, show login form if necessary, or check submitted password
-if ($passwordRequired && !$_SESSION["authorized"]) {
+if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] != $pagePassword))) {
+	
 	if ($_REQUEST["method"] == "ajax") {
 		die(); // if they're not calling from an authorized session, ajax returns nothing
 	}
+	
 	if ($_POST["pwd"] == $pagePassword) {
-		$_SESSION["authorized"] = true; // if a valid password has been passed, authorize the session
+		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
 		
 	} else {
 		
-		// needs authorization, so show the login page
+		// needs new authorization, so show the login page
 		
-?><!DOCTYPE html>
+		?><!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
 	<title>Debuggr: Log In</title>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
-		
+
 		* {
 			font-family: 'Source Code Pro', monospace;
 			margin: 0;
@@ -140,14 +137,12 @@ if ($passwordRequired && !$_SESSION["authorized"]) {
 			justify-content: center;
 		}
 
-		input,
-		button {
+		input, button {
 			padding: 4px;
 		}
 		
 	</style>
 </head>
-
 <body>
 	<div id="pageBox">
 		<div>
@@ -160,44 +155,39 @@ if ($passwordRequired && !$_SESSION["authorized"]) {
 </body>
 </html>
 <?
-		die();
+		die(); // end processing
 	}
 }
 
 // didn't need a login, so let's proceed
 
-$noFile = "<div class='ro'><span class='no'>000:</span><span class='co'>Nothing found.</span></div>"; // error to output if the file does not exist or is empty
+$noFile = "Nothing found."; // error to output if the file does not exist or is empty
 $fpassed = $_REQUEST["file"];
 
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed);
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
 
-// check if it's an image
-$isImage = getimagesize($fpassed);
-if ($isImage != false) $foutput = "<img src='" . $fpassed . "'>";
-else $foutput = file_get_contents( $fpassed );
-
-$c = 2; // indent
-
-if (!$foutput || ($preventAccessToThisFile && ($fpassed == basename(__FILE__)))) {
-	$foutput = $noFile; // no file there, or it's completely empty
+if ($fpassed == "") {
+	$foutput = $noFile;
 	
-} else if ($isImage == false) { 
-	
-	// add line numbers to the beginning of each line, in span tags
-	$x = 1;
-	$fx = explode("\n", trim( htmlspecialchars( $foutput ) ) );
-	$fcount = count($fx);
-	if ($fcount > 99) $c = 3;
-	if ($fcount > 999) $c = 4;
-	foreach($fx as &$fline) $fline = "<div class='ro'><span class='no'>" . str_pad($x++, $c, "0", STR_PAD_LEFT) . ":</span><span class='co'>" . $fline . "</span></div>";
-	$foutput = implode("\n", $fx);
+} else {
+
+	// check if it's an image
+	$isImage = getimagesize($fpassed);
+	if ($isImage != false) $foutput = "<img src='" . $fpassed . "'>";
+	else $foutput = file_get_contents( $fpassed );
+
+	if (!$foutput || ($preventAccessToThisFile && ($fpassed == basename(__FILE__)))) {
+		$foutput = $noFile; // no file there, or it's completely empty
+	} else if ($isImage == false) { 
+		$foutput = trim( htmlspecialchars( $foutput ) );
+	}
 }
 
 if ($_REQUEST["method"] == "ajax") {
 	die($foutput); // if the method is ajax, just return the content without the rest of the HTML, CSS, JS
 }
-	
+
 // if we got this far, output the whole page
 	
 ?><!DOCTYPE html>
@@ -209,51 +199,56 @@ if ($_REQUEST["method"] == "ajax") {
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
 	<script>
 		
+		// pass in some PHP variables
 		darkModeOn = <?= $startInDarkMode; ?>;
 		baseFile = "<?= $fpassed; ?>";
 		
+		// toggle the numbers using CSS and changing the button
 		function toggleNums() {
-			document.getElementById('code').classList.toggle('gone');
+			document.body.classList.toggle('linesOn');
 			if (document.getElementById('btnToggle').innerHTML == "Show Line #s") document.getElementById('btnToggle').innerHTML = "Hide Line #s";
 			else document.getElementById('btnToggle').innerHTML = "Show Line #s";
 		}
 		
+		// select the code
 		function selectCode() {
-			if (document.getElementById('btnToggle').innerHTML == "HIDE #s") toggleNums();
 			var r = document.createRange();
-			var w = document.getElementById("code");  
+			var w = document.getElementById("codeLines");  
 			r.selectNodeContents(w);  
 			var sel = window.getSelection(); 
 			sel.removeAllRanges(); 
 			sel.addRange(r);
 		}
 		
+		// toggle visual dark/lite mode
 		function toggleVisualMode() {
-			
 			if (darkModeOn) {
 				document.body.classList.remove("darkMode");
 				document.querySelector("#visualMode button").innerHTML = "Dark Mode";
-				darkModeOn = false;
 			} else {
 				document.body.classList.add("darkMode");
 				document.querySelector("#visualMode button").innerHTML = "Lite Mode";
-				darkModeOn = true;
 			}
+			darkMode = !darkMode;
 		}
 	
+		// use AJAX to load or reload files
 		function loadFile(fileToLoad = baseFile) {
-			document.getElementById("code").innerHTML = "<div class='ro'><span class='no'>000:</span><span class='co'>Loading...</span></div>";
+			codeLinesPre = document.querySelector("#codeLines pre");
+			codeLinesPre.innerHTML = "Loading...";
+			document.querySelector("#codeNums pre").innerHTML = "";
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
-						document.getElementById("code").innerHTML = this.responseText;
+						codeLinesPre.innerHTML = this.responseText;
 						baseFile = fileToLoad;
 						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
 						window.history.pushState( {}, "", historyURL);
 						document.querySelector("#filename span").innerHTML = fileToLoad;
+						prepLineNumbers(this.responseText.split("\n").length);
 					} else if ((this.readyState == 4) && (this.status != 200)) {
-						document.getElementById("code").innerHTML = "<?= $noFile; ?>";
-						console.log("Error: " + this.responseText);
+						codeLinesPre.innerHTML = "<?= $noFile; ?>";
+						console.log("AJAX error: " + this.responseText);
 					}
 			}
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad + "&method=ajax";
@@ -261,19 +256,26 @@ if ($_REQUEST["method"] == "ajax") {
 			ajax.send();
 		}
 		
-		function copyLineNumbers() {
-			document.getElementById("codeNums").innerHTML = "";
-			allNo = document.querySelectorAll("#code .no");
-			for (x=0; x < allNo.length; x++) {
-				copyNo = allNo[x].cloneNode(true);
-				document.getElementById("codeNums").appendChild(copyNo);
-				allNo[x].remove();
+		// output line numbers in #codeNums pre
+		function prepLineNumbers(numLines = 1) {
+			codeNumsPre = document.querySelector("#codeNums pre");
+			codeNumsPre.innerHTML = "";
+			outputLines = "";
+			padTo = numLines.toString().length + 1;
+			for (x=1; x<=numLines; x++) {
+				line = x + ":";
+				outputLines += line.padStart(padTo, "0") + "\n";
 			}
+			codeNumsPre.innerHTML = outputLines;
 		}
 		
+		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
-			copyLineNumbers();
-		}
+			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
+			document.getElementById("codeLines").onscroll = function() {
+				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop;
+			}
+		}		
 		
 	</script>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
@@ -286,19 +288,31 @@ if ($_REQUEST["method"] == "ajax") {
 			padding: 0;
 			box-sizing: border-box;
 			transition: background-color 0.25s, color 0.25s;
+			overflow: auto;
+		}
+		
+		body {
+			background-color: #eee;
+			color: #000;
+		}
+		
+		body.darkMode {
+			background-color: #222;
+			color: #fff;
 		}
 
 		#nav {
+			position: fixed;
 			background-color: #555;
 			color: #ddd;
-			position: fixed;
 			bottom: 0;
 			left: 0;
 			width: 100vw;
 			font-size: 18px;
 			height: 44px;
 			padding: 8px;
-			z-index: 10;
+			z-index: 100;
+			overflow: visible;
 		}
 
 		#nav span {
@@ -316,76 +330,57 @@ if ($_REQUEST["method"] == "ajax") {
 			float: right;
 			margin: 0 0 0 20px;
 		}
-
-		#code {
-			position: absolute;
-			overflow: auto;
-			width: 100vw;
-			height: calc(100vh - 44px);
-			white-space: pre;
-			padding: 0.5rem;
-			z-index: 5;
-		}
-		
-		body.darkMode #code {
-			background-color: #222;
-			color: #fff;
-		}
-
-		#code .ro {
-			position: relative;
-			float: left;
-			width: 100vw;
-		}
 		
 		#codeNums {
-			position: relative;
-			width: 4rem;
-			overflow: auto;
-			z-index: 10000;
-		}
-		
-		#codeNums .no {
-			position: relative;
-			float: left;
-			clear: left;
-		}
-		
-		#code .no {
-			position: relative;
-			width: 0rem;
-			background-color: #fff;
-			color: #aaa;
+			position: fixed;
+			top: 0;
+			left: -4rem;
+			width: 3.75rem;
+			height: calc(100vh - 44px);
 			font-weight: 300;
-			display: inline-block;
-			margin-left 0.5rem;
 			overflow: hidden;
-			transition: width 0.5s, background-color 0.25s, color 0.25s;
+			text-align: right;
+			color: #04717a;
+			transition: left 0.5s;
+			z-index: 1;
 		}
 		
-		body.darkMode #code .no {
-			background-color: #222;
+		body.linesOn #codeNums {
+			left: 0.25rem;
+		}
+		
+		body.darkMode #codeNums {
+			color: #a9e3e8;
+		}
+		
+		#codeLines {
+			position: absolute;
+			top: 0;
+			left: 0.25rem;
+			height: calc(100vh - 44px);
+			width: 100vw;
+			overflow: scroll;
+			transition: left 0.5s, width 0.5s;
+			z-index: 1;
+		}
+		
+		body.linesOn #codeLines {
+			left: 4.25rem;
+			width: calc(100vw - 4.25rem);
 		}
 
-		#code.gone .no {
-			width: 4rem;
-		}
-
-		#code .co {
-			position: relative;
-			display: inline-block;
-			overflow: hidden;
-			margin: 0 5vw 0 0.5vw;
-		}
-
-		#code img {
+		#codeLines img {
 			position: absolute;
 			top: 0;
 			left: 0;
 		}
 		
-		input,
-		button {
+		#codeNums, #codeLines {
+			font-size: 100%;
+			line-height: 140%;
+		}
+		
+		input, button {
 			padding: 4px;
 			text-transform: uppercase;
 		}
@@ -414,7 +409,7 @@ if ($_REQUEST["method"] == "ajax") {
 		#filenav {
 			overflow: auto;
 			float: left;
-			z-index: 10;
+			z-index: 100;
 			padding-right: 1rem;
 			margin-right: 1rem;
 			border-right: 1px solid #fff;
@@ -438,7 +433,7 @@ if ($_REQUEST["method"] == "ajax") {
 			padding: 0;
 			background-color: #fff;
 			border: 1px solid #ccc;
-			z-index: 10;
+			z-index: 100;
 		}
 		
 		#filenav ul ul {
@@ -511,17 +506,17 @@ if ($_REQUEST["method"] == "ajax") {
 	</style>
 </head>
 <body class="linesOn <? if ($startInDarkMode) { ?>darkMode<? } ?>">
+	<div id="codeNums"><pre></pre></div>
+	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
 	<div id="nav">
 		<? if ($showFilesMenu) echo fileMenu(); ?>
 		<span id="filename"><span><?= $fpassed; ?></span> <button onclick="loadFile();">Reload</button> <button onclick="window.open(baseFile);">Open</button></span>
 		<? if ($foutput != $noFile) { ?>
-			<span id="stats"><button id="btnToggle" onclick="toggleNums();">Show Line #s</button> <button onclick="selectCode()">Select Code</button></span>
+			<span id="stats"><button id="btnToggle" onclick="toggleNums();">Hide Line #s</button> <button onclick="selectCode()">Select Code</button></span>
 		<? } ?>
 		<span id="visualMode"><button onclick="toggleVisualMode()"><? if ($startInDarkMode) { ?>Lite<? } else { ?>Dark<? } ?> Mode</button></span>
 		<span id="logout"><? if ($passwordRequired) { ?><form method="POST"><input type="hidden" value="1" name="logout" id="logout"><button type="submit">Log Out</button></form><? } ?></span>
 		<span id="user"><a href="mailto:<?= $userEmail; ?>"><button>Email</button></a></span>
 	</div>
-	<div id="codeNums"></div>
-	<div id="code"><?= $foutput; ?></div>
 </body>
 </html>
