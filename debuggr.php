@@ -29,8 +29,8 @@ $showFilesMenu = false; // if true, will show a "Files" menu that links to files
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
 
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
-$startWithLinesOn = true; // true to start with the line numbers visible
-$showDebuggrLink = false; // true to include a link to Debuggr on Github in the options menu
+$startWithLinesOn = false; // true to start with the line numbers visible
+$showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
 
 
 // ********************************************************************************
@@ -210,13 +210,33 @@ if ($_REQUEST["method"] == "ajax") {
 		
 		// pass in some PHP variables
 		baseFile = "<?= $fpassed; ?>";
-		darkModeOn = <?= $startInDarkMode; ?>;
+		lineNumbersOn = <?= json_encode($startWithLinesOn); ?>;
+		darkModeOn = <?= json_encode($startInDarkMode); ?>;
 		
 		// toggle the numbers using CSS and changing the button
 		function toggleNums() {
-			document.body.classList.toggle('linesOn');
+			if (lineNumbersOn) {
+				document.body.classList.remove('linesOn');
+				document.querySelector("#optLineNumbers span").innerHTML = "&nbsp;";
+			} else {
+				document.body.classList.add('linesOn');
+				document.querySelector("#optLineNumbers span").innerHTML = "&check;";
+			}
+			lineNumbersOn = !lineNumbersOn;
 		}
 		
+		// toggle visual dark/lite mode
+		function toggleVisualMode() {
+			if (darkModeOn) {
+				document.body.classList.remove("darkMode");
+				document.querySelector("#optDarkMode span").innerHTML = "&nbsp;";
+			} else {
+				document.body.classList.add("darkMode");
+				document.querySelector("#optDarkMode span").innerHTML = "&check;";
+			}
+			darkModeOn = !darkModeOn;
+		}
+
 		// select the code text 
 		function selectCode() {
 			var r = document.createRange();
@@ -227,13 +247,6 @@ if ($_REQUEST["method"] == "ajax") {
 			sel.addRange(r);
 		}
 		
-		// toggle visual dark/lite mode
-		function toggleVisualMode() {
-			if (darkModeOn) document.body.classList.remove("darkMode");
-			else document.body.classList.add("darkMode");
-			darkModeOn = !darkModeOn;
-		}
-	
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
 		function loadFile(fileToLoad = baseFile) {
 			closeMenus();
@@ -474,6 +487,13 @@ if ($_REQUEST["method"] == "ajax") {
 			right: 0;
 		}
 		
+		#optionsNav li span {
+			color: green;
+			font-weight: bold;
+			font-size: 90%;
+			margin-top: -2px;
+		}
+		
 		a#menuIcon {
 			text-align: right;
 			font-size: 18px;
@@ -589,12 +609,12 @@ if ($_REQUEST["method"] == "ajax") {
 		<ul id="optionsNav">
 			<li><a id="menuIcon">&#9776;</a>
 				<ul>
-					<li><a href="javascript:selectCode()">Select All Code</a>
-					<li class="menuLine"><a href="javascript:toggleNums();">Toggle Line Numbers</a></li>
-					<li><a href="javascript:toggleVisualMode()">Toggle Dark Mode</a></li>
-					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
-					<? if ($passwordRequired) { ?><li><a href="javascript:logout()">Log Out</a></li><? } ?>
-					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank">Debuggr Info</a></li><? } ?>
+					<li><a href="javascript:selectCode()"><span>&nbsp;</span> Select All Code</a>
+					<li id="optDarkMode" class="menuLine"><a href="javascript:toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
+					<li id="optLineNumbers"><a href="javascript:toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
+					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
+					<? if ($passwordRequired) { ?><li><a href="javascript:logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
+					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr Info</a></li><? } ?>
 				</ul>
 			</li>
 		</ul>
