@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.98 by Tor de Vries
+Debuggr version 0.981 by Tor de Vries
 
 For more info, see https://github.com/tordevries/debuggr
 
@@ -25,11 +25,12 @@ $accessCurrentDirectoryOnly = false; // if true, restricts access to only files 
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
-$showFilesMenu = true; // if true, will show a "Files" menu that links to files in the current directory
+$showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
 
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
 $startWithLinesOn = true; // true to start with the line numbers visible
+$showDebuggrLink = false; // true to include a link to Debuggr on Github in the options menu
 
 
 // ********************************************************************************
@@ -56,25 +57,29 @@ function findAllFiles($dir = '.') {
 }
 
 // a recursive function to build a hierarchical <ul> menu of files from the array produced in findAllFiles();
-function buildFileMenu($arr, $path = "") {
-	global $accessCurrentDirectoryOnly;
+function buildFileMenu($arr = null, $path = "", $depth = 0) {
+	global $accessCurrentDirectoryOnly, $showFilesMenu;
 	$result = "<ul>";
-	foreach($arr as $key => $value) {
-		if ( is_numeric($key) ) {
-			$result .=	"<li><a onclick='loadFile(\"" . $path . $value . "\")'>" . $value . "</a></li>\n";
-		} else if (!$accessCurrentDirectoryOnly) {
-			$result .=	"<li class='hasSub'><a>" . $key . "</a>";
-			$result .= buildFileMenu($value, ($path . $key . DIRECTORY_SEPARATOR) );
-			$result .= 	"</li>\n";
+	if (!is_null($arr)) {
+		foreach($arr as $key => $value) {
+			if ( is_numeric($key) ) {
+				$result .=	"<li><a onclick='loadFile(\"" . $path . $value . "\")'>" . $value . "</a></li>\n";
+			} else if (!$accessCurrentDirectoryOnly) {
+				$result .=	"<li class='hasSub'><a>" . $key . "</a>";
+				$result .= buildFileMenu($value, ($path . $key . DIRECTORY_SEPARATOR), 1 );
+				$result .= 	"</li>\n";
+			}
 		}
 	}
-	$result .= "<li class='menuLine'><a onclick='openFile();'>Open File...</a></ul>\n";
+	if ($depth == 0) $result .= "<li class='" . ($showFilesMenu ? "menuLine" : "") . "'><a onclick='openFile();'>Open File...</a></li>";
+	$result .= "</ul>";
 	return $result;
 }
 
 // create an unordered list CSS-based file menu
 function fileMenu($dir = '.') {
-	$list = findAllFiles($dir);
+	global $showFilesMenu;
+	if ($showFilesMenu) $list = findAllFiles($dir);
 	$listHTML = "<ul id='fileNav'><li>&#128196;" . buildFileMenu($list) . "</li></ul>";
 	return $listHTML;
 }
@@ -231,7 +236,7 @@ if ($_REQUEST["method"] == "ajax") {
 	
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
 		function loadFile(fileToLoad = baseFile) {
-			closeFileMenu();
+			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
 			codeLinesPre.innerHTML = "Loading...";
 			document.querySelector("#codeNums pre").innerHTML = "";
@@ -259,31 +264,25 @@ if ($_REQUEST["method"] == "ajax") {
 		function prepLineNumbers(numLines) {
 			codeNumsPre = document.querySelector("#codeNums pre");
 			codeNumsPre.innerHTML = "";
-			if (numLines > 1) {
-				outputLines = "";
-				padTo = numLines.toString().length + 1;
-				for (x=1; x<=numLines; x++) {
-					line = x + ":";
-					outputLines += line.padStart(padTo, "0") + "\n";
-				}
-				codeNumsPre.innerHTML = outputLines;
-				document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
-
-			} else {
-				document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: 0rem; } body.linesOn #codeLines { width: calc(100vw - 0.25rem); left: 0.25rem; }";
+			outputLines = "";
+			padTo = numLines.toString().length + 1;
+			for (x=1; x<=numLines; x++) {
+				line = x + ":";
+				outputLines += line.padStart(padTo, "0") + "\n";
 			}
+			codeNumsPre.innerHTML = outputLines;
+			document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
 		}
 		
 		function openFile() {
-			closeFileMenu();
-			toOpen = window.prompt("Enter a filename and path:","");
-			console.log("toOpen: " + toOpen);
+			closeMenus();
+			toOpen = window.prompt("Enter a filename and path:", baseFile);
 			if ((toOpen != "") && (toOpen !== null)) {
 				loadFile(toOpen);
 			}
 		}
-		
-		function closeFileMenu() {
+
+		function closeMenus() {
 			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) {
 				allLI[x].classList.remove("showSub");
@@ -291,22 +290,19 @@ if ($_REQUEST["method"] == "ajax") {
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
-		<? if ($passwordRequired) { ?>
 		function logout() { document.getElementById("logoutForm").submit(); }
-		<? } ?>
 		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
 			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
-			
-			document.getElementById("codeLines").onscroll = function() { document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; }
-			
+			document.getElementById("codeLines").onscroll = function() { 
+				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; 
+			}
 			document.querySelector('#optionsNav li').onclick = function() { 
-				closeFileMenu(); 
+				closeMenus();
 				document.querySelector('#optionsNav li').classList.toggle('showSub');
 			}
 			
-<? if ($showFilesMenu) { ?>
 			// set file menu to open on click, not just hover
 			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) {
@@ -316,19 +312,17 @@ if ($_REQUEST["method"] == "ajax") {
 					event.stopPropagation();
 				}
 			}
-			
-			document.getElementById("codeLines").onclick = function() { closeFileMenu(); }
-			document.getElementById("codeNums").onclick = function() { closeFileMenu(); }
-<? } // end PHP if $showFilesMenu ?>	
-			
+						
+			document.getElementById("codeLines").onclick = function() { closeMenus(); }
+			document.getElementById("codeNums").onclick = function() { closeMenus(); }
+
 		}		
 		
 	</script>
-	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
 		
 		* {
-			font-family: 'Source Code Pro', monospace;
+			font-family: monospace;
 			tab-size: 3;
 			margin: 0;
 			padding: 0;
@@ -421,7 +415,7 @@ if ($_REQUEST["method"] == "ajax") {
 		
 		#codeNums, #codeLines {
 			font-size: 100%;
-			line-height: 140%;
+			line-height: 150%;
 		}
 		
 		input, button {
@@ -490,8 +484,6 @@ if ($_REQUEST["method"] == "ajax") {
 			margin-top: 4px;
 			border-top: 1px solid #ccc;
 		}
-
-<? if ($showFilesMenu) { ?>
 		
 		#fileNav {
 			float: left;
@@ -588,22 +580,21 @@ if ($_REQUEST["method"] == "ajax") {
 			bottom: 0;
 		}
 		
-<? } // end CSS file menu check ?>
-		
 	</style>
 </head>
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">
-		<? if ($showFilesMenu) echo fileMenu(); ?>
+		<?= fileMenu(); ?>
 		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload file" href="javascript:loadFile();">&#8635;</a> <a class="uicon"  title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
 		<ul id="optionsNav">
 			<li><a id="menuIcon">&#9776;</a>
 				<ul>
-					<? if ($foutput != $noFile) { ?><li><a href="javascript:selectCode()">Select All Code</a></li>
-					<li class="menuLine"><a href="javascript:toggleNums();">Toggle Line Numbers</a></li><? } ?>
+					<li><a href="javascript:selectCode()">Select All Code</a>
+					<li class="menuLine"><a href="javascript:toggleNums();">Toggle Line Numbers</a></li>
 					<li><a href="javascript:toggleVisualMode()">Toggle Dark Mode</a></li>
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a href="javascript:logout()">Log Out</a></li><? } ?>
+					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank">Debuggr Info</a></li><? } ?>
 				</ul>
 			</li>
 		</ul>

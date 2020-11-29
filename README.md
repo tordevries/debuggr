@@ -55,12 +55,13 @@ A Boolean value which, if true, will start the UI in dark mode by default, rathe
 #### startWithLinesOn
 A Boolean value which, if true, will start with the line numbers showing on the left, rather than hidden. The default is true.
 
+#### $showDebuggrLink
+A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
+
 ---
 ## Future Features
 
 Here are a few of the ideas on the future radar:
-- **Better nav bar interface.** It's not particularly pretty, though it works for now.
-- **Responsive layout.** Right now it's not great on mobile, but it'd be nice if it were.
 - **Code styling/highlighting.** It'd be nice to color the displayed code. PHP's built-in highlight_string() leaves a lot to be desired. This could be accomplished with PHP (e.g. with PEAR's Text_Highlighter) or JavaScript (e.g. with Highlight.js). 
 - **Whitelisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package, perhaps.
 - **Autoreloading.** Add a feature to auto-reload a file at intervals (5 seconds?). Useful for checking error_log, for example.
