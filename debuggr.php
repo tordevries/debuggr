@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.972 by Tor de Vries
+Debuggr version 0.98 by Tor de Vries
 
 For more info, see https://github.com/tordevries/debuggr
 
@@ -14,7 +14,7 @@ Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
 
 // CONFIGURATION -- edit these variables as needed
 
-$userName = "Your Name"; // put in your own name
+$userName = "Host"; // put in your own name
 $userEmail = "your@email.com"; // put in your own email address
 
 $pagePassword = "477demo"; // set a password
@@ -43,12 +43,13 @@ $startWithLinesOn = true; // true to start with the line numbers visible
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
 function findAllFiles($dir = '.') { 
+	global $preventAccessToThisFile;
 	$result = array();
 	$cdir = scandir($dir);
 	foreach ($cdir as $key => $value) {
 		if ( !in_array( $value, array(".", "..") ) ) {
 			 if ( is_dir($dir . DIRECTORY_SEPARATOR . $value) ) $result[$value] = findAllFiles( $dir . DIRECTORY_SEPARATOR . $value );
-			 else $result[] = $value;
+			 else if ( !$preventAccessToThisFile || ($preventAccessToThisFile && ($value != basename(__FILE__))) ) $result[] = $value;
 		}
 	}
 	return $result;
@@ -67,14 +68,14 @@ function buildFileMenu($arr, $path = "") {
 			$result .= 	"</li>\n";
 		}
 	}
-	$result .= "</ul>\n";
+	$result .= "<li class='menuLine'><a onclick='openFile();'>Open File...</a></ul>\n";
 	return $result;
 }
 
 // create an unordered list CSS-based file menu
 function fileMenu($dir = '.') {
 	$list = findAllFiles($dir);
-	$listHTML = "<ul id='filenav'><li>Files &#9650;" . buildFileMenu($list) . "</li></ul>";
+	$listHTML = "<ul id='fileNav'><li>&#128196;" . buildFileMenu($list) . "</li></ul>";
 	return $listHTML;
 }
 
@@ -120,6 +121,7 @@ if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] !
 <html>
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
@@ -133,7 +135,7 @@ if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] !
 
 		#pageBox {
 			display: flex;
-			height: 100vh;
+			height: 100vh;c
 			width: 100vw;
 			align-items: center;
 			justify-content: center;
@@ -196,8 +198,8 @@ if ($_REQUEST["method"] == "ajax") {
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="Cache-Control" content="no-store" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Cache-Control" content="no-store" />
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
 	<script>
 		
@@ -239,6 +241,7 @@ if ($_REQUEST["method"] == "ajax") {
 						codeLinesPre.innerHTML = this.responseText;
 						prepLineNumbers(this.responseText.split("\n").length);
 						baseFile = fileToLoad;
+						document.title = "Debuggr: " + fileToLoad;
 						document.querySelector("#filename span").innerHTML = fileToLoad;
 						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
 						window.history.pushState( {}, "", historyURL);
@@ -253,20 +256,35 @@ if ($_REQUEST["method"] == "ajax") {
 		}
 		
 		// output line numbers in #codeNums pre; pad numbers with 0s to appropriate width
-		function prepLineNumbers(numLines = 1) {
+		function prepLineNumbers(numLines) {
 			codeNumsPre = document.querySelector("#codeNums pre");
 			codeNumsPre.innerHTML = "";
-			outputLines = "";
-			padTo = numLines.toString().length + 1;
-			for (x=1; x<=numLines; x++) {
-				line = x + ":";
-				outputLines += line.padStart(padTo, "0") + "\n";
+			if (numLines > 1) {
+				outputLines = "";
+				padTo = numLines.toString().length + 1;
+				for (x=1; x<=numLines; x++) {
+					line = x + ":";
+					outputLines += line.padStart(padTo, "0") + "\n";
+				}
+				codeNumsPre.innerHTML = outputLines;
+				document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
+
+			} else {
+				document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: 0rem; } body.linesOn #codeLines { width: calc(100vw - 0.25rem); left: 0.25rem; }";
 			}
-			codeNumsPre.innerHTML = outputLines;
+		}
+		
+		function openFile() {
+			closeFileMenu();
+			toOpen = window.prompt("Enter a filename and path:","");
+			console.log("toOpen: " + toOpen);
+			if ((toOpen != "") && (toOpen !== null)) {
+				loadFile(toOpen);
+			}
 		}
 		
 		function closeFileMenu() {
-			allLI = document.querySelectorAll("#filenav li");
+			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) {
 				allLI[x].classList.remove("showSub");
 			}
@@ -283,11 +301,17 @@ if ($_REQUEST["method"] == "ajax") {
 			
 			document.getElementById("codeLines").onscroll = function() { document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; }
 			
+			document.querySelector('#optionsNav li').onclick = function() { 
+				closeFileMenu(); 
+				document.querySelector('#optionsNav li').classList.toggle('showSub');
+			}
+			
 <? if ($showFilesMenu) { ?>
 			// set file menu to open on click, not just hover
-			allLI = document.querySelectorAll("#filenav li");
+			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) {
 				allLI[x].onclick = function(event) {
+					document.querySelector('#optionsNav li').classList.remove('showSub');
 					this.classList.toggle("showSub");
 					event.stopPropagation();
 				}
@@ -338,6 +362,7 @@ if ($_REQUEST["method"] == "ajax") {
 
 		#nav span {
 			margin-right: 10px;
+			float: left;
 		}
 
 		#nav span a {
@@ -346,9 +371,8 @@ if ($_REQUEST["method"] == "ajax") {
 		}
 		
 		a.uicon  {
-			font-size: 24px;
 			font-weight: bold;
-			vertical-align: middle;
+
 		}
 		
 		#codeNums {
@@ -361,12 +385,12 @@ if ($_REQUEST["method"] == "ajax") {
 			overflow: hidden;
 			text-align: right;
 			color: #04717a;
-			transition: left 0.5s;
+			transition: left 0.3s, width 0.3s;
 			z-index: 1;
 		}
 		
 		body.linesOn #codeNums {
-			left: 0.25rem;
+			left: 0rem;
 		}
 		
 		body.darkMode #codeNums {
@@ -378,7 +402,7 @@ if ($_REQUEST["method"] == "ajax") {
 			top: 0;
 			left: 0.25rem;
 			height: calc(100vh - 44px);
-			width: 100vw;
+			width: calc(100vw - 0.25rem);
 			overflow: scroll;
 			transition: left 0.5s, width 0.5s;
 			z-index: 1;
@@ -418,25 +442,28 @@ if ($_REQUEST["method"] == "ajax") {
 		#optionsNav {
 			float: right;
 			overflow: visible;
+			text-align: right;
+			margin-top: -5px;
 		}
 		
 		#optionsNav li a {
 			display: block;
-			padding: 0.2rem 2rem 0.2rem 0.5rem;
-			font-size: 0.8rem;
+			padding: 0.2rem 0.2rem 0.2rem 0.5rem;
 			text-decoration: none;
 			color: #fff;
 		}
 		
 		#optionsNav li ul li a {
 			color: #000;
+			text-align: left;
 		}
 		
-		#optionsNav a:hover {
-			background-color: #ddd;
+		#optionsNav li ul li a:hover {
+			background-color: #bbb;
 		}
 		
 		#optionsNav ul {
+			position: absolute;
 			display: none;
 			list-style-type: none;
 			margin: 0;
@@ -447,114 +474,115 @@ if ($_REQUEST["method"] == "ajax") {
 			overflow: visible;
 		}
 		
-		#optionsNav li.showSub ul,
-		#optionsNav li:hover ul {
+		#optionsNav li.showSub ul {
 			display: block;
-			position: absolute;
-			bottom: 35px;
-			right: 0px;
+			bottom: 44px;
+			right: 0;
+		}
+		
+		a#menuIcon {
+			text-align: right;
+			font-size: 18px;
+		}
+		
+		.menuLine {
+			padding-top: 4px;
+			margin-top: 4px;
+			border-top: 1px solid #ccc;
 		}
 
 <? if ($showFilesMenu) { ?>
 		
-		#filenav {
+		#fileNav {
 			float: left;
 			z-index: 100;
 			padding-right: 1rem;
-			margin-right: 1rem;
-			border-right: 1px solid #fff;
 			overflow: visible;
 		}
 
-		#filenav a {
+		#fileNav a {
 			display: block;
 			padding: 0.2rem 2rem 0.2rem 0.5rem;
-			font-size: 0.8rem;
 			text-decoration: none;
 			color: #000000;
 		}
 
-		#filenav a:hover {
-			background-color: #bbbbbb;
+		#fileNav a:hover {
+			background-color: #bbb;
 		}
 
-		#filenav ul {
+		#fileNav ul {
+			position: absolute;
 			list-style-type: none;
 			margin: 0;
 			padding: 0;
+			left: 0;
 			background-color: #fff;
 			border: 1px solid #ccc;
 			z-index: 100;
 			overflow: visible;
 		}
 		
-		#filenav ul ul {
+		#fileNav ul ul {
 			border-left: 1px solid #000;
 		}
 
-		#filenav li {
+		#fileNav li {
 			float: left;
 			width: 100%;
 			white-space: nowrap;
 			overflow: visible;
 		}
 		
-		#filenav li.hasSub::before {
+		#fileNav li.hasSub::before {
 			content: ">";
 			width: 2rem;
 			text-align: right;
-			font-size: 0.8rem;
 			padding: 0.2rem;
 			float: right;
 			color: #777;
 		}
 		
-		#filenav li.hasSub li::before {
+		#fileNav li.hasSub li::before {
 			content: "";
 		}
 
-		#filenav li.hasSub li.hasSub::before {
+		#fileNav li.hasSub li.hasSub::before {
 			content: ">";
 		}
 		
-		#filenav li li {
+		#fileNav li li {
 			clear: left;
 			width: 100%;
 		}
 
-		#filenav ul,
-		#filenav li:hover ul ul,
-		#filenav li.showSub ul ul {
+		#fileNav ul,
+		#fileNav li.showSub ul ul {
 			display: none;
 			position: absolute;
 		}
 
-		#filenav li:hover ul,
-		#filenav li.showSub ul {
+		#fileNav li.showSub ul {
 			display: block;
 			position: absolute;
-			bottom: 35px;
+			bottom: 44px;
 		}
 
-		#filenav li:hover li:hover,
-		#filenav li.showSub li.showSub {
+		#fileNav li.showSub li.showSub {
 			position: relative;			
 		}
 		
-		#filenav li:hover li:hover ul,
-		#filenav li.showSub li.showSub ul {
+		#fileNav li.showSub li.showSub ul {
 			display: block;
 			left: 100%;
 			bottom: 0;
 		}
 		
-		#filenav li:hover li:hover ul ul,
-		#filenav li.showSub li.showSub ul ul {
+		#fileNav li.showSub li.showSub ul ul {
 			display: none;
 		}
 
-		#filenav li:hover li:hover li:hover ul,
-		#filenav li.showSub li.showSub li.showSub ul {
+		#fileNav li.showSub li.showSub li.showSub ul {
 			display: block;
 			left: 100%;
 			bottom: 0;
@@ -565,23 +593,23 @@ if ($_REQUEST["method"] == "ajax") {
 	</style>
 </head>
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
-	<div id="codeNums"><pre></pre></div>
-	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
 	<div id="nav">
 		<? if ($showFilesMenu) echo fileMenu(); ?>
-		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload File" href="javascript:loadFile();">&#8635;</a> <a class="uicon"  title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
+		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload file" href="javascript:loadFile();">&#8635;</a> <a class="uicon"  title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
 		<ul id="optionsNav">
-			<li><a class="uicon" href="javascript:this.closest('li').classList.toggle('showSub');">&#9776;</a>
+			<li><a id="menuIcon">&#9776;</a>
 				<ul>
 					<? if ($foutput != $noFile) { ?><li><a href="javascript:selectCode()">Select All Code</a></li>
-					<li><a href="javascript:toggleNums();">Toggle Line Numbers</a></li><? } ?>
+					<li class="menuLine"><a href="javascript:toggleNums();">Toggle Line Numbers</a></li><? } ?>
 					<li><a href="javascript:toggleVisualMode()">Toggle Dark Mode</a></li>
-					<li><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
+					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>">Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a href="javascript:logout()">Log Out</a></li><? } ?>
 				</ul>
 			</li>
 		</ul>
 	</div>
+	<div id="codeNums"><pre></pre></div>
+	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
 	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
 </html>
