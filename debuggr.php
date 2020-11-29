@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.981 by Tor de Vries
+Debuggr version 0.99 by Tor de Vries
 
 For more info, see https://github.com/tordevries/debuggr
 
@@ -28,8 +28,9 @@ $preventAccessToThisFile = true; // if true, prevents users from reading this PH
 $showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
 
+$highlightCode = true; // true to load Highlight.js for coloring text
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
-$startWithLinesOn = false; // true to start with the line numbers visible
+$startWithLinesOn = true; // true to start with the line numbers visible
 $showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
 
 
@@ -140,7 +141,7 @@ if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] !
 
 		#pageBox {
 			display: flex;
-			height: 100vh;c
+			height: 100vh;
 			width: 100vw;
 			align-items: center;
 			justify-content: center;
@@ -257,6 +258,7 @@ if ($_REQUEST["method"] == "ajax") {
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
 						codeLinesPre.innerHTML = this.responseText;
+						styleCode();
 						prepLineNumbers(this.responseText.split("\n").length);
 						baseFile = fileToLoad;
 						document.title = "Debuggr: " + fileToLoad;
@@ -303,6 +305,10 @@ if ($_REQUEST["method"] == "ajax") {
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
+		function styleCode() { // apply Highlights.js
+			<? if ($highlightCode) { ?>hljs.highlightBlock( document.querySelector('#codeLines pre') );<? } ?>
+		}
+		
 		function logout() { document.getElementById("logoutForm").submit(); }
 		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
@@ -329,13 +335,16 @@ if ($_REQUEST["method"] == "ajax") {
 			document.getElementById("codeLines").onclick = function() { closeMenus(); }
 			document.getElementById("codeNums").onclick = function() { closeMenus(); }
 
+			styleCode();
+			
 		}		
 		
 	</script>
+	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
 		
 		* {
-			font-family: monospace;
+			font-family: 'Source Code Pro', monospace;
 			tab-size: 3;
 			margin: 0;
 			padding: 0;
@@ -413,6 +422,10 @@ if ($_REQUEST["method"] == "ajax") {
 			overflow: scroll;
 			transition: left 0.5s, width 0.5s;
 			z-index: 1;
+		}
+		
+		#codeNums pre, #codeLines pre {
+			padding-top: 0.5em;
 		}
 		
 		body.linesOn #codeLines {
@@ -601,6 +614,308 @@ if ($_REQUEST["method"] == "ajax") {
 		}
 		
 	</style>
+<? if ($highlightCode) { ?>	
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js"></script>
+	<style>
+		/*
+		Google Code style (c) Aahan Krish <geekpanth3r@gmail.com>
+		*/
+
+		.hljs-comment,
+		.hljs-javadoc {
+			color: #800;
+		}
+
+		.hljs-keyword,
+		.method,
+		.hljs-list .hljs-keyword,
+		.nginx .hljs-title,
+		.hljs-tag .hljs-title,
+		.setting .hljs-value,
+		.hljs-winutils,
+		.tex .hljs-command,
+		.http .hljs-title,
+		.hljs-request,
+		.hljs-status {
+			color: #008;
+		}
+
+		.hljs-envvar,
+		.tex .hljs-special {
+			color: #660;
+		}
+
+		.hljs-string,
+		.hljs-tag .hljs-value,
+		.hljs-cdata,
+		.hljs-filter .hljs-argument,
+		.hljs-attr_selector,
+		.apache .hljs-cbracket,
+		.hljs-date,
+		.hljs-regexp,
+		.coffeescript .hljs-attribute {
+			color: #080;
+		}
+
+		.hljs-sub .hljs-identifier,
+		.hljs-pi,
+		.hljs-tag,
+		.hljs-tag .hljs-keyword,
+		.hljs-decorator,
+		.ini .hljs-title,
+		.hljs-shebang,
+		.hljs-prompt,
+		.hljs-hexcolor,
+		.hljs-rule .hljs-value,
+		.hljs-literal,
+		.hljs-symbol,
+		.ruby .hljs-symbol .hljs-string,
+		.hljs-number,
+		.css .hljs-function,
+		.clojure .hljs-attribute {
+			color: #066;
+		}
+
+		.hljs-class .hljs-title,
+		.smalltalk .hljs-class,
+		.hljs-javadoctag,
+		.hljs-yardoctag,
+		.hljs-phpdoc,
+		.hljs-dartdoc,
+		.hljs-type,
+		.hljs-typename,
+		.hljs-tag .hljs-attribute,
+		.hljs-doctype,
+		.hljs-class .hljs-id,
+		.hljs-built_in,
+		.setting,
+		.hljs-params,
+		.hljs-variable,
+		.hljs-name {
+			color: #606;
+		}
+
+		.css .hljs-tag,
+		.hljs-rule .hljs-property,
+		.hljs-pseudo,
+		.hljs-subst {
+			color: #000;
+		}
+
+		.css .hljs-class,
+		.css .hljs-id {
+			color: #9b703f;
+		}
+
+		.hljs-value .hljs-important {
+			color: #ff7700;
+			font-weight: bold;
+		}
+
+		.hljs-rule .hljs-keyword {
+			color: #c5af75;
+		}
+
+		.hljs-annotation,
+		.apache .hljs-sqbracket,
+		.nginx .hljs-built_in {
+			color: #9b859d;
+		}
+
+		.hljs-preprocessor,
+		.hljs-preprocessor *,
+		.hljs-pragma {
+			color: #444;
+		}
+
+		.tex .hljs-formula {
+			background-color: #eee;
+			font-style: italic;
+		}
+
+		.diff .hljs-header,
+		.hljs-chunk {
+			color: #808080;
+			font-weight: bold;
+		}
+
+		.diff .hljs-change {
+			background-color: #bccff9;
+		}
+
+		.hljs-addition {
+			background-color: #baeeba;
+		}
+
+		.hljs-deletion {
+			background-color: #ffc8bd;
+		}
+
+		.hljs-comment .hljs-yardoctag {
+			font-weight: bold;
+		}
+	</style>
+	<style>
+		/* highlight.js dark mode theme adaptation */
+		/* Dracula Theme v1.2.5
+		 *
+		 * https://github.com/dracula/highlightjs
+		 *
+		 * Copyright 2016-present, All rights reserved
+		 *
+		 * Code licensed under the MIT license
+		 *
+		 * @author Denis Ciccale <dciccale@gmail.com>
+		 * @author Zeno Rocha <hi@zenorocha.com>
+		 */
+
+		body.darkMode .hljs-built_in,
+		body.darkMode .hljs-selector-tag,
+		body.darkMode .hljs-section,
+		body.darkMode .hljs-link {
+			color: #8be9fd;
+		}
+
+		body.darkMode .hljs-keyword {
+			color: #d52feb;
+		}
+
+		body.darkMode .hljs,
+		body.darkMode .hljs-subst {
+			color: #f8f8f2;
+		}
+
+		body.darkMode .hljs-title {
+			color: #50fa7b;
+		}
+
+		body.darkMode .hljs-string,
+		body.darkMode .hljs-meta,
+		body.darkMode .hljs-name,
+		body.darkMode .hljs-type,
+		body.darkMode .hljs-attr,
+		body.darkMode .hljs-symbol,
+		body.darkMode .hljs-bullet,
+		body.darkMode .hljs-addition,
+		body.darkMode .hljs-variable,
+		body.darkMode .hljs-template-tag,
+		body.darkMode .hljs-template-variable {
+			color: #f1fa8c;
+		}
+
+		body.darkMode .hljs-comment,
+		body.darkMode .hljs-quote,
+		body.darkMode .hljs-deletion {
+			color: #6272a4;
+		}
+
+		body.darkMode .hljs-keyword,
+		body.darkMode .hljs-selector-tag,
+		body.darkMode .hljs-literal,
+		body.darkMode .hljs-title,
+		body.darkMode .hljs-section,
+		body.darkMode .hljs-doctag,
+		body.darkMode .hljs-type,
+		body.darkMode .hljs-name,
+		body.darkMode .hljs-strong {
+			font-weight: bold;
+		}
+
+		body.darkMode .hljs-literal,
+		body.darkMode .hljs-number {
+			color: #bd93f9;
+		}
+
+		body.darkMode .hljs-emphasis {
+			font-style: italic;
+		}
+
+	</style>
+	<style>
+		/* highlight.js noStyle adaptation */
+
+		body.noStyle .hljs,
+		body.noStyle .hljs-built_in,
+		body.noStyle .hljs-selector-tag,
+		body.noStyle .hljs-section,
+		body.noStyle .hljs-link,
+		body.noStyle .hljs-keyword,
+		body.noStyle .hljs,
+		body.noStyle .hljs-subst,
+		body.noStyle .hljs-title,
+		body.noStyle .hljs-string,
+		body.noStyle .hljs-meta,
+		body.noStyle .hljs-name,
+		body.noStyle .hljs-type,
+		body.noStyle .hljs-attr,
+		body.noStyle .hljs-symbol,
+		body.noStyle .hljs-bullet,
+		body.noStyle .hljs-addition,
+		body.noStyle .hljs-variable,
+		body.noStyle .hljs-template-tag,
+		body.noStyle .hljs-template-variable,
+		body.noStyle .hljs-comment,
+		body.noStyle .hljs-quote,
+		body.noStyle .hljs-deletion,
+		body.noStyle .hljs-keyword,
+		body.noStyle .hljs-selector-tag,
+		body.noStyle .hljs-literal,
+		body.noStyle .hljs-title,
+		body.noStyle .hljs-section,
+		body.noStyle .hljs-doctag,
+		body.noStyle .hljs-type,
+		body.noStyle .hljs-name,
+		body.noStyle .hljs-strong,
+		body.noStyle .hljs-literal,
+		body.noStyle .hljs-number,
+		body.noStyle .hljs-emphasis {
+			font-style: normal;
+			font-weight: normal;
+			color: #000;
+		}
+
+		body.darkMode.noStyle .hljs,
+		body.darkMode.noStyle .hljs-built_in,
+		body.darkMode.noStyle .hljs-selector-tag,
+		body.darkMode.noStyle .hljs-section,
+		body.darkMode.noStyle .hljs-link,
+		body.darkMode.noStyle .hljs-keyword,
+		body.darkMode.noStyle .hljs,
+		body.darkMode.noStyle .hljs-subst,
+		body.darkMode.noStyle .hljs-title,
+		body.darkMode.noStyle .hljs-string,
+		body.darkMode.noStyle .hljs-meta,
+		body.darkMode.noStyle .hljs-name,
+		body.darkMode.noStyle .hljs-type,
+		body.darkMode.noStyle .hljs-attr,
+		body.darkMode.noStyle .hljs-symbol,
+		body.darkMode.noStyle .hljs-bullet,
+		body.darkMode.noStyle .hljs-addition,
+		body.darkMode.noStyle .hljs-variable,
+		body.darkMode.noStyle .hljs-template-tag,
+		body.darkMode.noStyle .hljs-template-variable,
+		body.darkMode.noStyle .hljs-comment,
+		body.darkMode.noStyle .hljs-quote,
+		body.darkMode.noStyle .hljs-deletion,
+		body.darkMode.noStyle .hljs-keyword,
+		body.darkMode.noStyle .hljs-selector-tag,
+		body.darkMode.noStyle .hljs-literal,
+		body.darkMode.noStyle .hljs-title,
+		body.darkMode.noStyle .hljs-section,
+		body.darkMode.noStyle .hljs-doctag,
+		body.darkMode.noStyle .hljs-type,
+		body.darkMode.noStyle .hljs-name,
+		body.darkMode.noStyle .hljs-strong,
+		body.darkMode.noStyle .hljs-literal,
+		body.darkMode.noStyle .hljs-number,
+		body.darkMode.noStyle .hljs-emphasis {
+			font-style: normal;
+			font-weight: normal;
+			color: #fff;
+		}
+
+	</style>
+<? } ?>
 </head>
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">

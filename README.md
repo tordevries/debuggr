@@ -1,9 +1,9 @@
 # debuggr
-A single self-contained PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students. 
+A single self-contained PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students.
 
 The code includes very basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
-This is not compressed/minified. A compressed version was briefly offered, but as this was designed for use in a programming class, the verbose version is now the only version, for students interested in dissecting code.
+Debuggr is deliberately one single self-contained file containing all the HTML, CSS, JavaScript, and PHP. Its only external references are to load Source Code Pro from Google Fonts, and to load Highlights.js from CDNJS. It does not rely on any frameworks or libraries such as jQuery or Bootstrap.
 
 ---
 ## Installation and Use
@@ -46,8 +46,11 @@ A Boolean value which, if true, allows users to enter pathnames to parent direct
 A Boolean value which, if true, prevents users from reading this PHP file with itself. The default is true. The only scenario where you want this to be "false" is if you have configured a set of default values of this code that you want someone else to copy.
 
 #### showFilesMenu
-A Boolean value which, if true, will display a "Files" menu in the UI that links to all the files in the current directory. The default is false.
-If accessCurrentDirectoryOnly is false (see above), the "Files" menu will also include local folders and their files/subdirectories.
+A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false.
+If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories.
+
+#### highlightCode
+A Boolean value which, if true, will include references to load Highlight.js and a collection of CSS to provide basic code styling/highlighting. The default is true.
 
 #### startInDarkMode
 A Boolean value which, if true, will start the UI in dark mode by default, rather than lite mode. The default is true.
@@ -62,8 +65,6 @@ A Boolean value which, if true, includes a link in the options menu to this proj
 ## Future Features
 
 Here are a few of the ideas on the future radar:
-- **Code styling/highlighting.** It'd be nice to color the displayed code. PHP's built-in highlight_string() leaves a lot to be desired. This could be accomplished with PHP (e.g. with PEAR's Text_Highlighter) or JavaScript (e.g. with Highlight.js). 
 - **Whitelisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package, perhaps.
-- **Autoreloading.** Add a feature to auto-reload a file at intervals (5 seconds?). Useful for checking error_log, for example.
-- **Allow loading of remote files.** This would allow viewing the source of pages elsewhere, though only HTML/CSS/JS. Useful on mobile where it is otherwise difficult to read source code.
-- **Tabbed interface.** Maybe.
+- **Auto-reloading.** Add a feature to auto-reload a file at intervals (5 seconds?). Useful for checking error\_log, for example.
+- **Allow loading of remote files.** This would allow viewing the source of pages elsewhere using cURL, though obviously only HTML/CSS/JS. Useful on mobile where it is otherwise difficult to read source code.
