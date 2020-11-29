@@ -1,9 +1,9 @@
 # debuggr
-A single self-contained PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students.
+A PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students.
 
 The code includes very basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
-Debuggr is deliberately one single self-contained file containing all the HTML, CSS, JavaScript, and PHP. Its only external references are to load Source Code Pro from Google Fonts, and to load Highlights.js from CDNJS. It does not rely on any frameworks or libraries such as jQuery or Bootstrap.
+Debuggr is deliberately one single self-contained file containing all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and move around, especially for beginner coders just installing this for someone to view their server-side code. Its only external references are to load Source Code Pro from Google Fonts, and to load Highlights.js from CDNJS. It does not rely on any frameworks or libraries such as jQuery or Bootstrap.
 
 ---
 ## Installation and Use
