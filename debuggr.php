@@ -39,7 +39,7 @@ $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 $accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
-$allowRemoteFileReading = true; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
+$allowRemoteFileReading = false; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
 
 $showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
