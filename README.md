@@ -66,5 +66,4 @@ A Boolean value which, if true, includes a link in the options menu to this proj
 
 Here are a few of the ideas on the future radar:
 - **Whitelisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package, perhaps.
-- **Auto-reloading.** Add a feature to auto-reload a file at intervals (5 seconds?). Useful for checking error\_log, for example.
 - **Allow loading of remote files.** This would allow viewing the source of pages elsewhere using cURL, though obviously only HTML/CSS/JS. Useful on mobile where it is otherwise difficult to read source code.

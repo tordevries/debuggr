@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 0.99 by Tor de Vries
+Debuggr version 1.0-alpha by Tor de Vries
 
 For more info, see https://github.com/tordevries/debuggr
 
@@ -25,7 +25,7 @@ $accessCurrentDirectoryOnly = false; // if true, restricts access to only files 
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
-$showFilesMenu = false; // if true, will show a "Files" menu that links to files in the current directory
+$showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
 
 $highlightCode = true; // true to load Highlight.js for coloring text
@@ -35,20 +35,32 @@ $showDebuggrLink = true; // true to include a link to Debuggr on Github in the o
 
 
 // ********************************************************************************
+// ********************************************************************************
+//
 //
 // WARNING: CODE BELOW
+//
 // Ignore everything below this line unless you really know what you're doing.
 //
+//
+// ********************************************************************************
 // ********************************************************************************
 
+
+
+
+// ********************************************************************************
+// PHP FUNCTIONS
+// ********************************************************************************
 
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
 function findAllFiles($dir = '.') { 
-	global $preventAccessToThisFile;
-	$result = array();
-	$cdir = scandir($dir);
-	foreach ($cdir as $key => $value) {
+	global $preventAccessToThisFile; // check global configuration on access to the current file
+	$result = array(); // initialize empty array
+	
+	$cdir = scandir($dir); // scan submitted directory
+	foreach ($cdir as $key => $value) { // look line by line at directory scan
 		if ( !in_array( $value, array(".", "..") ) ) {
 			 if ( is_dir($dir . DIRECTORY_SEPARATOR . $value) ) $result[$value] = findAllFiles( $dir . DIRECTORY_SEPARATOR . $value );
 			 else if ( !$preventAccessToThisFile || ($preventAccessToThisFile && ($value != basename(__FILE__))) ) $result[] = $value;
@@ -56,6 +68,7 @@ function findAllFiles($dir = '.') {
 	}
 	return $result;
 }
+
 
 // a recursive function to build a hierarchical <ul> menu of files from the array produced in findAllFiles();
 function buildFileMenu($arr = null, $path = "", $depth = 0) {
@@ -77,6 +90,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 	return $result;
 }
 
+
 // create an unordered list CSS-based file menu
 function fileMenu($dir = '.') {
 	global $showFilesMenu;
@@ -86,7 +100,6 @@ function fileMenu($dir = '.') {
 }
 
 
-
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], true, 301);
@@ -94,12 +107,14 @@ if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 }
 
 // for security, kill the output if password is required but not set
-if ($passwordRequired && ($pagePassword == "")) {
-	die("ERROR: No password set.");
-}
+if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
 
 // we're using sessions, so let's go
 session_start();
+
+// set a boolean to use 
+$isStillAuthorized = ($_SESSION["authorized"] == $pagePassword);
+$fmenu = fileMenu();
 
 // has a logout command been passed?
 if ($_POST["logout"]) {
@@ -109,8 +124,31 @@ if ($_POST["logout"]) {
 	die();
 }
 
+
+// for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
+// return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu
+if ($_REQUEST["method"] == "pulse") {
+	if (!$isStillAuthorized) die("0");
+	$updateFile = (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]);
+	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
+	if (file_exists($_SESSION["filename"])) {
+		if ($updateFile && !$updateMenu) die("1"); // indicate an update by returning "1"
+		if ($updateFile && $updateMenu) die("3");
+	}
+	if ($updateMenu) die("2");
+	die(); // if no filename, or no update to the file, die with nothing
+}
+
+
+// return only the file menu HTML
+if ($_REQUEST["method"] == "menu") {
+	if (!$isStillAuthorized) die();
+	die($fmenu); // if no filename, or no update to the file, die with nothing
+}
+
+
 // for security, if the session is not authorized, check password and/or show login form if necessary
-if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] != $pagePassword))) {
+if ($passwordRequired && (!$_SESSION["authorized"] || !$isStillAuthorized)) {
 	
 	if ($_REQUEST["method"] == "ajax") {
 		die(); // if they're not calling from an authorized session, ajax returns nothing
@@ -120,7 +158,6 @@ if ($passwordRequired && (!$_SESSION["authorized"] || ($_SESSION["authorized"] !
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
 		
 	} else {
-		
 		// needs new authorization, so show the login page
 		
 		?><!DOCTYPE html>
@@ -179,10 +216,13 @@ if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed)
 
 if (!file_exists($fpassed)) {
 	$foutput = $noFile;
+	unset( $_SESSION["filename"] );
+	unset( $_SESSION["filetime"] );
+	unset( $_SESSION["filemenu"] );
 	
 } else {
-
-	// check if it's an image
+	
+	// check if it's an image and, if so, output an img tag
 	$isImage = getimagesize($fpassed);
 	if ($isImage != false) $foutput = "<img src='" . $fpassed . "'>";
 	else $foutput = file_get_contents( $fpassed );
@@ -192,11 +232,15 @@ if (!file_exists($fpassed)) {
 	} else if ($isImage == false) { 
 		$foutput = trim( htmlspecialchars( $foutput ) );
 	}
+
+	$_SESSION["filename"] = $fpassed;
+	$_SESSION["filetime"] = filemtime($fpassed);
+	$_SESSION["filemenu"] = $fmenu;
+
 }
 
-if ($_REQUEST["method"] == "ajax") {
-	die($foutput); // if the method is ajax, just return the content without the rest of the HTML, CSS, JS
-}
+// if the method is ajax, just return the content without the rest of the HTML, CSS, JS
+if ($_REQUEST["method"] == "ajax") die($foutput); 
 
 // if we got this far, output the whole page
 	
@@ -209,13 +253,20 @@ if ($_REQUEST["method"] == "ajax") {
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
 	<script>
 		
-		// pass in some PHP variables
+		// set some variables (including some passed from PHP
 		baseFile = "<?= $fpassed; ?>";
 		lineNumbersOn = <?= json_encode($startWithLinesOn); ?>;
 		darkModeOn = <?= json_encode($startInDarkMode); ?>;
+		reloadTimer = false;
+		
+		// shortcut for updating the status text
+		function statusMessage(msg) {
+			document.getElementById("statusMsg").innerHTML = msg;
+		}
 		
 		// toggle the numbers using CSS and changing the button
 		function toggleNums() {
+			closeMenus();
 			if (lineNumbersOn) {
 				document.body.classList.remove('linesOn');
 				document.querySelector("#optLineNumbers span").innerHTML = "&nbsp;";
@@ -228,6 +279,7 @@ if ($_REQUEST["method"] == "ajax") {
 		
 		// toggle visual dark/lite mode
 		function toggleVisualMode() {
+			closeMenus();
 			if (darkModeOn) {
 				document.body.classList.remove("darkMode");
 				document.querySelector("#optDarkMode span").innerHTML = "&nbsp;";
@@ -236,6 +288,19 @@ if ($_REQUEST["method"] == "ajax") {
 				document.querySelector("#optDarkMode span").innerHTML = "&check;";
 			}
 			darkModeOn = !darkModeOn;
+		}
+		
+		function toggleReloadTimer() {
+			closeMenus();
+			if (!reloadTimer) {
+				reloadPulse = setInterval(checkPulse, 5000);
+				document.querySelector("#optReload span").innerHTML = "&check;";
+				checkPulse();
+			} else {
+				clearInterval(reloadPulse);
+				document.querySelector("#optReload span").innerHTML = "&nbsp;";
+			}
+			reloadTimer = !reloadTimer;
 		}
 
 		// select the code text 
@@ -248,23 +313,76 @@ if ($_REQUEST["method"] == "ajax") {
 			sel.addRange(r);
 		}
 		
+		// use AJAX to check pulse on the file; has it been updated since last load?
+		function checkPulse() {
+			if (reloadTimer) statusMessage("&bull;");
+			else statusMessage("Checking for updates...");
+			ajax = new XMLHttpRequest();
+			ajax.onreadystatechange = function() {
+					if ((this.readyState == 4) && (this.status == 200)) {
+						if (this.responseText == "0") logout();
+						else if (this.responseText == "1") loadFile();
+						else if (this.responseText == "2") loadMenu();
+						else if (this.responseText == "3") { loadFile(); loadMenu(); }
+						else statusMessage("");
+					} else if ((this.readyState == 4) && (this.status != 200)) {
+						console.log("AJAX pulse error: " + this.responseText);
+					}
+			}
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=pulse";
+			ajax.open("POST", urlToLoad, true);
+			ajax.send();
+		}
+		
+		function setMenuClicks() {
+			allLI = document.querySelectorAll("#fileNav li");
+			for (x=0; x<allLI.length; x++) {
+				allLI[x].onclick = function(event) {
+					document.querySelector('#optionsNav li').classList.remove('showSub');
+					this.classList.toggle("showSub");
+					event.stopPropagation();
+				}
+			}
+		}
+		
+		function loadMenu() {
+			statusMessage("Loading menu...");
+			ajax = new XMLHttpRequest();
+			ajax.onreadystatechange = function() {
+					if ((this.readyState == 4) && (this.status == 200)) {
+						document.getElementById("fileNav").outerHTML = this.responseText;
+						setMenuClicks();
+						statusMessage("");
+					} else if ((this.readyState == 4) && (this.status != 200)) {
+						console.log("AJAX menu error: " + this.responseText);
+					}
+			}
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=menu";
+			ajax.open("POST", urlToLoad, true);
+			ajax.send();
+		}
+		
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
 		function loadFile(fileToLoad = baseFile) {
 			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
-			codeLinesPre.innerHTML = "Loading...";
-			document.querySelector("#codeNums pre").innerHTML = "";
+			statusMessage("Loading file...");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
+						if (fileToLoad != baseFile) {
+							document.getElementById("codeNums").scrollTop = 0;
+							document.getElementById("codeLines").scrollTop = 0;
+						}
+						baseFile = fileToLoad;
 						codeLinesPre.innerHTML = this.responseText;
 						styleCode();
 						prepLineNumbers(this.responseText.split("\n").length);
-						baseFile = fileToLoad;
 						document.title = "Debuggr: " + fileToLoad;
-						document.querySelector("#filename span").innerHTML = fileToLoad;
+						document.querySelector("#filenameRef span").innerHTML = fileToLoad;
 						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
 						window.history.pushState( {}, "", historyURL);
+						statusMessage("");
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						codeLinesPre.innerHTML = "<?= $noFile; ?>";
 						console.log("AJAX error: " + this.responseText);
@@ -281,10 +399,7 @@ if ($_REQUEST["method"] == "ajax") {
 			codeNumsPre.innerHTML = "";
 			outputLines = "";
 			padTo = numLines.toString().length + 1;
-			for (x=1; x<=numLines; x++) {
-				line = x + ":";
-				outputLines += line.padStart(padTo, "0") + "\n";
-			}
+			for (x=1; x<=numLines; x++) outputLines += (x + ":").padStart(padTo, "0") + "\n";
 			codeNumsPre.innerHTML = outputLines;
 			document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
 		}
@@ -299,9 +414,7 @@ if ($_REQUEST["method"] == "ajax") {
 
 		function closeMenus() {
 			allLI = document.querySelectorAll("#fileNav li");
-			for (x=0; x<allLI.length; x++) {
-				allLI[x].classList.remove("showSub");
-			}
+			for (x=0; x<allLI.length; x++) allLI[x].classList.remove("showSub");
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
@@ -314,23 +427,17 @@ if ($_REQUEST["method"] == "ajax") {
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
 			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
+			
 			document.getElementById("codeLines").onscroll = function() { 
 				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; 
 			}
+			
 			document.querySelector('#optionsNav li').onclick = function() { 
 				closeMenus();
 				document.querySelector('#optionsNav li').classList.toggle('showSub');
 			}
 			
-			// set file menu to open on click, not just hover
-			allLI = document.querySelectorAll("#fileNav li");
-			for (x=0; x<allLI.length; x++) {
-				allLI[x].onclick = function(event) {
-					document.querySelector('#optionsNav li').classList.remove('showSub');
-					this.classList.toggle("showSub");
-					event.stopPropagation();
-				}
-			}
+			setMenuClicks();
 						
 			document.getElementById("codeLines").onclick = function() { closeMenus(); }
 			document.getElementById("codeNums").onclick = function() { closeMenus(); }
@@ -386,9 +493,20 @@ if ($_REQUEST["method"] == "ajax") {
 			text-decoration: none;
 		}
 		
+		#filenameRef {
+			display: inline-block;
+		}
+		
+		#nav span#statusMsg {
+			margin-left: 10px;
+			color: #aaa;
+			float: right;
+		}
+		
 		a.uicon  {
 			font-weight: bold;
-
+			color: #ddd;
+			text-decoration: none;
 		}
 		
 		#codeNums {
@@ -469,6 +587,7 @@ if ($_REQUEST["method"] == "ajax") {
 		#optionsNav li a {
 			display: block;
 			padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+			margin-right: 0.5rem;
 			text-decoration: none;
 			color: #fff;
 		}
@@ -919,14 +1038,16 @@ if ($_REQUEST["method"] == "ajax") {
 </head>
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">
-		<?= fileMenu(); ?>
-		<? if ($fpassed != "") { ?><span id="filename"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload file" href="javascript:loadFile();">&#8635;</a> <a class="uicon"  title="Open file in new tab" href="javascript:window.open(baseFile);">&#10162;</a></span><? } ?>
+		<?= $fmenu; ?>
+		<div id="filenameRef"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload file" href="javascript:checkPulse();">&#8635;</a><span id="statusMsg"></span></div>
 		<ul id="optionsNav">
 			<li><a id="menuIcon">&#9776;</a>
 				<ul>
+					<li><a href="javascript:window.open(baseFile);"><span>&nbsp;</span> Open File in New Tab</a></li>
 					<li><a href="javascript:selectCode()"><span>&nbsp;</span> Select All Code</a>
 					<li id="optDarkMode" class="menuLine"><a href="javascript:toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a href="javascript:toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
+					<li id="optReload"><a href="javascript:toggleReloadTimer();"><span>&nbsp;</span> Auto-reload</a></li>
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a href="javascript:logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
 					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr Info</a></li><? } ?>
