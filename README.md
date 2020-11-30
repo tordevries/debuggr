@@ -67,7 +67,7 @@ A Boolean value which, if true, includes a link in the options menu to this proj
 #### allowCURLtoBypassHTTPS
 A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a _low_ security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_, as noted below.
 
-#### ertificatePathForCURL
+#### certificatePathForCURL
 A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for _your_ server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
