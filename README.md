@@ -1,9 +1,10 @@
 # debuggr
-A PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students.
+A PHP file to support reading any text file on another's server.  It was originally designed to allow a programming instructor to read server-side code written by his students. 
+By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and manage, with less file clutter, especially for beginner coders.
 
-The code includes very basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
+Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
-Debuggr is deliberately one single self-contained file containing all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and move around, especially for beginner coders just installing this for someone to view their server-side code. Its only external references are to load Source Code Pro from Google Fonts, and to load Highlights.js from CDNJS. It does not rely on any frameworks or libraries such as jQuery or Bootstrap.
+Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
 
 ---
 ## Installation and Use
@@ -66,3 +67,19 @@ A Boolean value which, if true, includes a link in the options menu to this proj
 Here are a few of the ideas on the future radar:
 - **Whitelisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Allow loading of remote files.** This would allow viewing the source of pages elsewhere using cURL, though obviously only HTML/CSS/JS. Useful on mobile where it is otherwise difficult to read source code.
+
+--
+## License
+
+Copyright (C) 2020 Tor de Vries (tor.devries@wsu.edu)
+
+This program is free software: you can redistribute it and/or modify it under the terms of the 
+GNU General Public License as published by the Free Software Foundation, either version 3 of 
+the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details.
+
+The complete license is available in the LICENSE.txt file accompanying this project, or online
+at <https://www.gnu.org/licenses/gpl-3.0.en.html>.

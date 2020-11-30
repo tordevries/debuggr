@@ -1,14 +1,29 @@
 <? 
 /*
 
-Debuggr version 1.0-alpha by Tor de Vries
+Debuggr version 1.0.1-alpha by Tor de Vries (tor.devries@wsu.edu)
 
-For more info, see https://github.com/tordevries/debuggr
+Copy this PHP code into the root directory of your server-side coding project so others can study your code.
+Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
+https://yourdomain.com/project/debuggr.php?file=yourfile.php
 
-Copy this PHP code into a "debuggr.php" file in the root directory of your PHP coding so others can study your code.
-Then, just add "?file=" and the name of a file to view its source code. 
+For more information, including an explanation of the options below: 
+https://github.com/tordevries/debuggr
 
-Example URL: https://dtc477.net/unit3/debuggr.php?file=debuggr.php
+-----
+
+Copyright (C) 2020 Tor de Vries (tor.devries@wsu.edu)
+
+This program is free software: you can redistribute it and/or modify it under the terms of the 
+GNU General Public License as published by the Free Software Foundation, either version 3 of 
+the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  
+If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -100,20 +115,26 @@ function fileMenu($dir = '.') {
 }
 
 
+
+// ********************************************************************************
+// PHP PROCEDURES
+// ********************************************************************************
+
+
+// for security, kill the output if password is required but not set
+if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
+
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], true, 301);
     die();
 }
 
-// for security, kill the output if password is required but not set
-if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
-
-// we're using sessions, so let's go
+// initalize sessions
 session_start();
 
-// set a boolean to use 
-$isStillAuthorized = ($_SESSION["authorized"] == $pagePassword);
+// set a boolean to use to confirm continued authorization
+$isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
 $fmenu = fileMenu();
 
 // has a logout command been passed?
@@ -148,7 +169,7 @@ if ($_REQUEST["method"] == "menu") {
 
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
-if ($passwordRequired && (!$_SESSION["authorized"] || !$isStillAuthorized)) {
+if (!$isStillAuthorized)) {
 	
 	if ($_REQUEST["method"] == "ajax") {
 		die(); // if they're not calling from an authorized session, ajax returns nothing
