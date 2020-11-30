@@ -78,7 +78,6 @@ $certificatePathForCURL = '/etc/ssl/certs'; // provide the absolute path to your
 function findAllFiles($dir = '.') { 
 	global $preventAccessToThisFile; // check global configuration on access to the current file
 	$result = array(); // initialize empty array
-	
 	$cdir = scandir($dir); // scan submitted directory
 	foreach ($cdir as $key => $value) { // look line by line at directory scan
 		if ( !in_array( $value, array(".", "..") ) ) {
@@ -119,6 +118,7 @@ function fileMenu($dir = '.') {
 	return $listHTML;
 }
 
+
 // check if a filepath is local or remote, then fetch accordingly
 function fetchFile($filepath) {
 	if (isFileRemote($filepath)) $returnData = fetchRemoteFile($filepath);
@@ -126,11 +126,13 @@ function fetchFile($filepath) {
 	return $returnData;
 }
 
+
 // simple boolean check if passed value is a valid sanitized URL or not
 function isFileRemote($url) {
 	$url = filter_var($url, FILTER_SANITIZE_URL);
 	return filter_var($url, FILTER_VALIDATE_URL);
 }
+
 
 function fetchLocalFile($localFilepath) {
 	global $noFile, $fmenu;
@@ -223,6 +225,7 @@ function fetchRemoteFile($remoteURL) {
 
 // for security, kill the output if password is required but not set
 if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
+
 
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
@@ -481,7 +484,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		}
 		
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
-		function loadFile(fileToLoad = baseFile) {
+		function loadFile(fileToLoad = baseFile, historyUpdate = true) {
 			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
 			statusMessage("Loading file...");
@@ -498,8 +501,10 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 						prepLineNumbers(this.responseText.split("\n").length);
 						document.title = "Debuggr: " + fileToLoad;
 						document.querySelector("#filenameRef span").innerHTML = fileToLoad;
-						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
-						window.history.pushState( {}, "", historyURL);
+						if (historyUpdate) {
+							historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
+							window.history.pushState( {}, "", historyURL);
+						}
 						statusMessage("");
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						codeLinesPre.innerHTML = "<?= $noFile; ?>";
@@ -562,6 +567,11 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 
 			styleCode();
 			
+			// since the URL is changed dynamically, we need to dynamically respond to back buttons
+			window.onpopstate = function(event) {
+				historyParam = document.location.href.split("<?= basename(__FILE__); ?>?file=").pop(); // get the file value passed to debuggr
+				loadFile(historyParam, false);
+			};
 		}		
 		
 	</script>
@@ -604,6 +614,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		#nav span {
 			margin-right: 10px;
 			float: left;
+			max-width: 70vw;
 		}
 
 		#nav span a {
