@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.0.3-alpha by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -39,6 +39,7 @@ $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 $accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
+$allowRemoteFileReading = true; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
 
 $showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
@@ -47,6 +48,10 @@ $highlightCode = true; // true to load Highlight.js for coloring text
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
 $startWithLinesOn = true; // true to start with the line numbers visible
 $showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
+
+// advanced remote file reading options related to $allowRemoteFileReading and the PHP cURL libraries
+$allowCURLtoBypassHTTPS = true; // if true, cURL will bypass HTTPS security checks; if false, you must set a security certificate path, below, for cURL to work
+$certificatePathForCURL = '/etc/ssl/certs'; // provide the absolute path to your server's security certificates; only applied if $allowCURLtoBypassHTTPS is false
 
 
 // ********************************************************************************
@@ -106,7 +111,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 }
 
 
-// create an unordered list CSS-based file menu
+// create an unordered list for the CSS-based file menu
 function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
@@ -114,6 +119,101 @@ function fileMenu($dir = '.') {
 	return $listHTML;
 }
 
+// check if a filepath is local or remote, then fetch accordingly
+function fetchFile($filepath) {
+	if (isFileRemote($filepath)) $returnData = fetchRemoteFile($filepath);
+	else $returnData = fetchLocalFile($filepath);
+	return $returnData;
+}
+
+// simple boolean check if passed value is a valid sanitized URL or not
+function isFileRemote($url) {
+	$url = filter_var($url, FILTER_SANITIZE_URL);
+	return filter_var($url, FILTER_VALIDATE_URL);
+}
+
+function fetchLocalFile($localFilepath) {
+	global $noFile, $fmenu;
+	
+	// check if file does not exist or is blocked
+	if ((!file_exists($localFilepath)) || ($preventAccessToThisFile && ($localFilepath == basename(__FILE__)))) {
+
+		// clear all the session variables
+		unset( $_SESSION["filename"] );
+		unset( $_SESSION["filetime"] );
+		unset( $_SESSION["filemenu"] );
+		
+		$returnOutput = $noFile;
+
+	} else { // the file DOES exist, so...
+
+		// check if it's an image; if so, output an img tag, otherwise read in the file contents
+		$isImage = getimagesize($localFilepath);
+		if ($isImage != false) $returnOutput = "<img src='" . $localFilepath . "'>";
+		else $returnOutput = file_get_contents($localFilepath);
+
+		if (!$returnOutput) $returnOutput = $noFile; // file is empty, output error
+		else if ($isImage == false) $returnOutput = htmlspecialchars($returnOutput); // convert to special characters for transmission
+
+		// set session variables used for AJAX checks
+		$_SESSION["filename"] = $localFilepath;
+		$_SESSION["filetime"] = filemtime($localFilepath);
+		$_SESSION["filemenu"] = $fmenu;
+
+	}
+	
+	return $returnOutput;
+}
+
+// function to read remote URLs via cURL; note that this is bypasses HTTPS confirmation checks and
+// is thus inherently insecure; it may be subject to MITM (man in the middle) attacks.
+function fetchRemoteFile($remoteURL) {
+	global $noFile, $fmenu, $allowCURLtoBypassHTTPS, $certificatePathForCURL;
+
+	// set session variables used for AJAX checks
+	$_SESSION["filename"] = $remoteURL;
+	$_SESSION["filetime"] = 0;
+	$_SESSION["filemenu"] = $fmenu;
+	
+	// prepare for common image suffixes; this may or may not be trustworthy
+	$imageSuffixes = ["png", "jpg", "jpeg", "gif", "svg", "webp", "jfif", "avif", "apng", "pjpeg", "pjp", "ico", "cur", "tif", "tiff", "bmp"];
+	$remotePath = parse_url($remoteURL, PHP_URL_PATH); // get the path component of the URL
+	$remoteSuffix = pathinfo($remotePath, PATHINFO_EXTENSION); // get the file extension on the path
+	
+	// if the extension on the file path of the URL ends in an image format, output an img tag
+	if (in_array($remoteSuffix, $imageSuffixes)) {
+		$returnOutput = "<img src='" . $remoteURL . "'>";
+		
+	} else { // not an image, so try to read the remote source
+		
+		if (function_exists('curl_init')) { // if cURL is available in PHP, use it
+			
+			// initialized cURL
+			$remoteCURL = curl_init($remoteURL);
+			
+			// set cURL options
+			curl_setopt($remoteCURL, CURLOPT_VERBOSE, false);
+			curl_setopt($remoteCURL, CURLOPT_TIMEOUT_MS, 5000);
+			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
+			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
+			if ($allowCURLtoBypassHTTPS) curl_setopt($remoteCURL, CURLOPT_SSL_VERIFYPEER, false);
+			else curl_setopt($remoteCURL, CURLOPT_CAPATH, $certificatePathForCURL);
+			$remoteCURLhttp = curl_getinfo($remoteCURL, CURLINFO_HTTP_CODE);
+			error_log("cURL HTTP code: " . $remoteCURLhttp);
+			error_log("cURL error: " . curl_strerror(curl_errno($remoteCURL)));
+			
+			// execute cURL call and convert to shareable code with htmlspecialchars()
+			$returnOutput = htmlspecialchars( curl_exec($remoteCURL) );
+			
+		} else {
+			error_log("Debuggr remote URL error: cURL is not enabled.");
+			$returnOutput = $noFile;
+			
+		}
+	}
+			
+	return $returnOutput;
+}
 
 
 // ********************************************************************************
@@ -147,12 +247,16 @@ if ($_POST["logout"]) {
 
 
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
-// return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu
+// return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
+// for remote files, always returns an update 
 if ($_REQUEST["method"] == "pulse") {
 	if (!$isStillAuthorized) die("0");
-	$updateFile = (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]);
+	$updateFile = (!isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
 	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
-	if (file_exists($_SESSION["filename"])) {
+	if (isFileRemote($_SESSION["filename"])) {
+		if (!$updateMenu) die("1"); // force an update on remote files by returning "1"
+		if ($updateMenu) die("3");
+	} else if (file_exists($_SESSION["filename"])) {
 		if ($updateFile && !$updateMenu) die("1"); // indicate an update by returning "1"
 		if ($updateFile && $updateMenu) die("3");
 	}
@@ -160,27 +264,28 @@ if ($_REQUEST["method"] == "pulse") {
 	die(); // if no filename, or no update to the file, die with nothing
 }
 
-
 // return only the file menu HTML
 if ($_REQUEST["method"] == "menu") {
 	if (!$isStillAuthorized) die();
-	die($fmenu); // if no filename, or no update to the file, die with nothing
+	die($fmenu); // die outputting menu HTML
 }
-
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
 	
-	if ($_REQUEST["method"] == "ajax") {
-		die(); // if they're not calling from an authorized session, ajax returns nothing
-	}
+	if ($_REQUEST["method"] == "ajax") die(); // if they're not calling from an authorized session, ajax returns nothing
 	
 	if ($_POST["pwd"] == $pagePassword) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
 		
 	} else {
 		// needs new authorization, so show the login page
-		
+
+
+// ********************************************************************************
+// HTML PAGE #1: LOG IN
+// ********************************************************************************
+
 		?><!DOCTYPE html>
 <html>
 <head>
@@ -227,43 +332,30 @@ if (!$isStillAuthorized) {
 	}
 }
 
-// didn't need a login, so let's proceed
+// ********************************************************************************
+// PHP PROCEDURES, CONTINUED
+// ********************************************************************************
 
-$noFile = "Nothing found."; // error to output if the file does not exist or is empty
+
+// it's not a pulse check, or a menu check, and the user didn't need to authorize, so let's proceed with output
+
+$noFile = "Nothing found."; // default message to output if the file does not exist or is empty
 $fpassed = $_REQUEST["file"];
 
-if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed);
+if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed); // if $accessCurrentDirectoryOnly is true, only allow files in current directory
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
 
-if (!file_exists($fpassed)) {
-	$foutput = $noFile;
-	unset( $_SESSION["filename"] );
-	unset( $_SESSION["filetime"] );
-	unset( $_SESSION["filemenu"] );
-	
-} else {
-	
-	// check if it's an image and, if so, output an img tag
-	$isImage = getimagesize($fpassed);
-	if ($isImage != false) $foutput = "<img src='" . $fpassed . "'>";
-	else $foutput = file_get_contents( $fpassed );
-
-	if (!$foutput || ($preventAccessToThisFile && ($fpassed == basename(__FILE__)))) {
-		$foutput = $noFile; // no file there, or it's completely empty
-	} else if ($isImage == false) { 
-		$foutput = trim( htmlspecialchars( $foutput ) );
-	}
-
-	$_SESSION["filename"] = $fpassed;
-	$_SESSION["filetime"] = filemtime($fpassed);
-	$_SESSION["filemenu"] = $fmenu;
-
-}
+$foutput = fetchFile($fpassed);
 
 // if the method is ajax, just return the content without the rest of the HTML, CSS, JS
 if ($_REQUEST["method"] == "ajax") die($foutput); 
 
 // if we got this far, output the whole page
+
+// ********************************************************************************
+// HTML PAGE #2: LOAD COMPLETE INTERFACE
+// ********************************************************************************
+
 	
 ?><!DOCTYPE html>
 <html>
@@ -311,6 +403,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			darkModeOn = !darkModeOn;
 		}
 		
+		// toggle the auto-load pulse check every 5 seconds
 		function toggleReloadTimer() {
 			closeMenus();
 			if (!reloadTimer) {
@@ -1076,7 +1169,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 					<li><a href="javascript:selectCode()"><span>&nbsp;</span> Select All Code</a>
 					<li id="optDarkMode" class="menuLine"><a href="javascript:toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a href="javascript:toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
-					<li id="optReload"><a href="javascript:toggleReloadTimer();"><span>&nbsp;</span> Auto-reload</a></li>
+					<li id="optReload"><a href="javascript:toggleReloadTimer();"><span>&nbsp;</span> Auto-load updates (5s)</a></li>
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a href="javascript:logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
 					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr Info</a></li><? } ?>
