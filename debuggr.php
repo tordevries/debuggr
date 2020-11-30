@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.1.5-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -121,7 +121,8 @@ function fileMenu($dir = '.') {
 
 // check if a filepath is local or remote, then fetch accordingly
 function fetchFile($filepath) {
-	if (isFileRemote($filepath)) $returnData = fetchRemoteFile($filepath);
+	global $allowRemoteFileReading;
+	if (isFileRemote($filepath) && $allowRemoteFileReading) $returnData = fetchRemoteFile($filepath);
 	else $returnData = fetchLocalFile($filepath);
 	return $returnData;
 }
@@ -198,6 +199,16 @@ function fetchRemoteFile($remoteURL) {
 			curl_setopt($remoteCURL, CURLOPT_TIMEOUT_MS, 5000);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
 			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
+			
+			// adapted from https://stackoverflow.com/questions/4184869/how-to-disguise-your-php-script-as-a-browser
+			$curlHeader = ['User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12',
+				'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+				'Accept-Language: en-us,en;q=0.5',
+				'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+				'Keep-Alive: 115',
+				'Connection: keep-alive'];
+			curl_setopt($remoteCURL, CURLOPT_HTTPHEADER, $curlHeader);
+			
 			if ($allowCURLtoBypassHTTPS) curl_setopt($remoteCURL, CURLOPT_SSL_VERIFYPEER, false);
 			else curl_setopt($remoteCURL, CURLOPT_CAPATH, $certificatePathForCURL);
 			$remoteCURLhttp = curl_getinfo($remoteCURL, CURLINFO_HTTP_CODE);
