@@ -46,6 +46,9 @@ A Boolean value which, if true, allows users to enter pathnames to parent direct
 #### preventAccessToThisFile
 A Boolean value which, if true, prevents users from reading this PHP file with itself. The default is true. The only scenario where you want this to be "false" is if you have configured a set of default values of this code that you want someone else to copy.
 
+#### allowRemoteFileReading
+A Boolean value which, if true, allows Debuggr to attempt to read remote URLs. The default is true. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; and finally, this can only read publicly-available pages, and not any remote web page that requires a password.
+
 #### showFilesMenu
 A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories. Also, the reload and auto-reload functions will check and dynamically reload updated file menus via AJAX.
 
@@ -58,15 +61,23 @@ A Boolean value which, if true, will start the UI in dark mode by default, rathe
 #### startWithLinesOn
 A Boolean value which, if true, will start with the line numbers showing on the left, rather than hidden. The default is true.
 
-#### $showDebuggrLink
+#### showDebuggrLink
 A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
+
+#### allowCURLtoBypassHTTPS
+A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a _low_ security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_, as noted below.
+
+#### ertificatePathForCURL
+A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for _your_ server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
 ## Future Features
 
-Here are a few of the ideas on the future radar:
-- **Whitelisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
-- **Allow loading of remote files.** This would allow viewing the source of pages elsewhere using cURL, though obviously only HTML/CSS/JS. Useful on mobile where it is otherwise difficult to read source code.
+Some ideas on the future radar:
+- **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
+- **Tabbed interface.** Allow creation of tabs to look at different files.
+- **Better styling.** This includes some basic CSS styling for use with Highlight.js, but I'd like to customize these.
+- **Code beautifying.** It might be nice to support js-beautify for code appearance, although this would unlink line number references versus the original source.
 
 --
 ## License
