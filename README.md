@@ -26,7 +26,7 @@ There are several PHP variables to configure access and output.
 A string variable for the host coder's name.
 
 #### userEmail
-A string variable for the host coder's email address, to enable the "Email" button.
+A string variable for the host coder's email address, to enable the "Email" option.
 
 #### pagePassword
 A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see preventAccessToThisFile, below) then they will be able to read your password.
@@ -35,7 +35,7 @@ A string variable for the password. It's strongly suggested that you use this. O
 A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. The default is true.
 
 #### forceSSL
-A Boolean value which, if true, will redirect all HTTP requests to HTTPS for security purposes. The default is true.
+A Boolean value which, if true, will redirect all HTTP requests to HTTPS for security purposes. The default is true. (You really ought to have an SSL certificate installed and be using HTTPS!)
 
 #### accessCurrentDirectoryOnly
 A Boolean value which, if true, restricts user access to only files in this same directory as this file, with no subdirectories allowed in the parameter pathname. The default is true.
