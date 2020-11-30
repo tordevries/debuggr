@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.0.1-alpha by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.0.3-alpha by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -37,11 +37,11 @@ $passwordRequired = true; // if true, requires a password and temporary session 
 $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 
 $accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
-$accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../'
+$accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 
 $showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
-// note: if $accessCurrentDirectoryOnly is false, the "Files" menu will include local folders and their files/subdirectories
+// note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
 
 $highlightCode = true; // true to load Highlight.js for coloring text
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
@@ -137,11 +137,11 @@ session_start();
 $isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
 $fmenu = fileMenu();
 
-// has a logout command been passed?
+// if a logout command been passed, clear the session and send back to login form
 if ($_POST["logout"]) {
 	session_unset();
 	session_destroy();
-	header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], true, 301);
+	header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
 	die();
 }
 
@@ -169,7 +169,7 @@ if ($_REQUEST["method"] == "menu") {
 
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
-if (!$isStillAuthorized)) {
+if (!$isStillAuthorized) {
 	
 	if ($_REQUEST["method"] == "ajax") {
 		die(); // if they're not calling from an authorized session, ajax returns nothing
@@ -334,27 +334,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			sel.addRange(r);
 		}
 		
-		// use AJAX to check pulse on the file; has it been updated since last load?
-		function checkPulse() {
-			if (reloadTimer) statusMessage("&bull;");
-			else statusMessage("Checking for updates...");
-			ajax = new XMLHttpRequest();
-			ajax.onreadystatechange = function() {
-					if ((this.readyState == 4) && (this.status == 200)) {
-						if (this.responseText == "0") logout();
-						else if (this.responseText == "1") loadFile();
-						else if (this.responseText == "2") loadMenu();
-						else if (this.responseText == "3") { loadFile(); loadMenu(); }
-						else statusMessage("");
-					} else if ((this.readyState == 4) && (this.status != 200)) {
-						console.log("AJAX pulse error: " + this.responseText);
-					}
-			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=pulse";
-			ajax.open("POST", urlToLoad, true);
-			ajax.send();
-		}
-		
+		// update the #fileNav UL-based menu to open and close with clicks
 		function setMenuClicks() {
 			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) {
@@ -364,6 +344,30 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 					event.stopPropagation();
 				}
 			}
+		}
+		
+		// use AJAX to check pulse on the file; has it been updated since last load?
+		function checkPulse(toCloseMenus) {
+			if (toCloseMenus) closeMenus();
+			if (reloadTimer) statusMessage("&bull;");
+			else statusMessage("Checking for updates...");
+			ajax = new XMLHttpRequest();
+			ajax.onreadystatechange = function() {
+					if ((this.readyState == 4) && (this.status == 200)) {
+						switch (this.responseText) {
+							case "0": logout(); break;
+							case "1": loadFile(); break;
+							case "2": loadMenu(); break;
+							case "3": loadFile(); loadMenu(); break;
+							default: statusMessage("");								
+						}
+					} else if ((this.readyState == 4) && (this.status != 200)) {
+						console.log("AJAX pulse error: " + this.responseText);
+					}
+			}
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=pulse";
+			ajax.open("GET", urlToLoad, true);
+			ajax.send();
 		}
 		
 		function loadMenu() {
@@ -1060,7 +1064,11 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">
 		<?= $fmenu; ?>
-		<div id="filenameRef"><span><?= $fpassed; ?></span> <a class="uicon" title="Reload file" href="javascript:checkPulse();">&#8635;</a><span id="statusMsg"></span></div>
+		<div id="filenameRef">
+			<span><?= $fpassed; ?></span> 
+			<a class="uicon" title="Reload file" href="javascript:checkPulse(true);">&#8635;</a>
+			<span id="statusMsg"></span>
+		</div>
 		<ul id="optionsNav">
 			<li><a id="menuIcon">&#9776;</a>
 				<ul>
