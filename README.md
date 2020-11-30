@@ -79,7 +79,7 @@ Some ideas on the future radar:
 - **Better styling.** This includes some basic CSS styling for use with Highlight.js, but I'd like to customize these.
 - **Code beautifying.** It might be nice to support js-beautify for code appearance, although this would unlink line number references versus the original source.
 
---
+---
 ## License
 
 Copyright (C) 2020 Tor de Vries (tor.devries@wsu.edu)
