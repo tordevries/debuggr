@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.2.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -757,16 +757,6 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			padding: 4px;
 			text-transform: uppercase;
 		}
-
-		@media only print {
-			#nav {
-				display: none;
-			}
-			#codeNums, #codeLines {
-				position: absolute;
-				overflow: visible;
-			}
-		}
 		
 		#optionsNav {
 			float: right;
@@ -921,6 +911,16 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			display: block;
 			left: 100%;
 			bottom: 0;
+		}
+		
+		@media only print {
+			#nav, #codeCols {
+				display: none;
+			}
+			#codeNums, #codeLines {
+				position: absolute;
+				overflow: visible;
+			}
 		}
 		
 	</style>
