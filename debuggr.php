@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.1.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -457,7 +457,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		function checkPulse(toCloseMenus) {
 			if (toCloseMenus) closeMenus();
 			if (reloadTimer) statusMessage("&bull;");
-			else statusMessage("Checking for updates...");
+			else statusMessage("Checking...");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
@@ -560,22 +560,36 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
-			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
 			
+			// output line numbers
+			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
+
+			// output column numbers
+			for (x=1; x<30; x++) document.getElementById("codeCols").innerHTML += "<span>" + (x * 10) + "</span>";
+
+			// reposition #codeNums and #codeCols as the user scrolls
 			document.getElementById("codeLines").onscroll = function() { 
 				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; 
+				document.getElementById("codeCols").style.top = document.getElementById("codeLines").scrollTop + "px"; 
 			}
+			document.querySelector("#codeLines pre").onscroll = function() {
+				document.getElementById("codeCols").style.left = (0 - document.querySelector("#codeLines pre").scrollLeft) + "px"; 
+			}			
 			
+			// set clicks for the options menu
 			document.querySelector('#optionsNav li').onclick = function() { 
 				closeMenus();
 				document.querySelector('#optionsNav li').classList.toggle('showSub');
 			}
 			
+			// set clicks for the file menu
 			setMenuClicks();
-						
+			
+			// close menus when someone clicks on the main code
 			document.getElementById("codeLines").onclick = function() { closeMenus(); }
 			document.getElementById("codeNums").onclick = function() { closeMenus(); }
 
+			// apply highlight.js
 			styleCode();
 			
 			// since the URL is changed dynamically, we need to dynamically respond to back buttons
@@ -625,7 +639,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		#nav span {
 			margin-right: 10px;
 			float: left;
-			max-width: 70vw;
+			max-width: 40vw;
 		}
 
 		#nav span a {
@@ -641,6 +655,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			margin-left: 10px;
 			color: #aaa;
 			float: right;
+			max-width: 30vw;
 		}
 		
 		a.uicon  {
@@ -679,11 +694,39 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			width: calc(100vw - 0.25rem);
 			overflow: scroll;
 			transition: left 0.5s, width 0.5s;
-			z-index: 1;
+			z-index: 2;
+		}
+		
+		#codeLines pre {
+			overflow: display;
+			background-size: 10ch 10ch;
+			background-image: linear-gradient(to right, #2c2c2c 1px, transparent 1px);
+			background-attachment: local;
+			z-index: 2;
 		}
 		
 		#codeNums pre, #codeLines pre {
 			padding-top: 0.5em;
+			padding-bottom: 2rem;
+		}
+		
+		#codeCols {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 500%;
+			height: 1.5em;
+			overflow: auto;
+			z-index: 1;
+		}
+		
+		#codeCols span {
+			width: 10ch;
+			display: inline-block;
+			white-space: nowrap;
+			text-align: right;
+			color: #333;
+			padding-right: 4px;
 		}
 		
 		body.linesOn #codeLines {
@@ -1200,7 +1243,10 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		</ul>
 	</div>
 	<div id="codeNums"><pre></pre></div>
-	<div id="codeLines"><pre><?= $foutput; ?></pre></div>
+	<div id="codeLines">
+		<div id="codeCols"></div>
+		<pre><?= $foutput; ?></pre>
+	</div>
 	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
 </html>
