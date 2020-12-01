@@ -700,9 +700,13 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		#codeLines pre {
 			overflow: display;
 			background-size: 10ch 10ch;
-			background-image: linear-gradient(to right, #2c2c2c 1px, transparent 1px);
+			background-image: linear-gradient(to right, #ddd 1px, transparent 1px);
 			background-attachment: local;
 			z-index: 2;
+		}
+		
+		body.darkMode #codeLines pre {
+			background-image: linear-gradient(to right, #333 1px, transparent 1px);
 		}
 		
 		#codeNums pre, #codeLines pre {
@@ -725,8 +729,12 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			display: inline-block;
 			white-space: nowrap;
 			text-align: right;
-			color: #333;
+			color: #bbb;
 			padding-right: 4px;
+		}
+		
+		body.darkMode #codeCols span {
+			color: #555;
 		}
 		
 		body.linesOn #codeLines {
