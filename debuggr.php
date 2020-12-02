@@ -47,7 +47,7 @@ $showFilesMenu = false; // if true, will add links to the FIles menu with files 
 $highlightCode = true; // true to load Highlight.js for coloring text
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
 $startWithLinesOn = true; // true to start with the line numbers visible
-$startWithColsOn  = true; // true to start with the column lines and numbers visible
+$startWithColsOn = true; // true to start with the column lines and numbers visible
 $showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
 
 // advanced remote file reading options related to $allowRemoteFileReading and the PHP cURL libraries
@@ -1192,9 +1192,9 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		</ul>
 	</div>
 	<div id="codeNums"><pre></pre></div>
-	<div id="codeLines">
+	<div id="codeLines" class="<?= ($startWithColsOn ? "" : "colsOff") ?>">
 		<div id="codeCols"></div>
-		<pre class="<?= ($startWithColsOn ? "colsOff" : "") ?>"><?= $foutput; ?></pre>
+		<pre><?= $foutput; ?></pre>
 	</div>
 	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
