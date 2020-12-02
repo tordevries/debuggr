@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.2.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.2.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -41,7 +41,7 @@ $accessParentDirectories = false; // if true, allows users to enter pathnames to
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
 $allowRemoteFileReading = false; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
 
-$showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
+$showFilesMenu = t; // if true, will add links to the FIles menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
 
 $highlightCode = true; // true to load Highlight.js for coloring text
@@ -201,7 +201,7 @@ function fetchRemoteFile($remoteURL) {
 			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
 			
 			// adapted from https://stackoverflow.com/questions/4184869/how-to-disguise-your-php-script-as-a-browser
-			$curlHeader = ['User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12',
+			$curlHeader = ['User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
 				'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 				'Accept-Language: en-us,en;q=0.5',
 				'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
