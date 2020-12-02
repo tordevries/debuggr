@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.2.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.3-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -39,14 +39,15 @@ $forceSSL = true; // if true, redirects HTTP requests to HTTPS
 $accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
 $accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
 $preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
-$allowRemoteFileReading = false; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
+$allowRemoteFileReading = true; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
 
-$showFilesMenu = t; // if true, will add links to the FIles menu with files in the current directory
+$showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
 
 $highlightCode = true; // true to load Highlight.js for coloring text
 $startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
 $startWithLinesOn = true; // true to start with the line numbers visible
+$startWithColsOn  = true; // true to start with the column lines and numbers visible
 $showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
 
 // advanced remote file reading options related to $allowRemoteFileReading and the PHP cURL libraries
@@ -104,7 +105,10 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 			}
 		}
 	}
-	if ($depth == 0) $result .= "<li class='" . ($showFilesMenu ? "menuLine" : "") . "'><a onclick='openFile();'>Open File...</a></li>";
+	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
+			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
+			"<li><a onclick='selectCode()'>Select All Code</a>" .
+			"<li class='menuLine'><a onclick='openFile();'>Open New File</a></li>";
 	$result .= "</ul>";
 	return $result;
 }
@@ -383,6 +387,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		// set some variables (including some passed from PHP
 		baseFile = "<?= $fpassed; ?>";
 		lineNumbersOn = <?= json_encode($startWithLinesOn); ?>;
+		colNumbersOn = <?= json_encode($startWithColsOn); ?>;
 		darkModeOn = <?= json_encode($startInDarkMode); ?>;
 		reloadTimer = false;
 		
@@ -391,7 +396,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			document.getElementById("statusMsg").innerHTML = msg;
 		}
 		
-		// toggle the numbers using CSS and changing the button
+		// toggle the row numbers using CSS
 		function toggleNums() {
 			closeMenus();
 			if (lineNumbersOn) {
@@ -402,6 +407,19 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 				document.querySelector("#optLineNumbers span").innerHTML = "&check;";
 			}
 			lineNumbersOn = !lineNumbersOn;
+		}
+
+		// toggle the column numbers using CSS
+		function toggleCols() {
+			closeMenus();
+			if (colNumbersOn) {
+				document.getElementById("codeLines").classList.add("colsOff");
+				document.querySelector("#optColumns span").innerHTML = "&nbsp;";
+			} else {
+				document.getElementById("codeLines").classList.remove("colsOff");
+				document.querySelector("#optColumns span").innerHTML = "&check;";
+			}
+			colNumbersOn = !colNumbersOn;
 		}
 		
 		// toggle visual dark/lite mode
@@ -731,6 +749,14 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 			text-align: right;
 			color: #bbb;
 			padding-right: 4px;
+		}
+		
+		#codeLines.colsOff #codeCols {
+			display: none;
+		}
+		
+		#codeLines.colsOff pre {
+			background: none;
 		}
 		
 		body.darkMode #codeCols span {
@@ -1141,90 +1167,6 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		}
 
 	</style>
-	<style>
-		/* highlight.js noStyle adaptation */
-
-		body.noStyle .hljs,
-		body.noStyle .hljs-built_in,
-		body.noStyle .hljs-selector-tag,
-		body.noStyle .hljs-section,
-		body.noStyle .hljs-link,
-		body.noStyle .hljs-keyword,
-		body.noStyle .hljs,
-		body.noStyle .hljs-subst,
-		body.noStyle .hljs-title,
-		body.noStyle .hljs-string,
-		body.noStyle .hljs-meta,
-		body.noStyle .hljs-name,
-		body.noStyle .hljs-type,
-		body.noStyle .hljs-attr,
-		body.noStyle .hljs-symbol,
-		body.noStyle .hljs-bullet,
-		body.noStyle .hljs-addition,
-		body.noStyle .hljs-variable,
-		body.noStyle .hljs-template-tag,
-		body.noStyle .hljs-template-variable,
-		body.noStyle .hljs-comment,
-		body.noStyle .hljs-quote,
-		body.noStyle .hljs-deletion,
-		body.noStyle .hljs-keyword,
-		body.noStyle .hljs-selector-tag,
-		body.noStyle .hljs-literal,
-		body.noStyle .hljs-title,
-		body.noStyle .hljs-section,
-		body.noStyle .hljs-doctag,
-		body.noStyle .hljs-type,
-		body.noStyle .hljs-name,
-		body.noStyle .hljs-strong,
-		body.noStyle .hljs-literal,
-		body.noStyle .hljs-number,
-		body.noStyle .hljs-emphasis {
-			font-style: normal;
-			font-weight: normal;
-			color: #000;
-		}
-
-		body.darkMode.noStyle .hljs,
-		body.darkMode.noStyle .hljs-built_in,
-		body.darkMode.noStyle .hljs-selector-tag,
-		body.darkMode.noStyle .hljs-section,
-		body.darkMode.noStyle .hljs-link,
-		body.darkMode.noStyle .hljs-keyword,
-		body.darkMode.noStyle .hljs,
-		body.darkMode.noStyle .hljs-subst,
-		body.darkMode.noStyle .hljs-title,
-		body.darkMode.noStyle .hljs-string,
-		body.darkMode.noStyle .hljs-meta,
-		body.darkMode.noStyle .hljs-name,
-		body.darkMode.noStyle .hljs-type,
-		body.darkMode.noStyle .hljs-attr,
-		body.darkMode.noStyle .hljs-symbol,
-		body.darkMode.noStyle .hljs-bullet,
-		body.darkMode.noStyle .hljs-addition,
-		body.darkMode.noStyle .hljs-variable,
-		body.darkMode.noStyle .hljs-template-tag,
-		body.darkMode.noStyle .hljs-template-variable,
-		body.darkMode.noStyle .hljs-comment,
-		body.darkMode.noStyle .hljs-quote,
-		body.darkMode.noStyle .hljs-deletion,
-		body.darkMode.noStyle .hljs-keyword,
-		body.darkMode.noStyle .hljs-selector-tag,
-		body.darkMode.noStyle .hljs-literal,
-		body.darkMode.noStyle .hljs-title,
-		body.darkMode.noStyle .hljs-section,
-		body.darkMode.noStyle .hljs-doctag,
-		body.darkMode.noStyle .hljs-type,
-		body.darkMode.noStyle .hljs-name,
-		body.darkMode.noStyle .hljs-strong,
-		body.darkMode.noStyle .hljs-literal,
-		body.darkMode.noStyle .hljs-number,
-		body.darkMode.noStyle .hljs-emphasis {
-			font-style: normal;
-			font-weight: normal;
-			color: #fff;
-		}
-
-	</style>
 <? } ?>
 </head>
 <body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
@@ -1238,13 +1180,12 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 		<ul id="optionsNav">
 			<li><a id="menuIcon">&#9776;</a>
 				<ul>
-					<li><a href="javascript:window.open(baseFile);"><span>&nbsp;</span> Open File in New Tab</a></li>
-					<li><a href="javascript:selectCode()"><span>&nbsp;</span> Select All Code</a>
-					<li id="optDarkMode" class="menuLine"><a href="javascript:toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
-					<li id="optLineNumbers"><a href="javascript:toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
-					<li id="optReload"><a href="javascript:toggleReloadTimer();"><span>&nbsp;</span> Auto-load updates (5s)</a></li>
+					<li id="optDarkMode"><a onclick="toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
+					<li id="optLineNumbers"><a onclick="toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
+					<li id="optColumns"><a onclick="toggleCols();"><span><?= ($startWithColsOn ? "&check;" : "&nbsp;") ?></span> Column Markers</a></li>
+					<li id="optReload"><a onclick="toggleReloadTimer();"><span>&nbsp;</span> Auto-load updates (5s)</a></li>
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
-					<? if ($passwordRequired) { ?><li><a href="javascript:logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
+					<? if ($passwordRequired) { ?><li><a onclick="logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
 					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr Info</a></li><? } ?>
 				</ul>
 			</li>
@@ -1253,7 +1194,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 	<div id="codeNums"><pre></pre></div>
 	<div id="codeLines">
 		<div id="codeCols"></div>
-		<pre><?= $foutput; ?></pre>
+		<pre class="<?= ($startWithColsOn ? "colsOff" : "") ?>"><?= $foutput; ?></pre>
 	</div>
 	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
