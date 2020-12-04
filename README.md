@@ -30,7 +30,7 @@ The debuggr.php file can be renamed to anything other .php filename. This means,
 
 https://yourdomain.com/code/?readme.txt
 
-If the configuration allowRemoteFileReading is set to true, a complete URL can be substituted for the filename, and Debuggr will read its source. However, it can only read what is publicly accessible through any web browser, so it cannot read any server-side code.
+If the configuration allowRemoteFileReading is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code, and some sites actively block such scraping; they will return nothing.
 
 ---
 ## Options
