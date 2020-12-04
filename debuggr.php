@@ -232,11 +232,26 @@ function fetchRemoteFile($remoteURL) {
 	return $returnOutput;
 }
 
+// function to output a simple PNG favicon of 
+function outputFavicon() {
+	$image = imagecreatetruecolor(32, 32); 	// create a blank image
+	$bkgd = imagecolorallocate($image, 34, 34, 34);	// set the background color
+	$textcolor = imagecolorallocate($image, 255, 255, 255); // set the text color
+	imagestring($image, 4, 5, 7,  "</>", $textcolor); // add text to the image
+	header("Content-Type: image/png"); // output correct header
+	imagepng($image); // output the image as png
+}
+
 
 // ********************************************************************************
 // PHP PROCEDURES
 // ********************************************************************************
 
+// output a favicon just to avoid the 404 error in the browser console
+if ($_REQUEST["mode"] == "favicon") {
+	outputFavicon();
+	die();
+}
 
 // for security, kill the output if password is required but not set
 if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
@@ -310,6 +325,7 @@ if (!$isStillAuthorized) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
+	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
 
@@ -385,6 +401,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Cache-Control" content="no-store" />
+	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
 	<script>
 		
