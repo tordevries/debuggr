@@ -1,6 +1,5 @@
 # debuggr
-A PHP file to allow others to read server-side coding files on your server.  It was originally designed to allow a programming instructor to read server-side code written by his students, once they had installed this. 
-By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and manage, with less file clutter, especially for beginner coders.
+A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and manage, with less file clutter, especially for beginner coders.
 
 Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
@@ -67,7 +66,7 @@ A Boolean value which, if true, allows Debuggr to attempt to read remote URLs. T
 A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories. Also, the reload and auto-reload functions will check and dynamically reload updated file menus via AJAX.
 
 #### highlightCode
-A Boolean value which, if true, will include references to load Highlight.js and a collection of CSS to provide basic code styling/highlighting. The default is true.
+A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. The default is true.
 
 #### startInDarkMode
 A Boolean value which, if true, will start the UI in dark mode by default, rather than lite mode. The default is true.
@@ -110,3 +109,5 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 
 The complete license is available in the LICENSE.txt file accompanying this project, or online
 at <https://www.gnu.org/licenses/gpl-3.0.en.html>.
+
+The [Highlight.js](https://highlightjs.org/) library is under the BSD-3 license.
