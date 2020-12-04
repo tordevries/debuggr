@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.6-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -172,6 +172,7 @@ function fetchLocalFile($localFilepath) {
 	return $returnOutput;
 }
 
+
 // function to read remote URLs via cURL; note that this is bypasses HTTPS confirmation checks and
 // is thus inherently insecure; it may be subject to MITM (man in the middle) attacks.
 function fetchRemoteFile($remoteURL) {
@@ -232,6 +233,7 @@ function fetchRemoteFile($remoteURL) {
 	return $returnOutput;
 }
 
+
 // function to output a simple PNG favicon of 
 function outputFavicon() {
 	$image = imagecreatetruecolor(32, 32); 	// create a blank image
@@ -266,9 +268,6 @@ if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 // initalize sessions
 session_start();
 
-// set a boolean to use to confirm continued authorization
-$isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
-$fmenu = fileMenu();
 
 // if a logout command been passed, clear the session and send back to login form
 if ($_POST["logout"]) {
@@ -279,34 +278,13 @@ if ($_POST["logout"]) {
 }
 
 
-// for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
-// return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
-// for remote files, always returns an update 
-if ($_REQUEST["mode"] == "pulse") {
-	if (!$isStillAuthorized) die("0");
-	$updateFile = (!isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
-	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
-	if (isFileRemote($_SESSION["filename"])) {
-		if (!$updateMenu) die("1"); // force an update on remote files by returning "1"
-		if ($updateMenu) die("3");
-	} else if (file_exists($_SESSION["filename"])) {
-		if ($updateFile && !$updateMenu) die("1"); // indicate an update by returning "1"
-		if ($updateFile && $updateMenu) die("3");
-	}
-	if ($updateMenu) die("2");
-	die(); // if no filename, or no update to the file, die with nothing
-}
-
-// return only the file menu HTML
-if ($_REQUEST["mode"] == "menu") {
-	if (!$isStillAuthorized) die();
-	die($fmenu); // die outputting menu HTML
-}
+// set a boolean to use to confirm continued authorization
+$isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
 	
-	if ($_REQUEST["mode"] == "ajax") die(); // if they're not calling from an authorized session, ajax returns nothing
+	if ( ($_REQUEST["mode"] == "ajax") || ($_REQUEST["mode"] == "pulse") || ($_REQUEST["mode"] == "menu") ) die(); // if they're not calling from an authorized session, ajax and other checks return nothing
 	
 	if ($_POST["pwd"] == $pagePassword) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
@@ -372,14 +350,42 @@ if (!$isStillAuthorized) {
 // ********************************************************************************
 
 
+// for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
+// return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
+// for remote files, always returns an update 
+if ($_REQUEST["mode"] == "pulse") {
+	$updateFile = (!isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
+	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
+	if (isFileRemote($_SESSION["filename"])) {
+		if (!$updateMenu) die("1"); // force an update on remote files by returning "1"
+		if ($updateMenu) die("3");
+	} else if (file_exists($_SESSION["filename"])) {
+		if ($updateFile && !$updateMenu) die("1"); // indicate an update by returning "1"
+		if ($updateFile && $updateMenu) die("3");
+	}
+	if ($updateMenu) die("2");
+	die(); // if no filename, or no update to the file, die with nothing
+}
+
+
+// generate HTML for the Files menu
+$fmenu = fileMenu();
+
+
+// return only the file menu HTML
+if ($_REQUEST["mode"] == "menu") {
+	die($fmenu); // die outputting menu HTML
+}
+
+
 // it's not a pulse check, or a menu check, and the user didn't need to authorize, so let's proceed with output
 
 $noFile = "Nothing found."; // default message to output if the file does not exist or is empty
 
 // was a file passed via file= or f= parameters in the URL? otherwise set it to the query string
-if (isset($_REQUEST["file"])) $fpassed = $_REQUEST["file"];
-else if (isset($_REQUEST["f"])) $fpassed = $_REQUEST["f"];
-else $fpassed = $_SERVER['QUERY_STRING'];
+if (isset($_REQUEST["file"])) $fpassed = rawurldecode($_REQUEST["file"]);
+else if (isset($_REQUEST["f"])) $fpassed = rawurldecode($_REQUEST["f"]);
+else $fpassed = rawurldecode($_SERVER['QUERY_STRING']);
 
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed); // if $accessCurrentDirectoryOnly is true, only allow files in current directory
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
@@ -561,7 +567,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 						console.log("AJAX error: " + this.responseText);
 					}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + fileToLoad;
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + encodeURIComponent(fileToLoad);
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
