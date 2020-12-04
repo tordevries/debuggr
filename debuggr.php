@@ -218,14 +218,14 @@ function fetchRemoteFile($remoteURL) {
 			if ($allowCURLtoBypassHTTPS) curl_setopt($remoteCURL, CURLOPT_SSL_VERIFYPEER, false);
 			else curl_setopt($remoteCURL, CURLOPT_CAPATH, $certificatePathForCURL);
 			$remoteCURLhttp = curl_getinfo($remoteCURL, CURLINFO_HTTP_CODE);
-			error_log("cURL HTTP code: " . $remoteCURLhttp);
-			error_log("cURL error: " . curl_strerror(curl_errno($remoteCURL)));
+			// error_log("cURL HTTP code: " . $remoteCURLhttp);
+			// error_log("cURL error: " . curl_strerror(curl_errno($remoteCURL)));
 			
 			// execute cURL call and convert to shareable code with htmlspecialchars()
 			$returnOutput = htmlspecialchars( curl_exec($remoteCURL) );
 			
 		} else {
-			error_log("Debuggr remote URL error: cURL is not enabled.");
+			// error_log("Debuggr remote URL error: cURL is not enabled.");
 			$returnOutput = $noFile;
 			
 		}
