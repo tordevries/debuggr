@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.5-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -326,6 +326,7 @@ if (!$isStillAuthorized) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
+	<!-- comment -->
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
 
@@ -394,7 +395,6 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 // HTML PAGE #2: LOAD COMPLETE INTERFACE
 // ********************************************************************************
 
-	
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -592,7 +592,11 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		}
 		
 		function styleCode() { // apply Highlights.js
-			<? if ($highlightCode) { ?>hljs.highlightBlock( document.querySelector('#codeLines pre') );<? } ?>
+			<? if ($highlightCode) { ?>
+			document.querySelector('#codeLines pre').className = "";
+			hljs.highlightBlock( document.querySelector('#codeLines pre') );
+			console.log("highlight");
+			<? } ?>
 		}
 		
 		function logout() { document.getElementById("logoutForm").submit(); }
@@ -644,6 +648,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		
 		* {
 			font-family: 'Source Code Pro', monospace;
+			font-size: 14px;
 			tab-size: 3;
 			margin: 0;
 			padding: 0;
@@ -755,7 +760,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		
 		#codeCols {
 			position: absolute;
-			top: 0;
+			top: -4px;
 			left: 0;
 			width: 500%;
 			height: 1.5em;
@@ -974,13 +979,16 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 <? if ($highlightCode) { ?>	
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js"></script>
 	<style>
-		/*
-		Google Code style (c) Aahan Krish <geekpanth3r@gmail.com>
-		*/
 
 		.hljs-comment,
 		.hljs-javadoc {
 			color: #800;
+		}
+		
+		.hljs-selector-tag,
+		.hljs-selector-id,
+		.hljs-selector-class {
+			color: #3e7bb5;
 		}
 
 		.hljs-keyword,
@@ -1010,8 +1018,9 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		.apache .hljs-cbracket,
 		.hljs-date,
 		.hljs-regexp,
+		.hljs-attribute, 
 		.coffeescript .hljs-attribute {
-			color: #080;
+			color: #70704c;
 		}
 
 		.hljs-sub .hljs-identifier,
@@ -1111,26 +1120,17 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		.hljs-comment .hljs-yardoctag {
 			font-weight: bold;
 		}
-	</style>
-	<style>
+
+
 		/* highlight.js dark mode theme adaptation */
-		/* Dracula Theme v1.2.5
-		 *
-		 * https://github.com/dracula/highlightjs
-		 *
-		 * Copyright 2016-present, All rights reserved
-		 *
-		 * Code licensed under the MIT license
-		 *
-		 * @author Denis Ciccale <dciccale@gmail.com>
-		 * @author Zeno Rocha <hi@zenorocha.com>
-		 */
 
 		body.darkMode .hljs-built_in,
 		body.darkMode .hljs-selector-tag,
+		body.darkMode .hljs-selector-id,
+		body.darkMode .hljs-selector-class,
 		body.darkMode .hljs-section,
 		body.darkMode .hljs-link {
-			color: #8be9fd;
+			color: #66d8ef;
 		}
 
 		body.darkMode .hljs-keyword {
@@ -1142,31 +1142,43 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			color: #f8f8f2;
 		}
 
-		body.darkMode .hljs-title {
-			color: #50fa7b;
+		body.darkMode .hljs-title,
+		body.darkMode .hljs-params {
+			color: #ffd2a7;
 		}
 
-		body.darkMode .hljs-string,
+		body.darkMode .hljs-string {
+			color: #a8ff60;	
+		}
+		
+		body.darkMode .hljs-keyword,
+		body.darkMode .hljs-tag,
 		body.darkMode .hljs-meta,
 		body.darkMode .hljs-name,
 		body.darkMode .hljs-type,
-		body.darkMode .hljs-attr,
 		body.darkMode .hljs-symbol,
 		body.darkMode .hljs-bullet,
 		body.darkMode .hljs-addition,
 		body.darkMode .hljs-variable,
 		body.darkMode .hljs-template-tag,
 		body.darkMode .hljs-template-variable {
-			color: #f1fa8c;
+			color: #96cbfe;
+		}
+		
+		body.darkMode .hljs-attr,
+		body.darkMode .hljs-attribute {
+			color: #f7f7cd;
 		}
 
-		body.darkMode .hljs-comment,
+		body.darkMode .hljs-comment {
+			color: #d17575;	
+		}
+		
 		body.darkMode .hljs-quote,
 		body.darkMode .hljs-deletion {
-			color: #6272a4;
+			color: #75715e;
 		}
 
-		body.darkMode .hljs-keyword,
 		body.darkMode .hljs-selector-tag,
 		body.darkMode .hljs-literal,
 		body.darkMode .hljs-title,
@@ -1180,7 +1192,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 
 		body.darkMode .hljs-literal,
 		body.darkMode .hljs-number {
-			color: #bd93f9;
+			color: #ff73fd;
 		}
 
 		body.darkMode .hljs-emphasis {
