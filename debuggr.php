@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.7-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.9-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -108,7 +108,8 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
 			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Code</a>" .
-			"<li class='menuLine'><a onclick='openFile();'>Open New File</a></li>";
+			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
+			"<li class='menuLine'><a onclick='openFile();'>Open New File...</a></li>";
 	$result .= "</ul>";
 	return $result;
 }
@@ -554,7 +555,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 						baseFile = fileToLoad;
 						codeLinesPre.innerHTML = this.responseText;
 						styleCode();
-						prepLineNumbers(this.responseText.split("\n").length);
+						prepCodeNumbers();
 						document.title = "Debuggr: " + fileToLoad;
 						document.querySelector("#filenameRef span").innerHTML = fileToLoad;
 						if (historyUpdate) {
@@ -572,22 +573,44 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			ajax.send();
 		}
 		
-		// output line numbers in #codeNums pre; pad numbers with 0s to appropriate width
-		function prepLineNumbers(numLines) {
+		// output line and column numbers in #codeNums pre, padding numbers with 0s to appropriate width; calculate and add column numbers
+		function prepCodeNumbers() {
+			document.getElementById("codeCols").innerHTML = ""; // clear column numbers
 			codeNumsPre = document.querySelector("#codeNums pre");
-			codeNumsPre.innerHTML = "";
-			outputLines = "";
-			padTo = numLines.toString().length + 1;
+			codeNumsPre.innerHTML = ""; // clear row numbers
+			numLines = document.querySelector("#codeLines pre").innerHTML.split("\n"); // extract lines into an array
+			maxWidth = 1; // set column character width low
+			padTo = numLines.length.toString().length + 1; // number of zeros to add to front of line numbers
+			
+			// update the CSS with new widths
 			document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
-			for (x=1; x<=numLines; x++) codeNumsPre.innerHTML += (x + ":").padStart(padTo, "0") + "\n";
+			
+			// output line numbers and check line widths for column output
+			for (x=1; x<numLines.length; x++) {
+				codeNumsPre.innerHTML += (x + ":").padStart(padTo, "0") + "\n";
+				if (numLines[x].length > maxWidth) maxWidth = numLines[x].length;
+			}
+			
+			// output columns based on maxWidth analysis
+			for (x=1; x<((maxWidth/10)+1); x++) document.getElementById("codeCols").innerHTML += "<span>" + (x * 10) + "</span>";
 		}
 		
+		// go to a line
+		function lineJumper() {
+			closeMenus();
+			toJump = window.prompt("Go to line:", "0");
+			if (!isNaN(toJump)) {
+				jumpLine = (toJump-1) * 21; // based on CSS of font size and line height
+				document.getElementById("codeNums").scrollTop = jumpLine;
+				document.getElementById("codeLines").scrollTop = jumpLine;
+			}
+		}
+		
+		// open a file or URL
 		function openFile() {
 			closeMenus();
-			toOpen = window.prompt("Enter a filename and path:", baseFile);
-			if ((toOpen != "") && (toOpen !== null)) {
-				loadFile(toOpen);
-			}
+			toOpen = window.prompt("Enter a filename<?= ($allowRemoteFileReading ? " or complete URL" : ""); ?>:", baseFile);
+			if ((toOpen != "") && (toOpen !== null)) loadFile(toOpen);
 		}
 
 		function closeMenus() {
@@ -600,7 +623,6 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			<? if ($highlightCode) { ?>
 			document.querySelector('#codeLines pre').className = "";
 			hljs.highlightBlock( document.querySelector('#codeLines pre') );
-			console.log("highlight");
 			<? } ?>
 		}
 		
@@ -609,11 +631,8 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
 		window.onload = function() {
 			
-			// output line numbers
-			prepLineNumbers(document.querySelector("#codeLines pre").innerHTML.split("\n").length);
-
-			// output column numbers
-			for (x=1; x<30; x++) document.getElementById("codeCols").innerHTML += "<span>" + (x * 10) + "</span>";
+			// output line and column numbers
+			prepCodeNumbers();
 
 			// reposition #codeNums and #codeCols as the user scrolls
 			document.getElementById("codeLines").onscroll = function() { 
@@ -751,6 +770,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			background-size: 10ch 10ch;
 			background-image: linear-gradient(to right, #ddd 1px, transparent 1px);
 			background-attachment: local;
+			padding-right: 10ch;
 			z-index: 2;
 		}
 		
@@ -767,7 +787,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			position: absolute;
 			top: -4px;
 			left: 0;
-			width: 500%;
+			width: auto;
 			height: 1.5em;
 			overflow: auto;
 			z-index: 1;
@@ -806,7 +826,6 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		}
 		
 		#codeNums, #codeLines {
-			font-size: 100%;
 			line-height: 150%;
 		}
 		
