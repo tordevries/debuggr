@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.6-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.7-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -578,9 +578,8 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			codeNumsPre.innerHTML = "";
 			outputLines = "";
 			padTo = numLines.toString().length + 1;
-			for (x=1; x<=numLines; x++) outputLines += (x + ":").padStart(padTo, "0") + "\n";
-			codeNumsPre.innerHTML = outputLines;
 			document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
+			for (x=1; x<=numLines; x++) codeNumsPre.innerHTML += (x + ":").padStart(padTo, "0") + "\n";
 		}
 		
 		function openFile() {
