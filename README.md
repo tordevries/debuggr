@@ -18,6 +18,20 @@ https://yourdomain.com/debuggr.php?file=readme.txt
 
 ...would read the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.)
 
+Debuggr also accepts "f" for the parameter, like this:
+
+https://yourdomain.com/debuggr.php?f=readme.txt
+
+It can also accept just the file name:
+
+https://yourdomain.com/debuggr.php?readme.txt
+
+The debuggr.php file can be renamed to anything other .php filename. This means, for example, that you can rename it to index.php and place it into a directory, which allows a URL format like this:
+
+https://yourdomain.com/code/?readme.txt
+
+If the configuration allowRemoteFileReading is set to true, a complete URL can be substituted for the filename, and Debuggr will read its source. However, it can only read what is publicly accessible through any web browser, so it cannot read any server-side code.
+
 ---
 ## Options
 There are several PHP variables to configure access and output.

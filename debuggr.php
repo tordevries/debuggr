@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.3-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -358,7 +358,11 @@ if (!$isStillAuthorized) {
 // it's not a pulse check, or a menu check, and the user didn't need to authorize, so let's proceed with output
 
 $noFile = "Nothing found."; // default message to output if the file does not exist or is empty
-$fpassed = $_REQUEST["file"];
+
+// was a file passed via file= or f= parameters in the URL? otherwise set it to the query string
+if (isset($_REQUEST["file"])) $fpassed = $_REQUEST["file"];
+else if (isset($_REQUEST["f"])) $fpassed = $_REQUEST["f"];
+else $fpassed = $_SERVER['QUERY_STRING'];
 
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed); // if $accessCurrentDirectoryOnly is true, only allow files in current directory
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
@@ -540,7 +544,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 						console.log("AJAX error: " + this.responseText);
 					}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad + "&method=ajax";
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=ajax&file=" + fileToLoad;
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
