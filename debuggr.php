@@ -586,9 +586,9 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			document.querySelector("style").innerHTML += "body.linesOn #codeNums { width: " + (padTo-1) + "rem; } body.linesOn #codeLines { width: calc(100vw - " + (padTo - 0.5) + "rem); left: " + (padTo - 0.5) + "rem; }";
 			
 			// output line numbers and check line widths for column output
-			for (x=1; x<numLines.length; x++) {
+			for (x=1; x<=numLines.length; x++) {
 				codeNumsPre.innerHTML += (x + ":").padStart(padTo, "0") + "\n";
-				if (numLines[x].length > maxWidth) maxWidth = numLines[x].length;
+				if (x<numLines.length) if (numLines[x].length > maxWidth) maxWidth = numLines[x].length;
 			}
 			
 			// output columns based on maxWidth analysis
@@ -780,7 +780,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		
 		#codeNums pre, #codeLines pre {
 			padding-top: 0.5em;
-			padding-bottom: 2rem;
+			padding-bottom: 80px; /* above the nav bar */
 		}
 		
 		#codeCols {
