@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -267,7 +267,7 @@ if ($_POST["logout"]) {
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
 // return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
 // for remote files, always returns an update 
-if ($_REQUEST["method"] == "pulse") {
+if ($_REQUEST["mode"] == "pulse") {
 	if (!$isStillAuthorized) die("0");
 	$updateFile = (!isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
 	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
@@ -283,7 +283,7 @@ if ($_REQUEST["method"] == "pulse") {
 }
 
 // return only the file menu HTML
-if ($_REQUEST["method"] == "menu") {
+if ($_REQUEST["mode"] == "menu") {
 	if (!$isStillAuthorized) die();
 	die($fmenu); // die outputting menu HTML
 }
@@ -291,7 +291,7 @@ if ($_REQUEST["method"] == "menu") {
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
 	
-	if ($_REQUEST["method"] == "ajax") die(); // if they're not calling from an authorized session, ajax returns nothing
+	if ($_REQUEST["mode"] == "ajax") die(); // if they're not calling from an authorized session, ajax returns nothing
 	
 	if ($_POST["pwd"] == $pagePassword) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
@@ -369,8 +369,8 @@ if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed)
 
 $foutput = fetchFile($fpassed);
 
-// if the method is ajax, just return the content without the rest of the HTML, CSS, JS
-if ($_REQUEST["method"] == "ajax") die($foutput); 
+// if the mode is ajax, just return the content without the rest of the HTML, CSS, JS
+if ($_REQUEST["mode"] == "ajax") die($foutput); 
 
 // if we got this far, output the whole page
 
@@ -494,7 +494,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 						console.log("AJAX pulse error: " + this.responseText);
 					}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=pulse";
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=pulse";
 			ajax.open("GET", urlToLoad, true);
 			ajax.send();
 		}
@@ -511,7 +511,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 						console.log("AJAX menu error: " + this.responseText);
 					}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=menu";
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=menu";
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
@@ -544,7 +544,7 @@ if ($_REQUEST["method"] == "ajax") die($foutput);
 						console.log("AJAX error: " + this.responseText);
 					}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?method=ajax&file=" + fileToLoad;
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + fileToLoad;
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
