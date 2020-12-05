@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.9-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.4.9.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -305,7 +305,6 @@ if (!$isStillAuthorized) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
-	<!-- comment -->
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<style>
 
@@ -1001,7 +1000,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		
 	</style>
 <? if ($highlightCode) { ?>	
-	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js" async></script>
 	<style>
 
 		.hljs-comment,
