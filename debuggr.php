@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.3-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.5-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -72,7 +72,7 @@ $startInDarkMode = true;
 // true to start with the line numbers visible
 $startWithLinesOn = true;
 
-// true to start with the column lines and numbers visible
+// true to start with the column markers and numbers visible
 $startWithColsOn = true;
 
 // true to include a link to Debuggr on Github in the options menu
@@ -539,12 +539,10 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		// use AJAX to check pulse on the file; has it been updated since last load?
 		function checkPulse(toCloseMenus) {
 			if (toCloseMenus) closeMenus();
-			if (reloadTimer) statusMessage("&bull;");
-			else statusMessage("Checking...");
+			statusMessage("&bull;");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
-						console.log("pulse: " + this.responseText);
 						switch (this.responseText) {
 							case "0": logout(); break;
 							case "1": loadFile(); break;
@@ -554,6 +552,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 						}
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						console.log("AJAX pulse error: " + this.responseText);
+						statusMessage("!");
 					}
 			}
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=pulse";
@@ -562,7 +561,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		}
 		
 		function loadMenu() {
-			statusMessage("Loading...");
+			statusMessage("&#8857;");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
@@ -571,6 +570,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 						statusMessage("");
 					} else if ((this.readyState == 4) && (this.status != 200)) {
 						console.log("AJAX menu error: " + this.responseText);
+						statusMessage("!");
 					}
 			}
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=menu";
@@ -583,7 +583,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			document.body.classList.add("isLoading");
 			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
-			statusMessage("Loading...");
+			statusMessage("&#8857;");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 				if ((this.readyState == 4) && (this.status == 200)) {
@@ -607,6 +607,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 					codeLinesPre.innerHTML = "<?= $noFile; ?>";
 					console.log("AJAX error: " + this.responseText);
 					document.body.classList.remove("isLoading");
+					statusMessage("!");
 				}
 			}
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + encodeURIComponent(fileToLoad);
@@ -754,7 +755,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		#nav span {
 			margin-right: 10px;
 			float: left;
-			max-width: 40vw;
+			max-width: 60vw;
 		}
 
 		#nav span a {
@@ -770,11 +771,12 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			margin-left: 10px;
 			color: #aaa;
 			float: right;
-			max-width: 30vw;
+			max-width: 2ch;
+			color: #c8ff00;
 		}
 		
 		a.uicon  {
-			font-weight: bold;
+			font-weight: normal;
 			color: #ddd;
 			text-decoration: none;
 		}
@@ -1370,8 +1372,8 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 	<div id="nav">
 		<?= $fmenu; ?>
 		<div id="filenameRef">
-			<span><?= $fpassed; ?></span> 
-			<a class="uicon" title="Reload file" href="javascript:checkPulse(true);">&#8635;</a>
+			<span onclick="openFile();"><?= $fpassed; ?></span> 
+			<a class="uicon" title="Reload file" onclick="checkPulse(true);">&#8635;</a>
 			<span id="statusMsg"></span>
 		</div>
 		<ul id="optionsNav">
