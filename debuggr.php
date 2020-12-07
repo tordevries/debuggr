@@ -27,32 +27,64 @@ If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+
+// ********************************************************************************
 // CONFIGURATION -- edit these variables as needed
+// ********************************************************************************
 
-$userName = "Host"; // put in your own name
-$userEmail = "your@email.com"; // put in your own email address
+// your name
+$userName = "Host";
 
-$pagePassword = "477demo"; // set a password
-$passwordRequired = true; // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
-$forceSSL = true; // if true, redirects HTTP requests to HTTPS
+// your email address
+$userEmail = "your@email.com";
 
-$accessCurrentDirectoryOnly = false; // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
-$accessParentDirectories = false; // if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
-$preventAccessToThisFile = true; // if true, prevents users from reading this PHP file with itself
-$allowRemoteFileReading = true; // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
+// set a password
+$pagePassword = "477demo";
 
-$showFilesMenu = false; // if true, will add links to the FIles menu with files in the current directory
-// note: if $accessCurrentDirectoryOnly is false, the Files menu will include local folders and their files/subdirectories
+// if true, requires a password and temporary session authorization to view the file; you really should leave this as true
+$passwordRequired = true; 
 
-$highlightCode = true; // true to load Highlight.js for coloring text
-$startInDarkMode = true; // true to start in dark mode by default; false to start in lite mode
-$startWithLinesOn = true; // true to start with the line numbers visible
-$startWithColsOn = true; // true to start with the column lines and numbers visible
-$showDebuggrLink = true; // true to include a link to Debuggr on Github in the options menu
+// if true, redirects HTTP requests to HTTPS
+$forceSSL = true;
+
+// if true, restricts access to only files in this same directory as this file, no subdirectories allowed
+$accessCurrentDirectoryOnly = false; 
+
+// if true, allows users to enter pathnames to parent directories, using '../', though never in the Files menu
+$accessParentDirectories = false; 
+
+// if true, prevents users from reading this PHP file with itself
+$preventAccessToThisFile = true;
+
+// if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
+$allowRemoteFileReading = true; 
+
+// if true, will add links to the FIles menu with files in the current directory
+// note: if $accessCurrentDirectoryOnly is false, the Files menu will also include local folders and their files/subdirectories
+$showFilesMenu = false; 
+
+// true to load Highlight.js for coloring text
+$highlightCode = true; 
+
+// true to start in dark mode by default; false to start in lite mode
+$startInDarkMode = true; 
+
+// true to start with the line numbers visible
+$startWithLinesOn = true;
+
+// true to start with the column lines and numbers visible
+$startWithColsOn = true;
+
+// true to include a link to Debuggr on Github in the options menu
+$showDebuggrLink = true; 
 
 // advanced remote file reading options related to $allowRemoteFileReading and the PHP cURL libraries
-$allowCURLtoBypassHTTPS = true; // if true, cURL will bypass HTTPS security checks; if false, you must set a security certificate path, below, for cURL to work
-$certificatePathForCURL = '/etc/ssl/certs'; // provide the absolute path to your server's security certificates; only applied if $allowCURLtoBypassHTTPS is false
+
+// if true, cURL will bypass HTTPS security checks; if false, you must set a security certificate path, below, for cURL to work
+$allowCURLtoBypassHTTPS = true; 
+
+// provide the absolute path to your server's security certificates; only applied if $allowCURLtoBypassHTTPS is false
+$certificatePathForCURL = '/etc/ssl/certs'; 
 
 
 // ********************************************************************************
