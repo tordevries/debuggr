@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -965,6 +965,7 @@ if ($reqMode == "ajax") die($foutput);
 			z-index: 100;
 			padding-right: 1rem;
 			overflow: visible;
+			list-style-type: none;
 		}
 
 		#fileNav a {
@@ -980,7 +981,6 @@ if ($reqMode == "ajax") die($foutput);
 
 		#fileNav ul {
 			position: absolute;
-			list-style-type: none;
 			margin: 0;
 			padding: 0;
 			left: 0;
