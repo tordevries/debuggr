@@ -190,7 +190,7 @@ function fetchLocalFile($localFilepath) {
 	} else { // the file DOES exist, so...
 
 		// check if it's an image; if so, output an img tag, otherwise read in the file contents
-		$isImage = getimagesize($localFilepath);
+		$isImage = @getimagesize($localFilepath);
 		if ($isImage != false) $returnOutput = "<img src='" . $localFilepath . "'>";
 		else $returnOutput = file_get_contents($localFilepath);
 
