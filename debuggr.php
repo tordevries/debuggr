@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.6-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -151,6 +151,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
+	else $list = null;
 	$listHTML = "<ul id='fileNav'><li>&#9650;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
 	return $listHTML;
 }
@@ -283,8 +284,12 @@ function outputFavicon() {
 // PHP PROCEDURES
 // ********************************************************************************
 
+// set $reqMode if one is passed
+if (isset($_REQUEST["mode"])) $reqMode = $_REQUEST["mode"];
+else $reqMode = "";
+
 // output a favicon just to avoid the 404 error in the browser console
-if ($_REQUEST["mode"] == "favicon") {
+if ($reqMode == "favicon") {
 	outputFavicon();
 	die();
 }
@@ -304,7 +309,7 @@ session_start();
 
 
 // if a logout command been passed, clear the session and send back to login form
-if ($_POST["logout"]) {
+if (isset($_POST["logout"])) {
 	session_unset();
 	session_destroy();
 	header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
@@ -319,9 +324,9 @@ $isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePas
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
 	
-	if ($_REQUEST["mode"] == "pulse") die("0");  // if they're not calling from an authorized session, pulse returns a zero to indicate logout
+	if ($reqMode == "pulse") die("0");  // if they're not calling from an authorized session, pulse returns a zero to indicate logout
 	
-	if ( ($_REQUEST["mode"] == "ajax") || ($_REQUEST["mode"] == "menu") ) die(); // if they're not calling from an authorized session, ajax and menu return nothing
+	if ( ($reqMode == "ajax") || ($reqMode == "menu") ) die(); // if they're not calling from an authorized session, ajax and menu return nothing
 	
 	if ($_POST["pwd"] == $pagePassword) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
@@ -394,13 +399,13 @@ $fmenu = fileMenu();
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
 // return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
 // for remote files, always returns an update 
-if ($_REQUEST["mode"] == "pulse") {
-	$updateFile = (!isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
-	$updateMenu = ($_SESSION["filemenu"] != $fmenu );
-	if (isFileRemote($_SESSION["filename"])) {
+if ($reqMode == "pulse") {
+	$updateFile = (isset($_SESSION["filename"]) && isset($_SESSION["filetime"]) && !isFileRemote($_SESSION["filename"]) && (filemtime($_SESSION["filename"]) > $_SESSION["filetime"]));
+	$updateMenu = (isset($_SESSION["filemenu"]) && ($_SESSION["filemenu"] != $fmenu ));
+	if (isset($_SESSION["filename"]) && isFileRemote($_SESSION["filename"])) {
 		if (!$updateMenu) die("1"); // force an update on remote files by returning "1"
 		if ($updateMenu) die("3");
-	} else if (file_exists($_SESSION["filename"])) {
+	} else if (isset($_SESSION["filename"]) && file_exists($_SESSION["filename"])) {
 		if ($updateFile && !$updateMenu) die("1"); // indicate an update by returning "1"
 		if ($updateFile && $updateMenu) die("3");
 	}
@@ -410,7 +415,7 @@ if ($_REQUEST["mode"] == "pulse") {
 
 
 // for an AJAX reload of only the file menu HTML
-if ($_REQUEST["mode"] == "menu") {
+if ($reqMode == "menu") {
 	$_SESSION["filemenu"] = $fmenu;
 	die($fmenu); // die outputting menu HTML
 }
@@ -431,7 +436,7 @@ if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed)
 $foutput = fetchFile($fpassed);
 
 // if the mode is ajax, just return the content without the rest of the HTML, CSS, JS
-if ($_REQUEST["mode"] == "ajax") die($foutput); 
+if ($reqMode == "ajax") die($foutput); 
 
 // if we got this far, output the whole page
 
