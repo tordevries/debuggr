@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -183,6 +183,7 @@ function fetchLocalFile($localFilepath) {
 		unset( $_SESSION["filetime"] );
 		unset( $_SESSION["filemenu"] );
 		
+		// set output to noFile
 		$returnOutput = $noFile;
 
 	} else { // the file DOES exist, so...
@@ -267,13 +268,13 @@ function fetchRemoteFile($remoteURL) {
 }
 
 
-// function to output a simple PNG favicon of 
+// function to output a simple PNG favicon
 function outputFavicon() {
 	$image = imagecreatetruecolor(32, 32); 	// create a blank image
 	$bkgd = imagecolorallocate($image, 34, 34, 34);	// set the background color
 	$textcolor = imagecolorallocate($image, 255, 255, 255); // set the text color
 	imagestring($image, 4, 5, 7,  "</>", $textcolor); // add text to the image
-	header("Content-Type: image/png"); // output correct header
+	header("Content-Type: image/png"); // output correct header for PNG graphics
 	imagepng($image); // output the image as png
 }
 
@@ -312,12 +313,15 @@ if ($_POST["logout"]) {
 
 
 // set a boolean to use to confirm continued authorization
+// note: if you change the password, the next reload will force existing sessions to log out
 $isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
 	
-	if ( ($_REQUEST["mode"] == "ajax") || ($_REQUEST["mode"] == "pulse") || ($_REQUEST["mode"] == "menu") ) die(); // if they're not calling from an authorized session, ajax and other checks return nothing
+	if ($_REQUEST["mode"] == "pulse") die("0");  // if they're not calling from an authorized session, pulse returns a zero to indicate logout
+	
+	if ( ($_REQUEST["mode"] == "ajax") || ($_REQUEST["mode"] == "menu") ) die(); // if they're not calling from an authorized session, ajax and menu return nothing
 	
 	if ($_POST["pwd"] == $pagePassword) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
@@ -383,6 +387,9 @@ if (!$isStillAuthorized) {
 // PHP PROCEDURES, CONTINUED
 // ********************************************************************************
 
+// generate HTML for the Files menu
+$fmenu = fileMenu();
+
 
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
 // return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
@@ -402,12 +409,9 @@ if ($_REQUEST["mode"] == "pulse") {
 }
 
 
-// generate HTML for the Files menu
-$fmenu = fileMenu();
-
-
-// return only the file menu HTML
+// for an AJAX reload of only the file menu HTML
 if ($_REQUEST["mode"] == "menu") {
+	$_SESSION["filemenu"] = $fmenu;
 	die($fmenu); // die outputting menu HTML
 }
 
@@ -540,6 +544,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
+						console.log("pulse: " + this.responseText);
 						switch (this.responseText) {
 							case "0": logout(); break;
 							case "1": loadFile(); break;
