@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -174,7 +174,7 @@ function isFileRemote($url) {
 
 
 function fetchLocalFile($localFilepath) {
-	global $noFile, $fmenu;
+	global $noFile, $fmenu, $preventAccessToThisFile;
 	
 	// check if file does not exist or is blocked
 	if ((!file_exists($localFilepath)) || ($preventAccessToThisFile && ($localFilepath == basename(__FILE__)))) {
@@ -319,7 +319,7 @@ if (isset($_POST["logout"])) {
 
 // set a boolean to use to confirm continued authorization
 // note: if you change the password, the next reload will force existing sessions to log out
-$isStillAuthorized = (!$passwordRequired || ($_SESSION["authorized"] == $pagePassword));
+$isStillAuthorized = (!$passwordRequired || (isset($_SESSION["authorized"]) && ($_SESSION["authorized"] == $pagePassword)));
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
@@ -328,7 +328,7 @@ if (!$isStillAuthorized) {
 	
 	if ( ($reqMode == "ajax") || ($reqMode == "menu") ) die(); // if they're not calling from an authorized session, ajax and menu return nothing
 	
-	if ($_POST["pwd"] == $pagePassword) {
+	if (isset($_POST["pwd"]) && ($_POST["pwd"] == $pagePassword)) {
 		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
 		
 	} else {
