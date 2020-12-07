@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.4.9.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -92,7 +92,7 @@ function findAllFiles($dir = '.') {
 
 // a recursive function to build a hierarchical <ul> menu of files from the array produced in findAllFiles();
 function buildFileMenu($arr = null, $path = "", $depth = 0) {
-	global $accessCurrentDirectoryOnly, $showFilesMenu;
+	global $accessCurrentDirectoryOnly, $showFilesMenu, $allowRemoteFileReading;
 	$result = "<ul>";
 	if (!is_null($arr)) {
 		foreach($arr as $key => $value) {
@@ -107,9 +107,9 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 	}
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
 			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
-			"<li><a onclick='selectCode()'>Select All Code</a>" .
+			"<li><a onclick='selectCode()'>Select All Text</a>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
-			"<li class='menuLine'><a onclick='openFile();'>Open New File...</a></li>";
+			"<li class='menuLine'><a onclick='openFile();'>Open New File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
 	$result .= "</ul>";
 	return $result;
 }
@@ -119,7 +119,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
-	$listHTML = "<ul id='fileNav'><li>&#128196;" . buildFileMenu($list) . "</li></ul>";
+	$listHTML = "<ul id='fileNav'><li>&#9650;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
 	return $listHTML;
 }
 
@@ -523,7 +523,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		}
 		
 		function loadMenu() {
-			statusMessage("Loading menu...");
+			statusMessage("Loading...");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
 					if ((this.readyState == 4) && (this.status == 200)) {
@@ -541,31 +541,34 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
 		function loadFile(fileToLoad = baseFile, historyUpdate = true) {
+			document.body.classList.add("isLoading");
 			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
-			statusMessage("Loading file...");
+			statusMessage("Loading...");
 			ajax = new XMLHttpRequest();
 			ajax.onreadystatechange = function() {
-					if ((this.readyState == 4) && (this.status == 200)) {
-						if (fileToLoad != baseFile) {
-							document.getElementById("codeNums").scrollTop = 0;
-							document.getElementById("codeLines").scrollTop = 0;
-						}
-						baseFile = fileToLoad;
-						codeLinesPre.innerHTML = this.responseText;
-						styleCode();
-						prepCodeNumbers();
-						document.title = "Debuggr: " + fileToLoad;
-						document.querySelector("#filenameRef span").innerHTML = fileToLoad;
-						if (historyUpdate) {
-							historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
-							window.history.pushState( {}, "", historyURL);
-						}
-						statusMessage("");
-					} else if ((this.readyState == 4) && (this.status != 200)) {
-						codeLinesPre.innerHTML = "<?= $noFile; ?>";
-						console.log("AJAX error: " + this.responseText);
+				if ((this.readyState == 4) && (this.status == 200)) {
+					if (fileToLoad != baseFile) {
+						document.getElementById("codeNums").scrollTop = 0;
+						document.getElementById("codeLines").scrollTop = 0;
 					}
+					baseFile = fileToLoad;
+					codeLinesPre.innerHTML = this.responseText;
+					styleCode();
+					prepCodeNumbers();
+					document.title = "Debuggr: " + fileToLoad;
+					document.querySelector("#filenameRef span").innerHTML = fileToLoad;
+					if (historyUpdate) {
+						historyURL = "<?= $_SERVER['PHP_SELF']; ?>?file=" + fileToLoad;
+						window.history.pushState( {}, "", historyURL);
+					}
+					statusMessage("");
+					document.body.classList.remove("isLoading");
+				} else if ((this.readyState == 4) && (this.status != 200)) {
+					codeLinesPre.innerHTML = "<?= $noFile; ?>";
+					console.log("AJAX error: " + this.responseText);
+					document.body.classList.remove("isLoading");
+				}
 			}
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + encodeURIComponent(fileToLoad);
 			ajax.open("POST", urlToLoad, true);
@@ -592,6 +595,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			
 			// output columns based on maxWidth analysis
 			for (x=1; x<((maxWidth/10)+1); x++) document.getElementById("codeCols").innerHTML += "<span>" + (x * 10) + "</span>";
+			return true;
 		}
 		
 		// go to a line
@@ -609,7 +613,10 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 		function openFile() {
 			closeMenus();
 			toOpen = window.prompt("Enter a filename<?= ($allowRemoteFileReading ? " or complete URL" : ""); ?>:", baseFile);
-			if ((toOpen != "") && (toOpen !== null)) loadFile(toOpen);
+			if ((toOpen != "") && (toOpen !== null)) {
+				document.body.classList.add("isLoading");
+				loadFile(toOpen);
+			}
 		}
 
 		function closeMenus() {
@@ -663,6 +670,8 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 				historyParam = document.location.href.split("<?= basename(__FILE__); ?>?file=").pop(); // get the file value passed to debuggr
 				loadFile(historyParam, false);
 			};
+			
+			document.body.classList.remove("isLoading");
 		}		
 		
 	</script>
@@ -689,7 +698,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			background-color: #222;
 			color: #fff;
 		}
-
+		
 		#nav {
 			position: fixed;
 			background-color: #555;
@@ -702,7 +711,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			z-index: 100;
 			overflow: visible;
 		}
-
+		
 		#nav span {
 			margin-right: 10px;
 			float: left;
@@ -777,9 +786,15 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			background-image: linear-gradient(to right, #333 1px, transparent 1px);
 		}
 		
-		#codeNums pre, #codeLines pre {
+		#codeNums pre, 
+		#codeLines pre {
 			padding-top: 0.5em;
 			padding-bottom: 80px; /* above the nav bar */
+		}
+		
+		body.isLoading #codeNums,
+		body.isLoading #codeLines {
+			filter: blur(1px);
 		}
 		
 		#codeCols {
@@ -932,6 +947,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			width: 100%;
 			white-space: nowrap;
 			overflow: visible;
+			cursor: pointer;
 		}
 		
 		#fileNav li.hasSub::before {
@@ -987,6 +1003,92 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			left: 100%;
 			bottom: 0;
 		}
+		
+		/* for loading screen */
+		
+		#loadingOverlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: calc(100vh - 44px);
+			background-color: rgba(128, 128, 128, 0.5);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 10000;
+		}
+		
+		body.isLoading #loadingOverlay {
+			display: flex;
+		}
+		
+		#outerLoading {
+			position: relative;
+			width: 150px;
+			height: 150px;
+			background-color: #444;
+			border-radius: 50%;
+			text-align: center;
+			color: #fff;
+			overflow: hidden;
+		}
+
+		#innerLoading {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			left: 0;
+			top: 0;
+			border-radius: 50%;
+			z-index: 3;
+		}
+		
+		body.isLoading #innerLoading {
+			animation: circleRotate 3s infinite linear;
+		}
+
+		@keyframes circleRotate {
+			from { transform: rotate(0deg); }
+			to { transform: rotate(359deg); }
+		}
+
+		#innerCover {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			width: 50%;
+			height: 100%;
+			background-image: linear-gradient(#444, #fff);
+			z-index: 5;
+		}
+
+		#innerDot {
+			position: absolute;
+			background-color: #fff;
+			width: 4%;
+			height: 4%;
+			bottom: 0;
+			left: 48%;
+			border-radius: 50%;
+			z-index: 6;
+		}
+
+		#innerContent {
+			position: absolute;
+			background-color: #444;
+			width: 92%;
+			height: 92%;
+			top: 4%;
+			left: 4%;
+			border-radius: 50%;
+			z-index: 5;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		
 		
 		@media only print {
 			#nav, #codeCols {
@@ -1225,7 +1327,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 	</style>
 <? } ?>
 </head>
-<body class="<? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
+<body class="isLoading <? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">
 		<?= $fmenu; ?>
 		<div id="filenameRef">
@@ -1251,6 +1353,15 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 	<div id="codeLines" class="<?= ($startWithColsOn ? "" : "colsOff") ?>">
 		<div id="codeCols"></div>
 		<pre><?= $foutput; ?></pre>
+	</div>
+	<div id="loadingOverlay">
+		<div id="outerLoading">
+			<div id="innerContent">Loading...</div>
+			<div id="innerLoading">
+				<div id="innerDot"></div>
+				<div id="innerCover"></div>
+			</div>
+		</div>
 	</div>
 	<? if ($passwordRequired) { ?><form method="POST" id="logoutForm"><input type="hidden" value="1" name="logout" id="logout"></form><? } ?>
 </body>
