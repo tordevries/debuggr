@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.6-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -659,19 +659,22 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			}
 		}
 
+		// close all the menus
 		function closeMenus() {
 			allLI = document.querySelectorAll("#fileNav li");
 			for (x=0; x<allLI.length; x++) allLI[x].classList.remove("showSub");
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
-		function styleCode() { // apply Highlights.js
+		// apply Highlights.js, if configured in PHP
+		function styleCode() {
 			<? if ($highlightCode) { ?>
-			document.querySelector('#codeLines pre').className = "";
-			hljs.highlightBlock( document.querySelector('#codeLines pre') );
+			document.querySelector('#codeLines pre').className = ""; // erase pre-existing highlight.js classes applied here
+			hljs.highlightBlock( document.querySelector('#codeLines pre') ); // run highlight.js on the code block
 			<? } ?>
 		}
 		
+		// submit the hidden logout form
 		function logout() { document.getElementById("logoutForm").submit(); }
 		
 		// when the window loads, prep line numbers, and connect the scrollTops of #codeLines to #codeNums
@@ -680,23 +683,25 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 			// output line and column numbers
 			prepCodeNumbers();
 
-			// reposition #codeNums and #codeCols as the user scrolls
+			// reposition #codeNums as the user scrolls
 			document.getElementById("codeLines").onscroll = function() { 
 				document.getElementById("codeNums").scrollTop = document.getElementById("codeLines").scrollTop; 
 				document.getElementById("codeCols").style.top = document.getElementById("codeLines").scrollTop + "px"; 
 			}
+			
+			// reposition #codeCols as the user scrolls
 			document.querySelector("#codeLines pre").onscroll = function() {
 				document.getElementById("codeCols").style.left = (0 - document.querySelector("#codeLines pre").scrollLeft) + "px"; 
 			}			
+			
+			// set clicks for the file menu
+			setMenuClicks();
 			
 			// set clicks for the options menu
 			document.querySelector('#optionsNav li').onclick = function() { 
 				closeMenus();
 				document.querySelector('#optionsNav li').classList.toggle('showSub');
 			}
-			
-			// set clicks for the file menu
-			setMenuClicks();
 			
 			// close menus when someone clicks on the main code
 			document.getElementById("codeLines").onclick = function() { closeMenus(); }
@@ -711,6 +716,7 @@ if ($_REQUEST["mode"] == "ajax") die($foutput);
 				loadFile(historyParam, false);
 			};
 			
+			// all done loading? remove the isLoading CSS class
 			document.body.classList.remove("isLoading");
 		}		
 		
