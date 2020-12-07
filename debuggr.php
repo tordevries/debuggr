@@ -338,6 +338,8 @@ if (!$isStillAuthorized) {
 	<title>Debuggr: Log In</title>
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
+	<? if ($highlightCode) { ?><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js" defer></script><? } ?>
+	<script>window.onload = function() { document.getElementById("pwd").focus(); };</script>
 	<style>
 
 		* {
@@ -348,9 +350,9 @@ if (!$isStillAuthorized) {
 		}
 
 		#pageBox {
-			display: flex;
 			height: 100vh;
 			width: 100vw;
+			display: flex;
 			align-items: center;
 			justify-content: center;
 		}
