@@ -75,7 +75,7 @@ A Boolean value which, if true, will start the UI in dark mode by default, rathe
 A Boolean value which, if true, will start with the line numbers showing on the left, rather than hidden. The default is true.
 
 #### startWithColsOn
-A Boolean value which, if true, will start with the column lines every 10 characters, with numbers, rather than hidden. The default is true.
+A Boolean value which, if true, will start with the column markers showing every 10 characters, rather than hidden. The default is true.
 
 #### showDebuggrLink
 A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
