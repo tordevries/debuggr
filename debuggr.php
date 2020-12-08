@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.3-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.4-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -648,7 +648,7 @@ if ($reqMode == "ajax") die($foutput);
 		// go to a line
 		function lineJumper() {
 			closeMenus();
-			toJump = window.prompt("Go to line:", "0");
+			toJump = window.prompt("Go to line number:", "");
 			if (!isNaN(toJump)) {
 				jumpLine = (toJump-1) * 21; // based on CSS of font size and line height
 				document.getElementById("codeNums").scrollTop = jumpLine;
@@ -778,6 +778,10 @@ if ($reqMode == "ajax") die($foutput);
 		
 		#filenameRef {
 			display: inline-block;
+		}
+		
+		#filenameRef span {
+			cursor: pointer;
 		}
 		
 		#nav span#statusMsg {
