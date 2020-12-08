@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.7-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -141,7 +141,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Text</a>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
-			"<li class='menuLine'><a onclick='openFile();'>Open New File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
+			"<li class='menuLine'><a onclick='openFile();'>Open File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
 	$result .= "</ul>";
 	return $result;
 }
@@ -152,7 +152,7 @@ function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
 	else $list = null;
-	$listHTML = "<ul id='fileNav'><li>&#9650;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
+	$listHTML = "<ul id='fileNav'><li>&#9650;&nbsp;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
 	return $listHTML;
 }
 
@@ -172,7 +172,7 @@ function isFileRemote($url) {
 	return filter_var($url, FILTER_VALIDATE_URL);
 }
 
-
+// check if a local file is valid and return appropriate info
 function fetchLocalFile($localFilepath) {
 	global $noFile, $fmenu, $preventAccessToThisFile;
 	
@@ -435,7 +435,8 @@ else $fpassed = rawurldecode($_SERVER['QUERY_STRING']);
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed); // if $accessCurrentDirectoryOnly is true, only allow files in current directory
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
 
-$foutput = fetchFile($fpassed);
+if ($fpassed != "") $foutput = fetchFile($fpassed);
+else $foutput = "No source indicated.\n\nInclude a source in the URL with ?file=filename, or use the \"Open\" command in the menu below.";
 
 // if the mode is ajax, just return the content without the rest of the HTML, CSS, JS
 if ($reqMode == "ajax") die($foutput); 
@@ -777,9 +778,6 @@ if ($reqMode == "ajax") die($foutput);
 		
 		#filenameRef {
 			display: inline-block;
-		}
-		
-		#filenameRef span {
 			cursor: pointer;
 		}
 		
