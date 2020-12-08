@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.3-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -236,12 +236,14 @@ function fetchRemoteFile($remoteURL) {
 			
 			// set cURL options
 			curl_setopt($remoteCURL, CURLOPT_VERBOSE, false);
-			curl_setopt($remoteCURL, CURLOPT_TIMEOUT_MS, 5000);
+			curl_setopt($remoteCURL, CURLOPT_TIMEOUT, 60);
+			curl_setopt($remoteCURL, CURLOPT_CONNECTTIMEOUT, 0);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
 			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
 			
-			// adapted from https://stackoverflow.com/questions/4184869/how-to-disguise-your-php-script-as-a-browser
-			$curlHeader = ['User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+			// set the cURL user agent to match the current browser's user agent
+			$userAgent = $_SERVER['HTTP_USER_AGENT'];
+			$curlHeader = [$userAgent,
 				'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 				'Accept-Language: en-us,en;q=0.5',
 				'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
