@@ -1,5 +1,5 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
-A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and manage, with less file clutter, especially for beginner coders.
+A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
 
 Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
 
@@ -29,7 +29,7 @@ In addition, the debuggr.php file can be renamed to any other .php filename. Thi
 
 https://yourdomain.com/code/?readme.txt
 
-If the configuration allowRemoteFileReading is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code, and some sites actively block such scraping; they will return nothing.
+If the configuration _allowRemoteFileReading_ is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely, and some sites actively block such scraping.
 
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" /> 
 
