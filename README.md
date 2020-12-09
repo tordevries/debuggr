@@ -7,7 +7,7 @@ Debuggr is licensed under the GNU General Public License, as noted below and det
 
 ---
 ## Installation and Use
-Whether you use the verbose or minified versions, installation is the same: upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
+Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
 
 Then, when you access file, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
 
