@@ -31,7 +31,8 @@ https://yourdomain.com/code/?readme.txt
 
 If the configuration allowRemoteFileReading is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code, and some sites actively block such scraping; they will return nothing.
 
-<img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
+<img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" /> 
+
 _Screenshot of Debuggr examining itself_
 
 ---
