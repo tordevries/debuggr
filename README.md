@@ -9,23 +9,23 @@ Debuggr is licensed under the GNU General Public License, as noted below and det
 ## Installation and Use
 Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
 
-Then, when you access file, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
+Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
 
 For example: this URL...
 
 https://yourdomain.com/debuggr.php?file=readme.txt
 
-...would read the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.)
+...would tell Debuggr to open the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.).
 
-Debuggr also accepts "f" for the parameter, like this:
+Debuggr also accepts "f" for the file parameter, like this:
 
 https://yourdomain.com/debuggr.php?f=readme.txt
 
-It can also accept just the file name:
+It can also accept just the file name after the question mark:
 
 https://yourdomain.com/debuggr.php?readme.txt
 
-The debuggr.php file can be renamed to anything other .php filename. This means, for example, that you can rename it to index.php and place it into a directory, which allows a URL format like this:
+In addition, the debuggr.php file can be renamed to any other .php filename. This means, for example, that you can rename it to index.php and place it in a directory, which allows a URL format like this:
 
 https://yourdomain.com/code/?readme.txt
 
@@ -60,10 +60,10 @@ A Boolean value which, if true, allows users to enter pathnames to parent direct
 A Boolean value which, if true, prevents users from reading this PHP file with itself. The default is true. The only scenario where you want this to be "false" is if you have configured a set of default values of this code that you want someone else to copy.
 
 #### allowRemoteFileReading
-A Boolean value which, if true, allows Debuggr to attempt to read remote URLs. The default is true. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; not every web site responds consistently to cURL calls; and finally, this can only read publicly-available pages, and not any remote web page that requires a password.
+A Boolean value which, if true, allows Debuggr to attempt to scrape content from remote URLs. The default is true. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; not every web site responds consistently to cURL calls; and finally, this can only read publicly-available pages and not any remote web page that requires a password. Note that Debuggr copies your browser's user agent when accessing other sites.
 
 #### showFilesMenu
-A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories. Also, the reload and auto-reload functions will check and dynamically reload updated file menus via AJAX.
+A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
 
 #### highlightCode
 A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. The default is true.
@@ -80,10 +80,10 @@ A Boolean value which, if true, will start with the column markers showing every
 #### showDebuggrLink
 A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
 
-#### allowCURLtoBypassHTTPS
+#### allowCURLtoBypassHTTPS (advanced)
 A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a _low_ security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_, as noted below.
 
-#### certificatePathForCURL
+#### certificatePathForCURL (advanced)
 A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for _your_ server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
