@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.8-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.6-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -139,6 +139,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 	}
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
 			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
+			"<li><a onclick='downloadFile()'>Download File</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Text</a>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
 			"<li class='menuLine'><a onclick='openFile();'>Open File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
@@ -201,7 +202,6 @@ function fetchLocalFile($localFilepath) {
 		$_SESSION["filename"] = $localFilepath;
 		$_SESSION["filetime"] = filemtime($localFilepath);
 		$_SESSION["filemenu"] = $fmenu;
-
 	}
 	
 	return $returnOutput;
@@ -441,6 +441,18 @@ else $foutput = "No source indicated.\n\nInclude a source in the URL with ?file=
 // if the mode is ajax, just return the content without the rest of the HTML, CSS, JS
 if ($reqMode == "ajax") die($foutput); 
 
+if ($reqMode == "download") {
+	$foutput = htmlspecialchars_decode($foutput);
+	header('Content-Description: File Transfer');
+	header('Content-Type: application/octet-stream');
+	header('Content-Disposition: attachment; filename="' . $_SESSION["filename"] . '"');
+	header('Expires: 0');
+	header('Cache-Control: must-revalidate');
+	header('Pragma: public');
+	header('Content-Length: ' . strlen($foutput));
+	die($foutput);
+}
+
 // if we got this far, output the whole page
 
 // ********************************************************************************
@@ -645,6 +657,12 @@ if ($reqMode == "ajax") die($foutput);
 			// output columns based on maxWidth analysis
 			for (x=1; x<((maxWidth/10)+1); x++) document.getElementById("codeCols").innerHTML += "<span>" + (x * 10) + "</span>";
 			return true;
+		}
+		
+		// download a file
+		function downloadFile() {
+			urlToDownload = "<?= $_SERVER['PHP_SELF']; ?>?mode=download&file=" + baseFile;
+			window.location.href = urlToDownload;
 		}
 		
 		// go to a line
