@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9.7-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9.8-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -455,6 +455,7 @@ if ($reqMode == "ajax") die($foutput);
 	<meta http-equiv="Cache-Control" content="no-store" />
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
+	<? if ($highlightCode) { ?><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js" async></script><? } ?>
 	<script>
 		
 		// set some variables (including some passed from PHP
@@ -743,7 +744,7 @@ if ($reqMode == "ajax") die($foutput);
 		}
 		
 		body {
-			background-color: #eee;
+			background-color: #fff;
 			color: #000;
 		}
 		
@@ -804,7 +805,7 @@ if ($reqMode == "ajax") die($foutput);
 			font-weight: 300;
 			overflow: hidden;
 			text-align: right;
-			color: #04717a;
+			color: #007680;
 			transition: left 0.3s, width 0.3s;
 			z-index: 1;
 		}
@@ -831,7 +832,7 @@ if ($reqMode == "ajax") die($foutput);
 		#codeLines pre {
 			overflow: display;
 			background-size: 10ch 10ch;
-			background-image: linear-gradient(to right, #ddd 1px, transparent 1px);
+			background-image: linear-gradient(to right, #eee 1px, transparent 1px);
 			background-attachment: local;
 			padding-right: 10ch;
 			z-index: 2;
@@ -867,7 +868,7 @@ if ($reqMode == "ajax") die($foutput);
 			display: inline-block;
 			white-space: nowrap;
 			text-align: right;
-			color: #bbb;
+			color: #ccc;
 			padding-right: 4px;
 		}
 		
@@ -1143,8 +1144,6 @@ if ($reqMode == "ajax") die($foutput);
 			justify-content: center;
 		}
 
-		
-		
 		@media only print {
 			#nav, #codeCols {
 				display: none;
@@ -1155,155 +1154,92 @@ if ($reqMode == "ajax") die($foutput);
 			}
 		}
 		
-	</style>
-<? if ($highlightCode) { ?>	
-	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js" async></script>
-	<style>
-
-		.hljs-comment,
-		.hljs-javadoc {
-			color: #800;
-		}
+<? if ($highlightCode) { ?>			
+		/* highlight.js for lite mode */
 		
+		.hljs,
+		.hljs-subst {
+			color: #525242;
+		}
+
+		.hljs-built_in,
 		.hljs-selector-tag,
 		.hljs-selector-id,
-		.hljs-selector-class {
-			color: #3e7bb5;
+		.hljs-selector-class,
+		.hljs-section,
+		.hljs-link {
+			color: #4291a1;
 		}
 
+		.hljs-keyword {
+			color: #d52feb;
+		}
+
+		.hljs-title,
+		.hljs-params {
+			color: #9c5e24;
+		}
+
+		.hljs-string {
+			color: #49910d;	
+		}
+		
 		.hljs-keyword,
-		.method,
-		.hljs-list .hljs-keyword,
-		.nginx .hljs-title,
-		.hljs-tag .hljs-title,
-		.setting .hljs-value,
-		.hljs-winutils,
-		.tex .hljs-command,
-		.http .hljs-title,
-		.hljs-request,
-		.hljs-status {
-			color: #008;
-		}
-
-		.hljs-envvar,
-		.tex .hljs-special {
-			color: #660;
-		}
-
-		.hljs-string,
-		.hljs-tag .hljs-value,
-		.hljs-cdata,
-		.hljs-filter .hljs-argument,
-		.hljs-attr_selector,
-		.apache .hljs-cbracket,
-		.hljs-date,
-		.hljs-regexp,
-		.hljs-attribute, 
-		.coffeescript .hljs-attribute {
-			color: #70704c;
-		}
-
-		.hljs-sub .hljs-identifier,
-		.hljs-pi,
 		.hljs-tag,
-		.hljs-tag .hljs-keyword,
-		.hljs-decorator,
-		.ini .hljs-title,
-		.hljs-shebang,
-		.hljs-prompt,
-		.hljs-hexcolor,
-		.hljs-rule .hljs-value,
-		.hljs-literal,
-		.hljs-symbol,
-		.ruby .hljs-symbol .hljs-string,
-		.hljs-number,
-		.css .hljs-function,
-		.clojure .hljs-attribute {
-			color: #066;
-		}
-
-		.hljs-class .hljs-title,
-		.smalltalk .hljs-class,
-		.hljs-javadoctag,
-		.hljs-yardoctag,
-		.hljs-phpdoc,
-		.hljs-dartdoc,
+		.hljs-meta,
+		.hljs-name,
 		.hljs-type,
-		.hljs-typename,
-		.hljs-tag .hljs-attribute,
-		.hljs-doctype,
-		.hljs-class .hljs-id,
-		.hljs-built_in,
-		.setting,
-		.hljs-params,
+		.hljs-symbol,
+		.hljs-bullet,
+		.hljs-addition,
 		.hljs-variable,
-		.hljs-name {
-			color: #606;
+		.hljs-template-tag,
+		.hljs-template-variable {
+			color: #47749e;
+		}
+		
+		.hljs-attr,
+		.hljs-attribute {
+			color: #878758;
 		}
 
-		.css .hljs-tag,
-		.hljs-rule .hljs-property,
-		.hljs-pseudo,
-		.hljs-subst {
-			color: #000;
+		.hljs-comment {
+			color: #9e5555;	
+		}
+		
+		.hljs-quote,
+		.hljs-deletion {
+			color: #75715e;
 		}
 
-		.css .hljs-class,
-		.css .hljs-id {
-			color: #9b703f;
-		}
-
-		.hljs-value .hljs-important {
-			color: #ff7700;
+		.hljs-selector-tag,
+		.hljs-literal,
+		.hljs-title,
+		.hljs-section,
+		.hljs-doctag,
+		.hljs-type,
+		.hljs-name,
+		.hljs-strong {
 			font-weight: bold;
 		}
 
-		.hljs-rule .hljs-keyword {
-			color: #c5af75;
+		.hljs-literal,
+		.hljs-number {
+			color: #c251c0;
 		}
 
-		.hljs-annotation,
-		.apache .hljs-sqbracket,
-		.nginx .hljs-built_in {
-			color: #9b859d;
-		}
-
-		.hljs-preprocessor,
-		.hljs-preprocessor *,
-		.hljs-pragma {
-			color: #444;
-		}
-
-		.tex .hljs-formula {
-			background-color: #eee;
+		.hljs-emphasis {
 			font-style: italic;
 		}
 
-		.diff .hljs-header,
-		.hljs-chunk {
-			color: #808080;
-			font-weight: bold;
+
+		/* highlight.js for dark mode */
+
+		body.darkMode .hljs,
+		body.darkMode .hljs-subst {
+			color: #f8f8f2;
 		}
-
-		.diff .hljs-change {
-			background-color: #bccff9;
-		}
-
-		.hljs-addition {
-			background-color: #baeeba;
-		}
-
-		.hljs-deletion {
-			background-color: #ffc8bd;
-		}
-
-		.hljs-comment .hljs-yardoctag {
-			font-weight: bold;
-		}
-
-
-		/* highlight.js dark mode theme adaptation */
-
+		
 		body.darkMode .hljs-built_in,
 		body.darkMode .hljs-selector-tag,
 		body.darkMode .hljs-selector-id,
@@ -1315,11 +1251,6 @@ if ($reqMode == "ajax") die($foutput);
 
 		body.darkMode .hljs-keyword {
 			color: #d52feb;
-		}
-
-		body.darkMode .hljs,
-		body.darkMode .hljs-subst {
-			color: #f8f8f2;
 		}
 
 		body.darkMode .hljs-title,
@@ -1351,7 +1282,7 @@ if ($reqMode == "ajax") die($foutput);
 		}
 
 		body.darkMode .hljs-comment {
-			color: #d17575;	
+			color: #c28686;	
 		}
 		
 		body.darkMode .hljs-quote,
@@ -1379,8 +1310,7 @@ if ($reqMode == "ajax") die($foutput);
 			font-style: italic;
 		}
 
-	</style>
-<? } ?>
+	<? } ?></style>
 </head>
 <body class="isLoading <? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
 	<div id="nav">

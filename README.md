@@ -97,7 +97,6 @@ Some ideas on the future radar:
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Tabbed interface.** Allow creation of tabs to look at different files.
 - **Downloading.** Allow the user to download the current code/text to their computer.
-- **Better styling.** This includes some basic CSS styling for use with Highlight.js, but I'd like to customize these further.
 - **Code beautifying.** It might be nice to support js-beautify for code appearance, although this would unlink line number references versus the original source.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
 - **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
