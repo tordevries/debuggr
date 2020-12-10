@@ -140,7 +140,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
 			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
 			"<li><a onclick='downloadFile()'>Download File</a></li>" .
-			"<li><a onclick='selectCode()'>Select All Text</a>" .
+			"<li><a onclick='selectCode()'>Select All Text</a></li>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
 			"<li class='menuLine'><a onclick='openFile();'>Open File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
 	$result .= "</ul>";
@@ -635,7 +635,7 @@ if ($reqMode == "download") {
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
-		
+
 		// output line and column numbers in #codeNums pre, padding numbers with 0s to appropriate width; calculate and add column numbers
 		function prepCodeNumbers() {
 			document.getElementById("codeCols").innerHTML = ""; // clear column numbers
