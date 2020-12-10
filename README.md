@@ -96,7 +96,7 @@ A string variable containing an absolute path to your web server's SSL security 
 Some ideas on the future radar:
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Tabbed interface.** Allow creation of tabs to look at different files.
-- **Code beautifying.** It might be nice to support js-beautify for code appearance, although this would unlink line number references versus the original source.
+- **Code beautifying.** It might be nice to support the Tidy library in PHP, or js-beautify, for reformatting code appearance, although this would unlink line number references versus the original source.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
 - **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
 
