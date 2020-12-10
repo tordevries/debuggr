@@ -1,7 +1,7 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
 A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
 
-Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. 
+Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. However, this is meant to be installed for individual use, not as a system-wide resource, or for use on mission-critical systems.
 
 Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
 
@@ -46,7 +46,7 @@ A string variable for the host coder's name.
 A string variable for the host coder's email address, to enable the "Email" option.
 
 #### pagePassword
-A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password.
+A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as this one from [LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it).
 
 #### passwordRequired
 A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. The default is true.
@@ -100,6 +100,7 @@ Some ideas on the future radar:
 - **Better styling.** This includes some basic CSS styling for use with Highlight.js, but I'd like to customize these further.
 - **Code beautifying.** It might be nice to support js-beautify for code appearance, although this would unlink line number references versus the original source.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
+- **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
 
 ---
 ## License
