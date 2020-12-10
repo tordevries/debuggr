@@ -46,7 +46,7 @@ A string variable for the host coder's name.
 A string variable for the host coder's email address, to enable the "Email" option.
 
 #### pagePassword
-A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see preventAccessToThisFile, below) then they will be able to read your password.
+A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password.
 
 #### passwordRequired
 A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. The default is true.
@@ -67,7 +67,7 @@ A Boolean value which, if true, prevents users from reading this PHP file with i
 A Boolean value which, if true, allows Debuggr to attempt to scrape content from remote URLs. The default is true. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; not every web site responds consistently to cURL calls; and finally, this can only read publicly-available pages and not any remote web page that requires a password. Note that Debuggr copies your browser's user agent when accessing other sites.
 
 #### showFilesMenu
-A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If accessCurrentDirectoryOnly is false (see above), the "Files" menu will _also_ include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
+A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If _accessCurrentDirectoryOnly_ is false (see above), the "Files" menu will also include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
 
 #### highlightCode
 A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. The default is true.
@@ -85,10 +85,10 @@ A Boolean value which, if true, will start with the column markers showing every
 A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
 
 #### allowCURLtoBypassHTTPS (advanced)
-A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a _low_ security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_, as noted below.
+A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_ as noted below.
 
 #### certificatePathForCURL (advanced)
-A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for _your_ server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
+A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
 ## Future Features
