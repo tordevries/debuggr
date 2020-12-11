@@ -16,23 +16,27 @@ Then, when you access debuggr.php, add a parameter named "file" set to the filen
 
 For example: this URL...
 
-https://yourdomain.com/debuggr.php?file=readme.txt
+https://yourdomain.com/debuggr.php?file=error_log
 
 ...would tell Debuggr to open the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.).
 
 Debuggr also accepts "f" for the file parameter, like this:
 
-https://yourdomain.com/debuggr.php?f=readme.txt
+https://yourdomain.com/debuggr.php?f=error_log
 
 It can also accept just the file name after the question mark:
 
-https://yourdomain.com/debuggr.php?readme.txt
+https://yourdomain.com/debuggr.php?error_log
 
 In addition, the debuggr.php file can be renamed to any other .php filename. This means, for example, that you can rename it to index.php and place it in a directory, which allows a URL format like this:
 
-https://yourdomain.com/code/?readme.txt
+https://yourdomain.com/code/?error_log
 
-If the configuration _allowRemoteFileReading_ is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely, and some sites actively block such scraping.
+If the configuration _allowRemoteFileReading_ is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source, like this:
+
+https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
+
+Remote scraping requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access files that require passwords; and some sites actively block such scraping.
 
 ---
 ## Using Debuggr
