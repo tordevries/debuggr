@@ -1,13 +1,16 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
 A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
 
-Debuggr includes basic security options, such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. However, this is meant to be installed for individual use, not as a system-wide resource, or for use on mission-critical systems.
+Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. However, this is meant to be installed for individual use, not as a system-wide resource, or for use on mission-critical systems.
 
 Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
 
 ---
 ## Installing Debuggr
-Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
+Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document. If nothing else, change the values of these settings:
+- **userName**: set to your name
+- **userEmail**: set to your email
+- **pagePassword**: set to a secure password that you only share with trusted contacts
 
 Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
 
@@ -58,6 +61,8 @@ The Options menu offers these commands:
 - **Email User**. Provides a mailto link with the host's name and email, if configured in the options.
 - **Log Out**. Logs you out, ending your session.
 - **Debuggr Info**. Links to this page on GitHub.
+
+With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
 
 ---
 ## Debuggr Options
