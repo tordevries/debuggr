@@ -333,7 +333,14 @@ if (!$isStillAuthorized) {
 	if ( ($reqMode == "ajax") || ($reqMode == "menu") ) die(); // if they're not calling from an authorized session, ajax and menu return nothing
 	
 	if (isset($_POST["pwd"]) && ($_POST["pwd"] == $pagePassword)) {
-		$_SESSION["authorized"] = $pagePassword; // if a valid password has been passed, authorize the session
+		
+		// if a valid password has been passed, authorize the session
+		$_SESSION["authorized"] = $pagePassword; 
+		
+		// refresh back to itself to eliminate the POST resubmit issue
+		$reloadURL = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		header("Location: " . $reloadURL); 
+		die();
 		
 	} else {
 		// needs new authorization, so show the login page
@@ -405,7 +412,7 @@ $fmenu = fileMenu();
 
 // prepare for common image, audio, and video file suffixes; this may or may not be trustworthy
 $imageSuffixes = ["png", "jpg", "jpeg", "gif", "svg", "webp", "jfif", "avif", "apng", "pjpeg", "pjp", "ico", "cur", "tif", "tiff", "bmp"];
-$audioSuffixes = ["mp3", "wav", "ogg", "aac"];
+$audioSuffixes = ["mp3", "wav", "aac"]; // can't tell ogg audio from video by file suffix, so all ogg files will be treated as video
 $videoSuffixes = ["mp4", "webm", "ogg"];
 
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
