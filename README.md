@@ -14,17 +14,20 @@ Upload the debuggr.php file to your hosting, and configure the variable options 
 
 Debuggr will show an error if these settings are unchanged from their defaults.
 
-Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
+---
+## Using Debuggr
+
+When you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
 
 https://yourdomain.com/debuggr.php?file=error_log
 
-...would tell Debuggr to open the file "readme.txt" in the same directory as "debuggr.php" (assuming you had the password, etc.).
+...would tell Debuggr to display PHP's protected "error_log" file in the same directory as Debuggr, which normally cannot be read by a web browser.
 
 Debuggr also accepts "f" for the file parameter, like this:
 
 https://yourdomain.com/debuggr.php?f=error_log
 
-It can also accept just the file name after the question mark:
+It also accepts just the file name after the question mark:
 
 https://yourdomain.com/debuggr.php?error_log
 
@@ -36,16 +39,17 @@ If the configuration _allowRemoteFileReading_ is set to true (which it is by def
 
 https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
 
-Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping.
+_Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
 
----
-## Using Debuggr
+With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
+
+#### Menus and Options
  
 Debuggr's navigation bar along the bottom lists the current filename or URL with a reload icon. It also offers two menus: the Files menu in the lower left corner, and the Options menu in the lower right.
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
-_Screenshot of Debuggr examining its own code, which it can do if the preventAccessToThisFile configuration is set to false._
+_Screenshot of Debuggr examining its own code, which is possible when the_ preventAccessToThisFile _setting is_ false.
 
 The Files menu offers these commands:
 - **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
@@ -66,7 +70,6 @@ The Options menu offers these commands:
 - **Log Out**. Logs you out, ending your session.
 - **Debuggr Info**. Links to this page on GitHub.
 
-With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
 
 ---
 ## Debuggr Options
