@@ -7,7 +7,7 @@ Debuggr is licensed under the GNU General Public License, as noted below and det
 
 ---
 ## Installing Debuggr
-Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document. If nothing else, change the values of these settings:
+Upload the debuggr.php file to your hosting, and configure the variable options near the beginning of the document. If nothing else, you should change the values of these settings:
 - **userName**: set to your name
 - **userEmail**: set to your email
 - **pagePassword**: set to a secure password that you only share with trusted contacts
@@ -32,7 +32,7 @@ In addition, the debuggr.php file can be renamed to any other .php filename. Thi
 
 https://yourdomain.com/code/?error_log
 
-If the configuration _allowRemoteFileReading_ is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source, like this:
+If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example:
 
 https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
 
