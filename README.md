@@ -7,14 +7,14 @@ Debuggr is licensed under the GNU General Public License, as noted below and det
 
 ---
 ## Installing Debuggr
-Upload the debuggr.php file to your hosting, and configure the variable options near the beginning of the document. If nothing else, you should change the values of these settings:
+Upload the debuggr.php file to your hosting, and configure the variable options near the beginning of the document. If nothing else, you must change the values of these settings:
 - **userName**: set to your name
 - **userEmail**: set to your email
 - **pagePassword**: set to a secure password that you only share with trusted contacts
 
-Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
+Debuggr will show an error if these settings are unchanged from their defaults.
 
-For example: this URL...
+Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
 
 https://yourdomain.com/debuggr.php?file=error_log
 
@@ -32,11 +32,11 @@ In addition, the debuggr.php file can be renamed to any other .php filename. Thi
 
 https://yourdomain.com/code/?error_log
 
-If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example:
+If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example, this URL would display the HTML source code of this project on GitHub:
 
 https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
 
-Remote scraping requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access files that require passwords; and some sites actively block such scraping.
+Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping.
 
 ---
 ## Using Debuggr

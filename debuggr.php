@@ -1,13 +1,15 @@
 <? 
 /*
 
-Debuggr version 1.5.6.3-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.6.5-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
+You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
+
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
 https://yourdomain.com/project/debuggr.php?file=yourfile.php
 
-For more information, including an explanation of the options below: 
+For more information: 
 https://github.com/tordevries/debuggr
 
 -----
@@ -32,13 +34,13 @@ If not, see <http://www.gnu.org/licenses/>.
 // CONFIGURATION -- edit these variables as needed
 // ********************************************************************************
 
-// your name
+// REQUIRED: your name
 $userName = "Host";
 
-// your email address
+// REQUIRED: your email address
 $userEmail = "your@email.com";
 
-// set a password
+// REQUIRED: set a password
 $pagePassword = "477demo";
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
@@ -298,9 +300,11 @@ if ($reqMode == "favicon") {
 	die();
 }
 
-// for security, kill the output if password is required but not set
-if ($passwordRequired && ($pagePassword == "")) die("ERROR: No password set.");
+// for security, kill the output if the basic defaults have not been changed
+if (($userName == "Host") || ($userEmail == "your@email.com") || (($pagePassword == "477demo") && $passwordRequired) ) die("ERROR: name, email, and password must be configured.");
 
+// for security, kill the output if password is required but blank
+if ($passwordRequired && ($pagePassword == "")) die("ERROR: no password set.");
 
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
@@ -338,8 +342,7 @@ if (!$isStillAuthorized) {
 		$_SESSION["authorized"] = $pagePassword; 
 		
 		// refresh back to itself to eliminate the POST resubmit issue
-		$reloadURL = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-		header("Location: " . $reloadURL); 
+		header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
 		die();
 		
 	} else {
@@ -405,7 +408,7 @@ if (!$isStillAuthorized) {
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.6.2-beta";
+$debuggrVersion = "1.5.6.5-beta";
 
 // generate HTML for the Files menu
 $fmenu = fileMenu();
@@ -948,8 +951,7 @@ if ($reqMode == "download") {
 		
 		#optionsNav li a {
 			display: block;
-			padding: 0.2rem 0.2rem 0.2rem 0.5rem;
-			margin-right: 0.5rem;
+			padding: 0.2rem 0.7rem 0.2rem 0.5rem;
 			text-decoration: none;
 			color: #fff;
 		}
