@@ -6,7 +6,7 @@ Debuggr includes basic security options, such as simple password protection, fil
 Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
 
 ---
-## Installation and Use
+## Installing Debuggr
 Upload the debuggr.php file to your hosting, and configure the variable options at the beginning of the document.
 
 Then, when you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read.
@@ -31,12 +31,36 @@ https://yourdomain.com/code/?readme.txt
 
 If the configuration _allowRemoteFileReading_ is set to true, a complete URL can be substituted for the filename, and Debuggr will scrape its source.  This requires the PHP cURL libraries to be installed, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely, and some sites actively block such scraping.
 
-<img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" /> 
+---
+## Using Debuggr
+ 
+Debuggr's navigation bar along the bottom lists the current filename or URL with a reload icon. It also offers two menus: the Files menu in the lower left corner, and the Options menu in the lower right.
+ 
+<img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
-_Screenshot of Debuggr examining itself_
+_Screenshot of Debuggr examining its own code, which it can do if the preventAccessToThisFile configuration is set to false._
+
+The Files menu offers these commands:
+- **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
+- **Open File in New Tab**. Opens the file directly in a new browser tab, so your browser is reading/executing it directly.
+- **Download File**. Downloads the current file to your device as a text file.
+- **Select All Text**. Selects all the text/code in the browser without selecting line numbers or other UI elements.
+- **Go To Line...**. Asks you for a line number, then scrolls to it.
+- **Open File/URL...**. Asks you for a file name or a complete URL (if _allowRemoteFileReading_ is set to true) to read.
+
+In addition, if _showFilesMenu_ is set to true, the Files menu will include a list of files in its same directory. And if _accessCurrentDirectoryOnly_ is set to false, the file list will include folders in a hierarchical menu.
+
+The Options menu offers these commands:
+- **Dark Mode**. Toggles the UI between Dark Mode and Lite Mode.
+- **Line Numbers**. Toggles the display of line numbers on the left margin.
+- **Column Markers**. Toggles the display of column markers every 10 characters.
+- **Auto-load Updates**. Enables an automatic reload check (see above) every 5 seconds.
+- **Email User**. Provides a mailto link with the host's name and email, if configured in the options.
+- **Log Out**. Logs you out, ending your session.
+- **Debuggr Info**. Links to this page on GitHub.
 
 ---
-## Options
+## Debuggr Options
 There are several PHP variables to configure access and output.
 
 #### userName
