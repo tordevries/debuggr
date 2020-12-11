@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.6-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.6.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -132,7 +132,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 				$result .=	"<li><a onclick='loadFile(\"" . $path . $value . "\")'>" . $value . "</a></li>\n";
 			} else if (!$accessCurrentDirectoryOnly) {
 				$result .=	"<li class='hasSub'><a>" . $key . "</a>";
-				$result .= buildFileMenu($value, ($path . $key . DIRECTORY_SEPARATOR), 1 );
+				$result .= buildFileMenu($value, ($path . $key . DIRECTORY_SEPARATOR), $depth++ );
 				$result .= 	"</li>\n";
 			}
 		}
@@ -361,16 +361,16 @@ if (!$isStillAuthorized) {
 		}
 
 		#pageBox {
-			height: 100vh;
+			height: 90vh;
 			width: 100vw;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 		}
 
-		input, button {
-			padding: 4px;
-		}
+		input, button { padding: 4px; }
+		
+		p { text-align: center; }
 		
 	</style>
 </head>
@@ -383,6 +383,7 @@ if (!$isStillAuthorized) {
 			</form>
 		</div>
 	</div>
+	<p><a href="https://github.com/tordevries/debuggr">What is Debuggr?</a></p>
 </body>
 </html>
 <?
@@ -393,6 +394,8 @@ if (!$isStillAuthorized) {
 // ********************************************************************************
 // PHP PROCEDURES, CONTINUED
 // ********************************************************************************
+
+$debuggrVersion = "1.5.6.1-beta";
 
 // generate HTML for the Files menu
 $fmenu = fileMenu();
@@ -1347,7 +1350,7 @@ if ($reqMode == "download") {
 					<li id="optReload"><a onclick="toggleReloadTimer();"><span>&nbsp;</span> Auto-load updates (5s)</a></li>
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a onclick="logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
-					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr Info</a></li><? } ?>
+					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr v<?= $debuggrVersion; ?></a></li><? } ?>
 				</ul>
 			</li>
 		</ul>
