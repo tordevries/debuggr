@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.6.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.6.3-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
@@ -175,7 +175,7 @@ function isFileRemote($url) {
 
 // check if a local file is valid and return appropriate info
 function fetchLocalFile($localFilepath) {
-	global $noFile, $fmenu, $preventAccessToThisFile;
+	global $noFile, $fmenu, $preventAccessToThisFile, $imageSuffixes, $audioSuffixes, $videoSuffixes;
 	
 	// check if file does not exist or is blocked
 	if ((!file_exists($localFilepath)) || ($preventAccessToThisFile && ($localFilepath == basename(__FILE__)))) {
@@ -190,13 +190,17 @@ function fetchLocalFile($localFilepath) {
 
 	} else { // the file DOES exist, so...
 
-		// check if it's an image; if so, output an img tag, otherwise read in the file contents
+		// get the path component of the URL, then the file extension on the path
+		$localSuffix = pathinfo($localFilepath, PATHINFO_EXTENSION); 
+		
+		// check if it's an image, audio file, or video file, otherwise read contents
 		$isImage = @getimagesize($localFilepath);
 		if ($isImage != false) $returnOutput = "<img src='" . $localFilepath . "'>";
-		else $returnOutput = file_get_contents($localFilepath);
+		else if (in_array($localSuffix, $audioSuffixes)) $returnOutput = "<audio src='" . $localFilepath . "' controls></audio>";
+		else if (in_array($localSuffix, $videoSuffixes)) $returnOutput = "<video src='" . $localFilepath . "' controls></video>";
+		else $returnOutput = htmlspecialchars(file_get_contents($localFilepath));
 
 		if (!$returnOutput) $returnOutput = $noFile; // file is empty, output error
-		else if ($isImage == false) $returnOutput = htmlspecialchars($returnOutput); // convert to special characters for transmission
 
 		// set session variables used for AJAX checks
 		$_SESSION["filename"] = $localFilepath;
@@ -207,27 +211,25 @@ function fetchLocalFile($localFilepath) {
 	return $returnOutput;
 }
 
-
 // function to read remote URLs via cURL; note that this is bypasses HTTPS confirmation checks and
 // is thus inherently insecure; it may be subject to MITM (man in the middle) attacks.
 function fetchRemoteFile($remoteURL) {
-	global $noFile, $fmenu, $allowCURLtoBypassHTTPS, $certificatePathForCURL;
+	global $noFile, $fmenu, $allowCURLtoBypassHTTPS, $certificatePathForCURL, $imageSuffixes, $audioSuffixes, $videoSuffixes;
 
 	// set session variables used for AJAX checks
 	$_SESSION["filename"] = $remoteURL;
 	$_SESSION["filetime"] = 0;
 	$_SESSION["filemenu"] = $fmenu;
-	
-	// prepare for common image suffixes; this may or may not be trustworthy
-	$imageSuffixes = ["png", "jpg", "jpeg", "gif", "svg", "webp", "jfif", "avif", "apng", "pjpeg", "pjp", "ico", "cur", "tif", "tiff", "bmp"];
-	$remotePath = parse_url($remoteURL, PHP_URL_PATH); // get the path component of the URL
-	$remoteSuffix = pathinfo($remotePath, PATHINFO_EXTENSION); // get the file extension on the path
+		
+	// get the path component of the URL, then the file extension on the path
+	$remotePath = parse_url($remoteURL, PHP_URL_PATH);
+	$remoteSuffix = pathinfo($remotePath, PATHINFO_EXTENSION); 
 	
 	// if the extension on the file path of the URL ends in an image format, output an img tag
-	if (in_array($remoteSuffix, $imageSuffixes)) {
-		$returnOutput = "<img src='" . $remoteURL . "'>";
-		
-	} else { // not an image, so try to read the remote source
+	if (in_array($remoteSuffix, $imageSuffixes)) $returnOutput = "<img src='" . $remoteURL . "'>";
+	else if (in_array($remoteSuffix, $audioSuffixes)) $returnOutput = "<audio src='" . $remoteURL . "' controls></audio>";
+	else if (in_array($remoteSuffix, $videoSuffixes)) $returnOutput = "<video src='" . $remoteURL . "' controls></video>";
+	else { // not an image, video, or audio file, so try to scrape the remote source
 		
 		if (function_exists('curl_init')) { // if cURL is available in PHP, use it
 			
@@ -361,7 +363,7 @@ if (!$isStillAuthorized) {
 		}
 
 		#pageBox {
-			height: 90vh;
+			height: 88vh;
 			width: 100vw;
 			display: flex;
 			align-items: center;
@@ -395,11 +397,16 @@ if (!$isStillAuthorized) {
 // PHP PROCEDURES, CONTINUED
 // ********************************************************************************
 
+// version
 $debuggrVersion = "1.5.6.2-beta";
 
 // generate HTML for the Files menu
 $fmenu = fileMenu();
 
+// prepare for common image, audio, and video file suffixes; this may or may not be trustworthy
+$imageSuffixes = ["png", "jpg", "jpeg", "gif", "svg", "webp", "jfif", "avif", "apng", "pjpeg", "pjp", "ico", "cur", "tif", "tiff", "bmp"];
+$audioSuffixes = ["mp3", "wav", "ogg", "aac"];
+$videoSuffixes = ["mp4", "webm", "ogg"];
 
 // for a quick AJAX pulse check on the file's timestamp using previously-stored session variables
 // return 1 for update; 0 for no longer authorized; 2 to update menu; 3 to update file and menu;
