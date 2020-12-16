@@ -51,7 +51,7 @@ Debuggr's navigation bar along the bottom lists the current filename or URL with
 
 _Screenshot of Debuggr examining its own code, possible when the setting_ preventAccessToThisFile _is_ false.
 
-The Files menu offers these commands:
+The Files menu (left side of the nav bar) offers these commands:
 - **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
 - **Open File in New Tab**. Opens the file directly in a new browser tab, so your browser is reading/executing it directly.
 - **Download File**. Downloads the current file to your device as a text file.
@@ -61,7 +61,7 @@ The Files menu offers these commands:
 
 In addition, if _showFilesMenu_ is set to true, the Files menu will include a list of files in its same directory. And if _accessCurrentDirectoryOnly_ is set to false, the file list will include folders in a hierarchical menu.
 
-The Options menu offers these commands:
+The Options menu (right side of the nav bar) offers these commands:
 - **Dark Mode**. Toggles the UI between Dark Mode and Lite Mode.
 - **Line Numbers**. Toggles the display of line numbers on the left margin.
 - **Column Markers**. Toggles the display of column markers every 10 characters.
