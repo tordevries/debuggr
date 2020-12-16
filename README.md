@@ -49,7 +49,7 @@ Debuggr's navigation bar along the bottom lists the current filename or URL with
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
-_Screenshot of Debuggr examining its own code, which is possible when the_ preventAccessToThisFile _setting is_ false.
+_Screenshot of Debuggr examining its own code, possible when the setting_ preventAccessToThisFile _is_ false.
 
 The Files menu offers these commands:
 - **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
