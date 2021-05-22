@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.7.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.7.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -236,11 +236,15 @@ function fetchRemoteFile($remoteURL) {
 		if (function_exists('curl_init')) { // if cURL is available in PHP, use it
 			
 			// initialized cURL
-			$remoteCURL = curl_init($remoteURL);
-			error_log("cURL url: " . $remoteURL);
+			$remoteCURL = curl_init();
 			
 			// set cURL options
+			curl_setopt($remoteCURL, CURLOPT_URL, $remoteURL);
+			curl_setopt($remoteCURL, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+			curl_setopt($remoteCURL, CURLOPT_ENCODING, '');
+			curl_setopt($remoteCURL, CURLOPT_TCP_FASTOPEN, true);
 			curl_setopt($remoteCURL, CURLOPT_VERBOSE, false);
+			curl_setopt($remoteCURL, CURLOPT_POST, false);
 			curl_setopt($remoteCURL, CURLOPT_TIMEOUT, 60);
 			curl_setopt($remoteCURL, CURLOPT_CONNECTTIMEOUT, 0);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
@@ -720,6 +724,8 @@ if ($reqMode == "download") {
 			toStyle = document.querySelector('#codeLines pre');
 			toStyle.className = ""; // erase pre-existing highlight.js classes applied here
 			hljs.highlightElement(toStyle); // run highlight.js on the code block
+			
+			// prep hyperlinking
 			pageTags = document.querySelectorAll(".hljs-string");
 			const noProtocol = new RegExp('^.*.(htm|html|js|css|jpg|png|gif|php)$');
 			const someProtocol = new RegExp('^(http|https).*$');
