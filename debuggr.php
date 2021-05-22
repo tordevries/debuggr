@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.6.5-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.7.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -721,7 +721,7 @@ if ($reqMode == "download") {
 			toStyle.className = ""; // erase pre-existing highlight.js classes applied here
 			hljs.highlightElement(toStyle); // run highlight.js on the code block
 			pageTags = document.querySelectorAll(".hljs-string");
-			const noProtocol = new RegExp('^.*.(htm|html|js|css)$');
+			const noProtocol = new RegExp('^.*.(htm|html|js|css|jpg|png|gif|php)$');
 			const someProtocol = new RegExp('^(http|https).*$');
 			for (const tag of pageTags) {
 				sTag = tag.innerHTML.substr(1, (tag.innerHTML.length - 2) );
