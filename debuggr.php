@@ -11,7 +11,6 @@ https://yourdomain.com/project/debuggr.php?file=yourfile.php
 
 For more information: 
 https://github.com/tordevries/debuggr
-
 -----
 
 Copyright (C) 2020 Tor de Vries (tor.devries@wsu.edu)
@@ -35,18 +34,19 @@ If not, see <http://www.gnu.org/licenses/>.
 // ********************************************************************************
 
 // REQUIRED: your name
-$userName = "Host";
+$userName = "Hostx";
 
 // REQUIRED: your email address
-$userEmail = "your@email.com";
+$userEmail = "yourx@email.com";
 
 // REQUIRED: set a password
-$pagePassword = "477demo";
+$pagePassword = "477demox";
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $passwordRequired = true; 
 
 // if true, redirects HTTP requests to HTTPS
+
 $forceSSL = true;
 
 // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
@@ -140,7 +140,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 		}
 	}
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
-			"<li><a onclick='window.open(baseFile);'>Open File in New Tab</a></li>" .
+			"<li><a onclick='window.open(baseFile);'>Execute File</a></li>" .
 			"<li><a onclick='downloadFile()'>Download File</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Text</a></li>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
@@ -155,7 +155,7 @@ function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
 	else $list = null;
-	$listHTML = "<ul id='fileNav'><li>&#9650;&nbsp;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
+	$listHTML = "<ul id='fileNav'><li>&#9776;&nbsp;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
 	return $listHTML;
 }
 
@@ -237,6 +237,7 @@ function fetchRemoteFile($remoteURL) {
 			
 			// initialized cURL
 			$remoteCURL = curl_init($remoteURL);
+			error_log("cURL url: " . $remoteURL);
 			
 			// set cURL options
 			curl_setopt($remoteCURL, CURLOPT_VERBOSE, false);
@@ -448,9 +449,9 @@ if ($reqMode == "menu") {
 $noFile = "Nothing found."; // default message to output if the file does not exist or is empty
 
 // was a file passed via file= or f= parameters in the URL? otherwise set it to the query string
-if (isset($_REQUEST["file"])) $fpassed = rawurldecode($_REQUEST["file"]);
-else if (isset($_REQUEST["f"])) $fpassed = rawurldecode($_REQUEST["f"]);
-else $fpassed = rawurldecode($_SERVER['QUERY_STRING']);
+$fpassed = rawurldecode($_SERVER['QUERY_STRING']);
+if (isset($_REQUEST["file"])) $fpassed = str_replace('file=', '', $fpassed);
+else if (isset($_REQUEST["f"])) $fpassed = str_replace('f=', '', $fpassed);
 
 if ($accessCurrentDirectoryOnly) $fpassed = basename($fpassed); // if $accessCurrentDirectoryOnly is true, only allow files in current directory
 if (!$accessParentDirectories) $fpassed = ltrim( str_replace("..", "", $fpassed), '/'); // if the passed file starts with a slash, remove it, and don't allow ".." directory traversal
@@ -487,7 +488,7 @@ if ($reqMode == "download") {
 	<meta http-equiv="Cache-Control" content="no-store" />
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
-	<? if ($highlightCode) { ?><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.0/highlight.min.js" async></script><? } ?>
+	<? if ($highlightCode) { ?><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js" integrity="sha512-s+tOYYcC3Jybgr9mVsdAxsRYlGNq4mlAurOrfNuGMQ/SCofNPu92tjE7YRZCsdEtWL1yGkqk15fU/ark206YTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><? } ?>
 	<script>
 		
 		// set some variables (including some passed from PHP
@@ -646,7 +647,7 @@ if ($reqMode == "download") {
 					document.body.classList.remove("isLoading");
 				} else if ((this.readyState == 4) && (this.status != 200)) {
 					codeLinesPre.innerHTML = "<?= $noFile; ?>";
-					console.log("AJAX error: " + this.responseText);
+					console.log("Error: " + this.responseText);
 					document.body.classList.remove("isLoading");
 					statusMessage("!");
 				}
@@ -713,11 +714,37 @@ if ($reqMode == "download") {
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
-		// apply Highlights.js, if configured in PHP
+		// apply Highlights.js and Anchorme.js, if configured in PHP
 		function styleCode() {
 			<? if ($highlightCode) { ?>
-			document.querySelector('#codeLines pre').className = ""; // erase pre-existing highlight.js classes applied here
-			hljs.highlightBlock( document.querySelector('#codeLines pre') ); // run highlight.js on the code block
+			toStyle = document.querySelector('#codeLines pre');
+			toStyle.className = ""; // erase pre-existing highlight.js classes applied here
+			hljs.highlightElement(toStyle); // run highlight.js on the code block
+			pageTags = document.querySelectorAll(".hljs-string");
+			const noProtocol = new RegExp('^.*.(htm|html|js|css)$');
+			const someProtocol = new RegExp('^(http|https).*$');
+			for (const tag of pageTags) {
+				sTag = tag.innerHTML.substr(1, (tag.innerHTML.length - 2) );
+				if (someProtocol.test(sTag)) {
+					tag.innerHTML = tag.innerHTML.substr(0,1) + '<a href="<?= $_SERVER['PHP_SELF']; ?>?file=' + sTag + '">' + sTag + '</a>' + tag.innerHTML.substr(-1);
+				} else if (noProtocol.test(sTag)) {
+					sPassed = "<?= $fpassed; ?>";
+					sTagPre = "";
+					if ( sTag.startsWith("//") ) {
+						sTagPreTest = "<?= $fpassed ?>";
+						if ( sTagPreTest.startsWith("http://") ) sTagPre = "http:";
+						else sTagPre = "https:";
+					} else if ( someProtocol.test(sPassed) ) {
+						basePassed = "<?= basename($fpassed); ?>"; 
+						if ( sPassed.endsWith("/") ) {
+							sTagPre = sPassed;
+						} else if (basePassed != "") {
+							sTagPre = sPassed.substr(0, (sPassed.length - basePassed.length) );
+						}
+					}
+					tag.innerHTML = tag.innerHTML.substr(0,1) + '<a href="<?= $_SERVER['PHP_SELF']; ?>?file=' + sTagPre + sTag + '">' + sTag + '</a>' + tag.innerHTML.substr(-1);
+				}
+			}
 			<? } ?>
 		}
 		
@@ -802,6 +829,7 @@ if ($reqMode == "download") {
 			padding: 10px;
 			z-index: 100;
 			overflow: visible;
+			user-select: none;
 		}
 		
 		#nav span {
@@ -846,6 +874,7 @@ if ($reqMode == "download") {
 			color: #007680;
 			transition: left 0.3s, width 0.3s;
 			z-index: 1;
+			user-select: none;
 		}
 		
 		body.linesOn #codeNums {
@@ -899,6 +928,7 @@ if ($reqMode == "download") {
 			height: 1.5em;
 			overflow: auto;
 			z-index: 1;
+			user-select: none;
 		}
 		
 		#codeCols span {
@@ -951,13 +981,13 @@ if ($reqMode == "download") {
 		
 		#optionsNav li a {
 			display: block;
-			padding: 0.2rem 0.7rem 0.2rem 0.5rem;
 			text-decoration: none;
 			color: #fff;
 		}
 		
 		#optionsNav li ul li a {
 			color: #000;
+			padding: 0.2rem 0.7rem 0.2rem 0.5rem;
 			text-align: left;
 		}
 		
@@ -992,7 +1022,8 @@ if ($reqMode == "download") {
 		
 		a#menuIcon {
 			text-align: right;
-			font-size: 18px;
+			font-size: 14px;
+			padding: 0;
 		}
 		
 		.menuLine {
@@ -1194,6 +1225,15 @@ if ($reqMode == "download") {
 <? if ($highlightCode) { ?>			
 		/* highlight.js for lite mode */
 		
+		.hljs a {
+			text-decoration: none;
+			border-bottom: 1px dotted #888;
+		}
+
+		.hljs a:hover {
+			border-bottom: 1px solid #888;
+		}
+		
 		.hljs,
 		.hljs-subst {
 			color: #525242;
@@ -1217,6 +1257,7 @@ if ($reqMode == "download") {
 			color: #9c5e24;
 		}
 
+		.hljs a, 
 		.hljs-string {
 			color: #49910d;	
 		}
@@ -1240,6 +1281,7 @@ if ($reqMode == "download") {
 			color: #878758;
 		}
 
+		a .hljs-comment,
 		.hljs-comment {
 			color: #9e5555;	
 		}
@@ -1295,6 +1337,7 @@ if ($reqMode == "download") {
 			color: #ffd2a7;
 		}
 
+		body.darkMode .hljs a, 
 		body.darkMode .hljs-string {
 			color: #a8ff60;	
 		}
@@ -1318,6 +1361,7 @@ if ($reqMode == "download") {
 			color: #f7f7cd;
 		}
 
+		body.darkMode a .javascript .hljs-comment, 
 		body.darkMode .hljs-comment {
 			color: #c28686;	
 		}
@@ -1358,7 +1402,7 @@ if ($reqMode == "download") {
 			<span id="statusMsg"></span>
 		</div>
 		<ul id="optionsNav">
-			<li><a id="menuIcon">&#9776;</a>
+			<li><a id="menuIcon">&#9965;</a>
 				<ul>
 					<li id="optDarkMode"><a onclick="toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a onclick="toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
