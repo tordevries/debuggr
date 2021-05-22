@@ -106,7 +106,7 @@ A Boolean value which, if true, allows Debuggr to attempt to scrape content from
 A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If _accessCurrentDirectoryOnly_ is false (see above), the "Files" menu will also include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
 
 #### highlightCode
-A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. The default is true.
+A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. Debuggr also will attempt to hyperlink URLs in href and src attributes, with the links loading into Debuggr. The default is true.
 
 #### startInDarkMode
 A Boolean value which, if true, will start the UI in dark mode by default, rather than lite mode. The default is true.
