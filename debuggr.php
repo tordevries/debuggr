@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.7.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.7.3-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -40,7 +40,7 @@ $userName = "Hostx";
 $userEmail = "yourx@email.com";
 
 // REQUIRED: set a password
-$pagePassword = "477demo";
+$pagePassword = "default";
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $passwordRequired = true; 
@@ -61,7 +61,7 @@ $preventAccessToThisFile = true;
 // if true, Debuggr can attempt to read remote URL source codes; if false, will return nothing on attempts
 $allowRemoteFileReading = true; 
 
-// if true, will add links to the FIles menu with files in the current directory
+// if true, will add links to the Files menu with files in the current directory
 // note: if $accessCurrentDirectoryOnly is false, the Files menu will also include local folders and their files/subdirectories
 $showFilesMenu = false; 
 
@@ -87,9 +87,6 @@ $allowCURLtoBypassHTTPS = true;
 
 // provide the absolute path to your server's security certificates; only applied if $allowCURLtoBypassHTTPS is false
 $certificatePathForCURL = '/etc/ssl/certs'; 
-
-// are there added authentication functions in an external file? name an add-on PHP file here, or null for nothing
-$moreAuthenticationFunctions = '';
 
 
 // ********************************************************************************
@@ -177,6 +174,7 @@ function isFileRemote($url) {
 	$url = filter_var($url, FILTER_SANITIZE_URL);
 	return filter_var($url, FILTER_VALIDATE_URL);
 }
+
 
 // check if a local file is valid and return appropriate info
 function fetchLocalFile($localFilepath) {
@@ -309,7 +307,7 @@ if ($reqMode == "favicon") {
 }
 
 // for security, kill the output if the basic defaults have not been changed
-if (($userName == "Host") || ($userEmail == "your@email.com") || (($pagePassword == "477demo") && $passwordRequired) ) die("ERROR: name, email, and password must be configured.");
+if (($userName == "Host") || ($userEmail == "your@email.com") || (($pagePassword == "default") && $passwordRequired) ) die("ERROR: name, email, and password must be configured.");
 
 // for security, kill the output if password is required but blank
 if ($passwordRequired && ($pagePassword == "")) die("ERROR: no password set.");
@@ -323,14 +321,9 @@ if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 // initalize sessions
 session_start();
 
-// set up authorization hooks
-if ($moreAuthenticationFunctions != '') {
-	require $moreAuthenticationFunctions;
-}
 
 // if a logout command been passed, clear the session and send back to login form
 if (isset($_POST["logout"])) {
-	if (isset($dUserAuth)) $dUserAuth->logout();
 	session_unset();
 	session_destroy();
 	header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
@@ -340,7 +333,7 @@ if (isset($_POST["logout"])) {
 
 // set a boolean to use to confirm continued authorization
 // note: if you change the password, the next reload will force existing sessions to log out
-$isStillAuthorized = (!$passwordRequired || (isset($_SESSION["authorized"]) && ($_SESSION["authorized"] == $pagePassword)) || (isset($_SESSION["authorized"]) && ($dUserAuth->accessLevel > 0)) );
+$isStillAuthorized = (!$passwordRequired || (isset($_SESSION["authorized"]) && ($_SESSION["authorized"] == $pagePassword)));
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
@@ -357,11 +350,6 @@ if (!$isStillAuthorized) {
 		// refresh back to itself to eliminate the POST resubmit issue
 		header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
 		die();
-		
-		
-	} else if (isset($dUserAuth)) {
-		
-		// code for a
 		
 	} else {
 		// needs new authorization, so show the login page
@@ -426,7 +414,7 @@ if (!$isStillAuthorized) {
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.6.5-beta";
+$debuggrVersion = "1.5.7.3-beta";
 
 // generate HTML for the Files menu
 $fmenu = fileMenu();
@@ -467,6 +455,7 @@ $noFile = "Nothing found."; // default message to output if the file does not ex
 
 // was a file passed via file= or f= parameters in the URL? otherwise set it to the query string
 $fpassed = rawurldecode($_SERVER['QUERY_STRING']);
+if ($reqMode == "ajax") $fpassed = str_replace('mode=ajax&', '', $fpassed);
 if (isset($_REQUEST["file"])) $fpassed = str_replace('file=', '', $fpassed);
 else if (isset($_REQUEST["f"])) $fpassed = str_replace('f=', '', $fpassed);
 
@@ -1040,9 +1029,10 @@ if ($reqMode == "download") {
 		}
 		
 		a#menuIcon {
+			font-family: Arial, sans-serif;
 			text-align: right;
 			font-size: 14px;
-			padding: 0;
+			padding: 7px 0 0 0;
 		}
 		
 		.menuLine {
@@ -1421,7 +1411,7 @@ if ($reqMode == "download") {
 			<span id="statusMsg"></span>
 		</div>
 		<ul id="optionsNav">
-			<li><a id="menuIcon">&#9965;</a>
+			<li><a id="menuIcon">&#9650;</a>
 				<ul>
 					<li id="optDarkMode"><a onclick="toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a onclick="toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
