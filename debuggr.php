@@ -40,7 +40,7 @@ $userName = "Hostx";
 $userEmail = "yourx@email.com";
 
 // REQUIRED: set a password
-$pagePassword = "477demox";
+$pagePassword = "477demo";
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $passwordRequired = true; 
@@ -87,6 +87,9 @@ $allowCURLtoBypassHTTPS = true;
 
 // provide the absolute path to your server's security certificates; only applied if $allowCURLtoBypassHTTPS is false
 $certificatePathForCURL = '/etc/ssl/certs'; 
+
+// are there added authentication functions in an external file? name an add-on PHP file here, or null for nothing
+$moreAuthenticationFunctions = '';
 
 
 // ********************************************************************************
@@ -320,9 +323,14 @@ if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 // initalize sessions
 session_start();
 
+// set up authorization hooks
+if ($moreAuthenticationFunctions != '') {
+	require $moreAuthenticationFunctions;
+}
 
 // if a logout command been passed, clear the session and send back to login form
 if (isset($_POST["logout"])) {
+	if (isset($dUserAuth)) $dUserAuth->logout();
 	session_unset();
 	session_destroy();
 	header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
@@ -332,7 +340,7 @@ if (isset($_POST["logout"])) {
 
 // set a boolean to use to confirm continued authorization
 // note: if you change the password, the next reload will force existing sessions to log out
-$isStillAuthorized = (!$passwordRequired || (isset($_SESSION["authorized"]) && ($_SESSION["authorized"] == $pagePassword)));
+$isStillAuthorized = (!$passwordRequired || (isset($_SESSION["authorized"]) && ($_SESSION["authorized"] == $pagePassword)) || (isset($_SESSION["authorized"]) && ($dUserAuth->accessLevel > 0)) );
 
 // for security, if the session is not authorized, check password and/or show login form if necessary
 if (!$isStillAuthorized) {
@@ -349,6 +357,11 @@ if (!$isStillAuthorized) {
 		// refresh back to itself to eliminate the POST resubmit issue
 		header("Location: " . $_SERVER["REQUEST_URI"], true, 301);
 		die();
+		
+		
+	} else if (isset($dUserAuth)) {
+		
+		// code for a
 		
 	} else {
 		// needs new authorization, so show the login page
