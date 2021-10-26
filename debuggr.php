@@ -34,10 +34,10 @@ If not, see <http://www.gnu.org/licenses/>.
 // ********************************************************************************
 
 // REQUIRED: your name
-$userName = "Hostx";
+$userName = "Host";
 
 // REQUIRED: your email address
-$userEmail = "yourx@email.com";
+$userEmail = "your@email.com";
 
 // REQUIRED: set a password
 $pagePassword = "default";
