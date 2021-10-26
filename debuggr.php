@@ -13,7 +13,7 @@ For more information:
 https://github.com/tordevries/debuggr
 -----
 
-Copyright (C) 2020 Tor de Vries (tor.devries@wsu.edu)
+Copyright (C) 2020-2021 Tor de Vries (tor.devries@wsu.edu)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation, either version 3 of 
