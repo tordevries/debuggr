@@ -1,16 +1,18 @@
 <? 
 /*
 
-Debuggr version 1.5.7.3-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.7.4-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
 
-Then, add the parameter "?file=" and the name of a file to view its source code. For example: 
+Then, use the lower left menu's "Open" command, or add the parameter "?file=" and the name of a file, to view
+its source code. For example:
 https://yourdomain.com/project/debuggr.php?file=yourfile.php
 
 For more information: 
 https://github.com/tordevries/debuggr
+
 -----
 
 Copyright (C) 2020-2021 Tor de Vries (tor.devries@wsu.edu)
@@ -46,7 +48,6 @@ $pagePassword = "default";
 $passwordRequired = true; 
 
 // if true, redirects HTTP requests to HTTPS
-
 $forceSSL = true;
 
 // if true, restricts access to only files in this same directory as this file, no subdirectories allowed
@@ -414,7 +415,7 @@ if (!$isStillAuthorized) {
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.7.3-beta";
+$debuggrVersion = "1.5.7.4-beta";
 
 // generate HTML for the Files menu
 $fmenu = fileMenu();
