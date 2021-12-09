@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.7.4-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.8-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -108,6 +108,9 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 // PHP FUNCTIONS
 // ********************************************************************************
+
+// version
+$debuggrVersion = "1.5.8-beta";
 
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
@@ -414,9 +417,6 @@ if (!$isStillAuthorized) {
 // PHP PROCEDURES, CONTINUED
 // ********************************************************************************
 
-// version
-$debuggrVersion = "1.5.7.4-beta";
-
 // generate HTML for the Files menu
 $fmenu = fileMenu();
 
@@ -642,7 +642,7 @@ if ($reqMode == "download") {
 					}
 					baseFile = fileToLoad;
 					codeLinesPre.innerHTML = this.responseText;
-					styleCode();
+					styleCode(fileToLoad);
 					prepCodeNumbers();
 					document.title = "Debuggr: " + fileToLoad;
 					document.querySelector("#filenameRef span").innerHTML = fileToLoad;
@@ -722,7 +722,7 @@ if ($reqMode == "download") {
 		}
 		
 		// apply Highlights.js and Anchorme.js, if configured in PHP
-		function styleCode() {
+		function styleCode(sPassed) {
 			<? if ($highlightCode) { ?>
 			toStyle = document.querySelector('#codeLines pre');
 			toStyle.className = ""; // erase pre-existing highlight.js classes applied here
@@ -730,25 +730,29 @@ if ($reqMode == "download") {
 			
 			// prep hyperlinking
 			pageTags = document.querySelectorAll(".hljs-string");
-			const noProtocol = new RegExp('^.*.(htm|html|js|css|jpg|png|gif|php)$');
+			const noProtocol = new RegExp('^.*.(htm|html|js|css|jpg|png|gif|php|mp3|mp4)$');
 			const someProtocol = new RegExp('^(http|https).*$');
 			for (const tag of pageTags) {
 				sTag = tag.innerHTML.substr(1, (tag.innerHTML.length - 2) );
 				if (someProtocol.test(sTag)) {
 					tag.innerHTML = tag.innerHTML.substr(0,1) + '<a href="<?= $_SERVER['PHP_SELF']; ?>?file=' + sTag + '">' + sTag + '</a>' + tag.innerHTML.substr(-1);
 				} else if (noProtocol.test(sTag)) {
-					sPassed = "<?= $fpassed; ?>";
 					sTagPre = "";
 					if ( sTag.startsWith("//") ) {
-						sTagPreTest = "<?= $fpassed ?>";
-						if ( sTagPreTest.startsWith("http://") ) sTagPre = "http:";
+						if ( sPassed.startsWith("http://") ) sTagPre = "http:";
 						else sTagPre = "https:";
-					} else if ( someProtocol.test(sPassed) ) {
-						basePassed = "<?= basename($fpassed); ?>"; 
-						if ( sPassed.endsWith("/") ) {
-							sTagPre = sPassed;
-						} else if (basePassed != "") {
-							sTagPre = sPassed.substr(0, (sPassed.length - basePassed.length) );
+					} else {
+						if ( sPassed.search("/") != -1) {
+							if ( sPassed.startsWith("/") ) {
+								sTagPre = "/";
+							}
+							aPassed = sPassed.split("/");
+							basePassed = aPassed.pop(); 
+							if ( sPassed.endsWith("/") ) {
+									sTagPre += aPassed.join("/");
+							} else {
+								sTagPre += aPassed.join("/") + "/";
+							}
 						}
 					}
 					tag.innerHTML = tag.innerHTML.substr(0,1) + '<a href="<?= $_SERVER['PHP_SELF']; ?>?file=' + sTagPre + sTag + '">' + sTag + '</a>' + tag.innerHTML.substr(-1);
@@ -791,7 +795,7 @@ if ($reqMode == "download") {
 			document.getElementById("codeNums").onclick = function() { closeMenus(); }
 
 			// apply highlight.js
-			styleCode();
+			styleCode("<?= $fpassed; ?>");
 			
 			// since the URL is changed dynamically, we need to dynamically respond to back buttons
 			window.onpopstate = function(event) {
