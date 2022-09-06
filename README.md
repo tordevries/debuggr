@@ -39,9 +39,12 @@ If the configuration _allowRemoteFileReading_ is set to true (which it is by def
 
 https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
 
+With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
+
+Debuggr's remote scraping will automatically follow most redirects. However, it may not follow HTTP to HTTPS redirects. If your URL is HTTP (e.g. not secure) and cURL returns a blank page, try it with HTTPS.
+
 _Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
 
-With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
 
 #### Menus and Options
  
@@ -140,7 +143,7 @@ Some ideas on the future radar:
 ---
 ## License
 
-Copyright (C) 2020-2021 Tor de Vries (tor.devries@wsu.edu)
+Copyright (C) 2020-2022 Tor de Vries (tor.devries@wsu.edu)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation, either version 3 of 
