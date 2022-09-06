@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.8-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.9-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -15,7 +15,7 @@ https://github.com/tordevries/debuggr
 
 -----
 
-Copyright (C) 2020-2021 Tor de Vries (tor.devries@wsu.edu)
+Copyright (C) 2020-2022 Tor de Vries (tor.devries@wsu.edu)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation, either version 3 of 
@@ -36,13 +36,13 @@ If not, see <http://www.gnu.org/licenses/>.
 // ********************************************************************************
 
 // REQUIRED: your name
-$userName = "Host";
+$userName = "Host"; // default = "Host"
 
 // REQUIRED: your email address
-$userEmail = "your@email.com";
+$userEmail = "your@email.com"; // default = "your@email.com"
 
 // REQUIRED: set a password
-$pagePassword = "default";
+$pagePassword = "default"; // default = "default"
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
 $passwordRequired = true; 
@@ -110,7 +110,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.8-beta";
+$debuggrVersion = "1.5.9-beta";
 
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
@@ -254,6 +254,7 @@ function fetchRemoteFile($remoteURL) {
 			curl_setopt($remoteCURL, CURLOPT_CONNECTTIMEOUT, 0);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
 			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($remoteCURL, CURLOPT_FOLLOWLOCATION, true);
 			
 			// set the cURL user agent to match the current browser's user agent
 			$userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -484,7 +485,7 @@ if ($reqMode == "download") {
 // if we got this far, output the whole page
 
 // ********************************************************************************
-// HTML PAGE #2: LOAD COMPLETE INTERFACE
+// HTML PAGE #2: LOAD COMPLETE HTML AND JAVASCRIPT INTERFACE
 // ********************************************************************************
 
 ?><!DOCTYPE html>
@@ -542,9 +543,11 @@ if ($reqMode == "download") {
 			if (darkModeOn) {
 				document.body.classList.remove("darkMode");
 				document.querySelector("#optDarkMode span").innerHTML = "&nbsp;";
+				document.querySelector("style").innerHTML += "::-webkit-scrollbar-track { background: #aaa; } ::-webkit-scrollbar-thumb { background: #333; }";
 			} else {
 				document.body.classList.add("darkMode");
 				document.querySelector("#optDarkMode span").innerHTML = "&check;";
+				document.querySelector("style").innerHTML += "::-webkit-scrollbar-track { background: #333; } ::-webkit-scrollbar-thumb { background: #aaa; }";;
 			}
 			darkModeOn = !darkModeOn;
 		}
@@ -786,8 +789,7 @@ if ($reqMode == "download") {
 			
 			// set clicks for the options menu
 			document.querySelector('#optionsNav li').onclick = function() { 
-				closeMenus();
-				document.querySelector('#optionsNav li').classList.toggle('showSub');
+				this.classList.toggle("showSub");
 			}
 			
 			// close menus when someone clicks on the main code
@@ -818,7 +820,6 @@ if ($reqMode == "download") {
 			margin: 0;
 			padding: 0;
 			box-sizing: border-box;
-			overflow: auto;
 		}
 		
 		body {
@@ -904,7 +905,7 @@ if ($reqMode == "download") {
 			left: 0.25rem;
 			height: calc(100vh - 44px);
 			width: calc(100vw - 0.25rem);
-			overflow: scroll;
+			overflow: auto;
 			transition: left 0.5s, width 0.5s;
 			z-index: 2;
 		}
@@ -924,7 +925,7 @@ if ($reqMode == "download") {
 		
 		#codeNums pre, 
 		#codeLines pre {
-			padding-top: 0.5em;
+			padding-top: 1em;
 			padding-bottom: 80px; /* above the nav bar */
 		}
 		
@@ -939,7 +940,8 @@ if ($reqMode == "download") {
 			left: 0;
 			width: auto;
 			height: 1.5em;
-			overflow: auto;
+			overflow: visible;
+			white-space: nowrap;
 			z-index: 1;
 			user-select: none;
 		}
@@ -987,9 +989,15 @@ if ($reqMode == "download") {
 		
 		#optionsNav {
 			float: right;
-			overflow: visible;
+			overflow: hidden;
+			width: 2em;
+			white-space: nowrap;
 			text-align: right;
 			margin-top: -5px;
+		}
+		
+		#optionsNav:hover {
+			overflow: visible;
 		}
 		
 		#optionsNav li a {
@@ -1236,6 +1244,11 @@ if ($reqMode == "download") {
 			}
 		}
 		
+		/* default scrollbars to dark mode */
+		::-webkit-scrollbar { width: 12px; height: 12px; }
+		::-webkit-scrollbar-track { background: #333; }
+		::-webkit-scrollbar-thumb { background: #aaa; border-radius: 3px; }
+		
 <? if ($highlightCode) { ?>			
 		/* highlight.js for lite mode */
 		
@@ -1416,8 +1429,7 @@ if ($reqMode == "download") {
 			<span id="statusMsg"></span>
 		</div>
 		<ul id="optionsNav">
-			<li><a id="menuIcon">&#9650;</a>
-				<ul>
+			<li><a id="menuIcon">&#9650;</a><ul>
 					<li id="optDarkMode"><a onclick="toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a onclick="toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
 					<li id="optColumns"><a onclick="toggleCols();"><span><?= ($startWithColsOn ? "&check;" : "&nbsp;") ?></span> Column Markers</a></li>
@@ -1425,8 +1437,7 @@ if ($reqMode == "download") {
 					<li class="menuLine"><a href="mailto:<?= $userEmail; ?>"><span>&nbsp;</span> Email <?= $userName; ?></a></li>
 					<? if ($passwordRequired) { ?><li><a onclick="logout()"><span>&nbsp;</span> Log Out</a></li><? } ?>
 					<? if ($showDebuggrLink) { ?><li class="menuLine"><a href="https://github.com/tordevries/debuggr" target="_blank"><span>&nbsp;</span> Debuggr v<?= $debuggrVersion; ?></a></li><? } ?>
-				</ul>
-			</li>
+				</ul></li>
 		</ul>
 	</div>
 	<div id="codeNums"><pre></pre></div>
