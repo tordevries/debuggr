@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.9-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.5.10-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -110,7 +110,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.9-beta";
+$debuggrVersion = "1.5.10-beta";
 
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
@@ -665,6 +665,13 @@ if ($reqMode == "download") {
 			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + encodeURIComponent(fileToLoad);
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
+		}
+		
+		// test if string is a valid URL; unused but saving for future use
+		function isValidUrl(u) {
+			try { test = new URL(u); }
+			catch (err) {	return false; }
+			return true;
 		}
 
 		// output line and column numbers in #codeNums pre, padding numbers with 0s to appropriate width; calculate and add column numbers
