@@ -52,11 +52,12 @@ Debuggr's navigation bar along the bottom lists the current filename or URL with
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
-_Screenshot of Debuggr examining its own code, possible when the setting_ preventAccessToThisFile _is_ false.
+_Screenshot of Debuggr examining its own code, only possible when the setting_ preventAccessToThisFile _is_ false.
 
 The Files menu (left side of the nav bar) offers these commands:
 - **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
-- **Open File in New Tab**. Opens the file directly in a new browser tab, so your browser is reading/executing it directly.
+- **Reload and Tidy (beta)**. Reloads the current file and parses it with the PHP Tidy library in an attempt to beautify the code. Results may vary.
+- **Execute File**. Opens the file directly in a new browser tab, so your browser is reading/executing it directly.
 - **Download File**. Downloads the current file to your device as a text file.
 - **Select All Text**. Selects all the text/code in the browser without selecting line numbers or other UI elements.
 - **Go To Line...**. Asks you for a line number, then scrolls to it.
@@ -123,6 +124,15 @@ A Boolean value which, if true, will start with the column markers showing every
 #### showDebuggrLink
 A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
 
+#### logTimings
+A Boolean value which, if true, instructs Debuggr to record how long processing each request has taken. The default is false.
+
+#### logTimingsFilename
+A string variable for the path and filename of the log file, if logTimings is true. The default is "debuggr-timing.txt".
+
+#### $logTimingsTimestamp
+A string variable for the format of the PHP date function used in the timing logs, if logTimings is true. The default is month/day/year plus 24-hour hour:minute:second, or "m/d/Y H:i:s".
+
 #### allowCURLtoBypassHTTPS (advanced)
 A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. This is a security risk; you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_ as noted below.
 
@@ -134,8 +144,6 @@ A string variable containing an absolute path to your web server's SSL security 
 
 Some ideas on the future radar:
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
-- **Tabbed interface.** Allow creation of tabs to look at different files.
-- **Code beautifying.** It might be nice to support the Tidy library in PHP, or js-beautify, or something similar for reformatting code appearance, although this would unlink line number references versus the original source.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
 - **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
 - **Analytics.** Could be interesting to integrate with your own Google Analytics account so you could track usage.

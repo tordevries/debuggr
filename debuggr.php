@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.5.10-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.6.0-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -75,11 +75,22 @@ $startInDarkMode = true;
 // true to start with the line numbers visible
 $startWithLinesOn = true;
 
-// true to start with the column markers and numbers visible
+// set to  true to start with the column markers and numbers visible
 $startWithColsOn = true;
 
-// true to include a link to Debuggr on Github in the options menu
+// set to true to include a link to Debuggr on Github in the options menu
 $showDebuggrLink = true; 
+
+
+// set to true to enable timing logs every time Debuggr fetches a file or URL 
+$logTimings = false;
+
+// customize the log path and filename
+$logTimingsFilename = "debuggr-timing.txt"; 
+
+// customize the log timestamp format; defaults to month/day/year plus 24-hour hour:minute:second
+$logTimingsTimestamp = "m/d/Y H:i:s";
+
 
 // advanced remote file reading options related to $allowRemoteFileReading and the PHP cURL libraries
 
@@ -110,7 +121,13 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.5.10-beta";
+$debuggrVersion = "1.6.0-beta";
+
+// start timer
+if ($logTimings) {
+	$timerStart = hrtime(true);
+	$timerTimestamp = date($logTimingsTimestamp, time());
+}
 
 // a recursive function that returns a multidimensional array of files/folders in local directory; 
 // adapted from user-submitted code on https://www.php.net/manual/en/function.scandir.php
@@ -144,6 +161,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 		}
 	}
 	if ($depth == 0) $result .= "<li><a class='" . ($showFilesMenu ? "menuLine" : "") . "' href='javascript:checkPulse(true);'>Reload File</a></li>" . 
+			"<li><a onclick='tidyCode()'>Reload and Tidy (beta)</a></li>" .
 			"<li><a onclick='window.open(baseFile);'>Execute File</a></li>" .
 			"<li><a onclick='downloadFile()'>Download File</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Text</a></li>" .
@@ -180,9 +198,31 @@ function isFileRemote($url) {
 }
 
 
+// use the PHP Tidy function to try to clean up code formatting
+function tidyCode($input) {
+	$tidy = new tidy;
+	$tidyConfig = array('indent' => true,
+											'indent-spaces' => 5,
+											'wrap' => 0,
+											'wrap-attributes' => false,
+											'vertical-space' => true,
+											'preserve-entities' => true,
+											'merge-emphasis' => false,
+											'merge-divs' => false,
+											'join-styles' => false,
+											'fix-bad-comments' => false,
+											'drop-empty-paras' => false,
+											'coerce-endtags' => false,
+											'drop-empty-elements' => false,
+											'output-xhtml' => false);
+	$tidy->parseString($input, $tidyConfig, "UTF8");
+	$tidy->cleanRepair();
+	return $tidy;
+}
+
 // check if a local file is valid and return appropriate info
 function fetchLocalFile($localFilepath) {
-	global $noFile, $fmenu, $preventAccessToThisFile, $imageSuffixes, $audioSuffixes, $videoSuffixes;
+	global $noFile, $fmenu, $preventAccessToThisFile, $imageSuffixes, $audioSuffixes, $videoSuffixes, $logTimings, $logTimingsFilename, $timerStart, $timerTimestamp, $tidyMode;
 	
 	// check if file does not exist or is blocked
 	if ((!file_exists($localFilepath)) || ($preventAccessToThisFile && ($localFilepath == basename(__FILE__)))) {
@@ -201,11 +241,17 @@ function fetchLocalFile($localFilepath) {
 		$localSuffix = pathinfo($localFilepath, PATHINFO_EXTENSION); 
 		
 		// check if it's an image, audio file, or video file, otherwise read contents
+		$isFile = false;
 		$isImage = @getimagesize($localFilepath);
 		if ($isImage != false) $returnOutput = "<img src='" . $localFilepath . "'>";
 		else if (in_array($localSuffix, $audioSuffixes)) $returnOutput = "<audio src='" . $localFilepath . "' controls></audio>";
 		else if (in_array($localSuffix, $videoSuffixes)) $returnOutput = "<video src='" . $localFilepath . "' controls></video>";
-		else $returnOutput = htmlspecialchars(file_get_contents($localFilepath));
+		else {
+			$isFile = true;
+			$returnOutput = file_get_contents($localFilepath);
+			if ($tidyMode) $returnOutput = tidyCode($returnOutput);
+			$returnOutput = htmlspecialchars($returnOutput);
+		}
 
 		if (!$returnOutput) $returnOutput = $noFile; // file is empty, output error
 
@@ -215,13 +261,24 @@ function fetchLocalFile($localFilepath) {
 		$_SESSION["filemenu"] = $fmenu;
 	}
 	
+	if ($logTimings) {
+		$timerElapsed = round( ((hrtime(true) - $timerStart)/1e+9), 5);
+		if ($isFile) {
+			$localDataSize = round( (filesize($localFilepath) / 1024), 2);
+			$toLog = "[" . $timerTimestamp . "] " . $timerElapsed . "s to read and return local " . $localDataSize . "kb: " . $localFilepath . "\n";
+		} else {
+			$toLog = "[" . $timerTimestamp . "] " . $timerElapsed . "s to process local media: " . $localFilepath . "\n";
+		}
+		error_log($toLog, 3, $logTimingsFilename);
+	}
+	
 	return $returnOutput;
 }
 
 // function to read remote URLs via cURL; note that this is bypasses HTTPS confirmation checks and
 // is thus inherently insecure; it may be subject to MITM (man in the middle) attacks.
 function fetchRemoteFile($remoteURL) {
-	global $noFile, $fmenu, $allowCURLtoBypassHTTPS, $certificatePathForCURL, $imageSuffixes, $audioSuffixes, $videoSuffixes;
+	global $noFile, $fmenu, $allowCURLtoBypassHTTPS, $certificatePathForCURL, $imageSuffixes, $audioSuffixes, $videoSuffixes, $logTimings, $logTimingsFilename, $timerStart, $timerTimestamp, $tidyMode;
 
 	// set session variables used for AJAX checks
 	$_SESSION["filename"] = $remoteURL;
@@ -230,7 +287,10 @@ function fetchRemoteFile($remoteURL) {
 		
 	// get the path component of the URL, then the file extension on the path
 	$remotePath = parse_url($remoteURL, PHP_URL_PATH);
-	$remoteSuffix = pathinfo($remotePath, PATHINFO_EXTENSION); 
+	$remoteSuffix = pathinfo($remotePath, PATHINFO_EXTENSION);
+	
+	// create empty string
+	$toLog = "";
 	
 	// if the extension on the file path of the URL ends in an image format, output an img tag
 	if (in_array($remoteSuffix, $imageSuffixes)) $returnOutput = "<img src='" . $remoteURL . "'>";
@@ -253,8 +313,8 @@ function fetchRemoteFile($remoteURL) {
 			curl_setopt($remoteCURL, CURLOPT_TIMEOUT, 60);
 			curl_setopt($remoteCURL, CURLOPT_CONNECTTIMEOUT, 0);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
-			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($remoteCURL, CURLOPT_FOLLOWLOCATION, true);
+			if ($logTimings) curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
 			
 			// set the cURL user agent to match the current browser's user agent
 			$userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -273,13 +333,32 @@ function fetchRemoteFile($remoteURL) {
 			// error_log("cURL error: " . curl_strerror(curl_errno($remoteCURL)));
 			
 			// execute cURL call and convert to shareable code with htmlspecialchars()
-			$returnOutput = htmlspecialchars( curl_exec($remoteCURL) );
+			$returnOutput = curl_exec($remoteCURL);
+			if ($tidyMode) $returnOutput = tidyCode($returnOutput);
+			$returnOutput = htmlspecialchars($returnOutput);
+			
+			if ($logTimings) {
+				$info = curl_getinfo($remoteCURL);
+				$curlTime = round( $info['total_time'], 5);
+				$timerElapsed = round( ((hrtime(true) - $timerStart)/1e+9), 5);
+				$curlTimePercentage = round( (($curlTime / $timerElapsed) * 100), 2);
+				$curlDataSize = round( ($info['size_download'] / 1024), 2); 
+				$curlDataSpeed = round( ($info['speed_download'] / 1024), 2);
+ 				$toLog = "[" . $timerTimestamp . "] " . $timerElapsed . "s to fetch and return remote " . $curlDataSize . "kb (cURL: " . $curlTime . "s, " . $curlTimePercentage . "%): " . $remoteURL . "\n";
+				error_log($toLog, 3, $logTimingsFilename);
+			}
 			
 		} else {
 			// error_log("Debuggr remote URL error: cURL is not enabled.");
 			$returnOutput = $noFile;
 			
 		}
+	}
+	
+	if ( ($logTimings) && ($toLog == "") ) {
+		$timerElapsed = round( ((hrtime(true) - $timerStart)/1e+9), 5);
+		$toLog = "[" . $timerTimestamp . "] " . $timerElapsed . "s to process remote media: " . $remoteURL . "\n";
+		error_log($toLog, 3, $logTimingsFilename);
 	}
 			
 	return $returnOutput;
@@ -304,6 +383,12 @@ function outputFavicon() {
 // set $reqMode if one is passed
 if (isset($_REQUEST["mode"])) $reqMode = $_REQUEST["mode"];
 else $reqMode = "";
+
+// set $tidyMode if one is passed
+if (isset($_REQUEST["maketidy"])) {
+	$tidyMode = ($_REQUEST["maketidy"] == "true");
+	
+} else $tidyMode = false;
 
 // output a favicon just to avoid the 404 error in the browser console
 if ($reqMode == "favicon") {
@@ -458,6 +543,7 @@ $noFile = "Nothing found."; // default message to output if the file does not ex
 // was a file passed via file= or f= parameters in the URL? otherwise set it to the query string
 $fpassed = rawurldecode($_SERVER['QUERY_STRING']);
 if ($reqMode == "ajax") $fpassed = str_replace('mode=ajax&', '', $fpassed);
+if ($tidyMode) $fpassed = str_replace('maketidy=true&', '', $fpassed);
 if (isset($_REQUEST["file"])) $fpassed = str_replace('file=', '', $fpassed);
 else if (isset($_REQUEST["f"])) $fpassed = str_replace('f=', '', $fpassed);
 
@@ -497,6 +583,7 @@ if ($reqMode == "download") {
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
 	<title>Debuggr: <?= $fpassed; ?> by <?= $userName; ?></title>
 	<? if ($highlightCode) { ?><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js" integrity="sha512-s+tOYYcC3Jybgr9mVsdAxsRYlGNq4mlAurOrfNuGMQ/SCofNPu92tjE7YRZCsdEtWL1yGkqk15fU/ark206YTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><? } ?>
+
 	<script>
 		
 		// set some variables (including some passed from PHP
@@ -631,7 +718,7 @@ if ($reqMode == "download") {
 		}
 		
 		// use AJAX to reload the file or to load files from the Files menu (if enabled)
-		function loadFile(fileToLoad = baseFile, historyUpdate = true) {
+		function loadFile(fileToLoad = baseFile, historyUpdate = true, toTidy = false) {
 			document.body.classList.add("isLoading");
 			closeMenus();
 			codeLinesPre = document.querySelector("#codeLines pre");
@@ -662,7 +749,10 @@ if ($reqMode == "download") {
 					statusMessage("!");
 				}
 			}
-			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax&file=" + encodeURIComponent(fileToLoad);
+			if (toTidy) addtidy = "&maketidy=true";
+			else addtidy = "";
+			urlToLoad = "<?= $_SERVER['PHP_SELF']; ?>?mode=ajax" + addtidy + "&file=" + encodeURIComponent(fileToLoad);
+			console.log(urlToLoad);
 			ajax.open("POST", urlToLoad, true);
 			ajax.send();
 		}
@@ -731,11 +821,30 @@ if ($reqMode == "download") {
 			document.querySelector("#optionsNav li").classList.remove("showSub");
 		}
 		
+		// reload and apply PHP Tidy function
+		function tidyCode() {
+			loadFile(baseFile, false, true);
+		}
+		
 		// apply Highlights.js and Anchorme.js, if configured in PHP
 		function styleCode(sPassed) {
-			<? if ($highlightCode) { ?>
+			<? if ($highlightCode) { ?>			
 			toStyle = document.querySelector('#codeLines pre');
 			toStyle.className = ""; // erase pre-existing highlight.js classes applied here
+			
+			// make a backup of the original unformatted source
+			// doing now for possible future features (TBA)
+			sourceBackup = document.getElementById('codeBackup'); // check for element
+			if (!sourceBackup) { // is it null?
+				sourceBackup = document.createElement('div'); // make a new element
+				sourceBackup.id = "codeBackup";
+				sourceBackup.style.display = "none"; // make it hidden
+				sourceBackupPre = document.createElement('pre');
+				sourceBackup.appendChild(sourceBackupPre);
+				document.body.appendChild(sourceBackup); // attach it to the end of the DOM
+			}
+			document.querySelector('#codeBackup pre').innerHTML = toStyle.innerHTML; // copy the innerHTML of the code to the backup
+			
 			hljs.highlightElement(toStyle); // run highlight.js on the code block
 			
 			// prep hyperlinking
