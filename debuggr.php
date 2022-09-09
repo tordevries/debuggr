@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.6.1-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.6.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -121,7 +121,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.6.1-beta";
+$debuggrVersion = "1.6.2-beta";
 
 // start timer
 if ($logTimings) {
@@ -177,7 +177,7 @@ function fileMenu($dir = '.') {
 	global $showFilesMenu;
 	if ($showFilesMenu) $list = findAllFiles($dir);
 	else $list = null;
-	$listHTML = "<ul id='fileNav'><li>&#9776;&nbsp;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
+	$listHTML = "<ul id='fileNav'><li><span id='fileIcon'>&#9776;</span>&nbsp;" . buildFileMenu($list) . "</li></ul>"; // not file icon &#128196;
 	return $listHTML;
 }
 
@@ -978,6 +978,11 @@ if ($reqMode == "download") {
 			text-decoration: none;
 		}
 		
+		#fileIcon {
+			font-size: 22px;
+			margin-top: -5px;
+		}
+		
 		#filenameRef {
 			display: inline-block;
 			cursor: pointer;
@@ -1165,8 +1170,8 @@ if ($reqMode == "download") {
 		a#menuIcon {
 			font-family: Arial, sans-serif;
 			text-align: right;
-			font-size: 14px;
-			padding: 7px 0 0 0;
+			font-size: 24px;
+			padding: 2px 0 0 0;
 		}
 		
 		.menuLine {
@@ -1550,7 +1555,7 @@ if ($reqMode == "download") {
 			<span id="statusMsg"></span>
 		</div>
 		<ul id="optionsNav">
-			<li><a id="menuIcon">&#9650;</a><ul>
+			<li><a id="menuIcon">&#9881;</a><ul>
 					<li id="optDarkMode"><a onclick="toggleVisualMode()"><span><?= ($startInDarkMode ? "&check;" : "&nbsp;") ?></span> Dark Mode</a></li>
 					<li id="optLineNumbers"><a onclick="toggleNums();"><span><?= ($startWithLinesOn ? "&check;" : "&nbsp;") ?></span> Line Numbers</a></li>
 					<li id="optColumns"><a onclick="toggleCols();"><span><?= ($startWithColsOn ? "&check;" : "&nbsp;") ?></span> Column Markers</a></li>
