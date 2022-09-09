@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.6.0-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.6.1-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -121,7 +121,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.6.0-beta";
+$debuggrVersion = "1.6.1-beta";
 
 // start timer
 if ($logTimings) {
@@ -209,11 +209,13 @@ function tidyCode($input) {
 											'preserve-entities' => true,
 											'merge-emphasis' => false,
 											'merge-divs' => false,
+											'merge-spans' => false,
 											'join-styles' => false,
 											'fix-bad-comments' => false,
 											'drop-empty-paras' => false,
 											'coerce-endtags' => false,
 											'drop-empty-elements' => false,
+											'enclose-block-text' => false,
 											'output-xhtml' => false);
 	$tidy->parseString($input, $tidyConfig, "UTF8");
 	$tidy->cleanRepair();
@@ -314,7 +316,7 @@ function fetchRemoteFile($remoteURL) {
 			curl_setopt($remoteCURL, CURLOPT_CONNECTTIMEOUT, 0);
 			curl_setopt($remoteCURL, CURLOPT_HEADER, false);
 			curl_setopt($remoteCURL, CURLOPT_FOLLOWLOCATION, true);
-			if ($logTimings) curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($remoteCURL, CURLOPT_RETURNTRANSFER, true);
 			
 			// set the cURL user agent to match the current browser's user agent
 			$userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -333,9 +335,10 @@ function fetchRemoteFile($remoteURL) {
 			// error_log("cURL error: " . curl_strerror(curl_errno($remoteCURL)));
 			
 			// execute cURL call and convert to shareable code with htmlspecialchars()
-			$returnOutput = curl_exec($remoteCURL);
-			if ($tidyMode) $returnOutput = tidyCode($returnOutput);
-			$returnOutput = htmlspecialchars($returnOutput);
+			$returnCURLoutput = curl_exec($remoteCURL);
+			if ($tidyMode) $returnCURLoutput = tidyCode($returnCURLoutput);
+			$returnOutput = htmlspecialchars($returnCURLoutput);
+			
 			
 			if ($logTimings) {
 				$info = curl_getinfo($remoteCURL);
@@ -732,6 +735,7 @@ if ($reqMode == "download") {
 						document.getElementById("codeLines").scrollTop = 0;
 					}
 					baseFile = fileToLoad;
+					console.log(this.responseText);
 					codeLinesPre.innerHTML = this.responseText;
 					styleCode(fileToLoad);
 					prepCodeNumbers();
