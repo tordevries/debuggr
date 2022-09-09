@@ -556,6 +556,7 @@ else $foutput = "No source indicated.\n\nInclude a source in the URL with ?file=
 // if the mode is ajax, just return the content without the rest of the HTML, CSS, JS
 if ($reqMode == "ajax") die($foutput); 
 
+// if mode is download, force the browser to download a copy of the currently-accessed code
 if ($reqMode == "download") {
 	$foutput = htmlspecialchars_decode($foutput);
 	header('Content-Description: File Transfer');
