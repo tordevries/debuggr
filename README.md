@@ -144,7 +144,6 @@ Some ideas on the future radar:
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
 - **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
 - **Analytics.** Could be interesting to integrate with your own Google Analytics account so you could track usage.
-- **Externalize CSS and JavaScript.** Make it load its own JavaScript and CSS through external calls to itself, or through CDNs.
 
 ---
 ## License
