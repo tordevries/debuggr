@@ -579,7 +579,7 @@ if ($reqMode == "download") {
 	<script src="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-main.css" rel="stylesheet">
-	<? if ($highlightCode) { ?><link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7/debuggr-highlight.css" rel="stylesheet"><? } ?>
+	<? if ($highlightCode) { ?><link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-highlight.css" rel="stylesheet"><? } ?>
 	<style></style>
 </head>
 <body class="isLoading <? if ($startWithLinesOn) { ?>linesOn<? } ?> <? if ($startInDarkMode) { ?>darkMode<? } ?>">
