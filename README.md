@@ -121,9 +121,6 @@ A Boolean value which, if true, will start with the line numbers showing on the 
 #### startWithColsOn
 A Boolean value which, if true, will start with the column markers showing every 10 characters, rather than hidden. The default is true.
 
-#### showDebuggrLink
-A Boolean value which, if true, includes a link in the options menu to this project's Github page. The default is true.
-
 #### logTimings
 A Boolean value which, if true, instructs Debuggr to record how long processing each request has taken. The default is false.
 
