@@ -1,3 +1,10 @@
+/* JavaScript for the Debuggr project
+ * v1.7
+ *
+ * For more information: 
+ * https://github.com/tordevries/debuggr
+ */
+
 // shortcut for updating the status text
 function statusMessage(msg) {
 	document.getElementById("statusMsg").innerHTML = msg;

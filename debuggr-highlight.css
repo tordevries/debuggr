@@ -1,6 +1,8 @@
-/*
- * Custom highlight CSS for Debuggr.php, when using highlight.js
+/* Custom highlighting CSS for the Debuggr project, when used with highlight.js
  * v1.7
+ *
+ * For more information: 
+ * https://github.com/tordevries/debuggr
  */
 
 .hljs a {
