@@ -1,5 +1,5 @@
 /* JavaScript for the Debuggr project
- * v1.7
+ * v1.7.2
  *
  * For more information: 
  * https://github.com/tordevries/debuggr

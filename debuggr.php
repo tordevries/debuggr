@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.7-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.7.2-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -117,7 +117,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.7-beta";
+$debuggrVersion = "1.7.2-beta";
 
 // start timer
 if ($logTimings) {
