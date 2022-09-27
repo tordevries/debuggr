@@ -22,6 +22,20 @@ body.darkMode {
 	color: #fff;
 }
 
+body.loginPage #pageBox {
+	background-color: #fff;
+	color: #000;
+	height: 88vh;
+	width: 100vw;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+body.loginPage input, body.loginPage button { padding: 4px; }
+
+body.loginPage p { text-align: center; }
+
 #nav {
 	position: fixed;
 	background-color: #555;
