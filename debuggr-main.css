@@ -1,0 +1,445 @@
+/*
+ * Externalized primary CSS for Debuggr.php
+ * v1.7
+ */
+
+* {
+	font-family: 'Source Code Pro', monospace;
+	font-size: 14px;
+	tab-size: 3;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #fff;
+	color: #000;
+}
+
+body.darkMode {
+	background-color: #222;
+	color: #fff;
+}
+
+#nav {
+	position: fixed;
+	background-color: #555;
+	color: #ddd;
+	bottom: 0;
+	left: 0;
+	width: 100vw;
+	height: 44px;
+	padding: 10px;
+	z-index: 100;
+	overflow: visible;
+	user-select: none;
+}
+
+#nav span {
+	margin-right: 10px;
+	float: left;
+	max-width: 60vw;
+}
+
+#nav span a {
+	color: #ddd;
+	text-decoration: none;
+}
+
+#fileIcon {
+	font-size: 22px;
+	margin-top: -5px;
+}
+
+#filenameRef {
+	display: inline-block;
+	cursor: pointer;
+}
+
+#nav span#statusMsg {
+	margin-left: 10px;
+	color: #aaa;
+	float: right;
+	max-width: 2ch;
+	color: #c8ff00;
+}
+
+a.uicon  {
+	font-weight: normal;
+	color: #ddd;
+	text-decoration: none;
+}
+
+#codeNums {
+	position: fixed;
+	top: 0;
+	left: -4rem;
+	width: 3.75rem;
+	height: calc(100vh - 44px);
+	font-weight: 300;
+	overflow: hidden;
+	text-align: right;
+	color: #007680;
+	transition: left 0.3s, width 0.3s;
+	z-index: 1;
+	user-select: none;
+}
+
+body.linesOn #codeNums {
+	left: 0rem;
+}
+
+body.darkMode #codeNums {
+	color: #a9e3e8;
+}
+
+#codeLines {
+	position: absolute;
+	top: 0;
+	left: 0.25rem;
+	height: calc(100vh - 44px);
+	width: calc(100vw - 0.25rem);
+	overflow: auto;
+	transition: left 0.5s, width 0.5s;
+	z-index: 2;
+}
+
+#codeLines pre {
+	overflow: display;
+	background-size: 10ch 10ch;
+	background-image: linear-gradient(to right, #eee 1px, transparent 1px);
+	background-attachment: local;
+	padding-right: 10ch;
+	z-index: 2;
+}
+
+body.darkMode #codeLines pre {
+	background-image: linear-gradient(to right, #333 1px, transparent 1px);
+}
+
+#codeNums pre, 
+#codeLines pre {
+	padding-top: 1em;
+	padding-bottom: 80px; /* above the nav bar */
+}
+
+body.isLoading #codeNums,
+body.isLoading #codeLines {
+	filter: blur(1px);
+}
+
+#codeCols {
+	position: absolute;
+	top: -4px;
+	left: 0;
+	width: auto;
+	height: 1.5em;
+	overflow: visible;
+	white-space: nowrap;
+	z-index: 1;
+	user-select: none;
+}
+
+#codeCols span {
+	width: 10ch;
+	display: inline-block;
+	white-space: nowrap;
+	text-align: right;
+	color: #ccc;
+	padding-right: 4px;
+}
+
+#codeLines.colsOff #codeCols {
+	display: none;
+}
+
+#codeLines.colsOff pre {
+	background: none;
+}
+
+body.darkMode #codeCols span {
+	color: #555;
+}
+
+body.linesOn #codeLines {
+	left: 4.25rem;
+	width: calc(100vw - 4.25rem);
+}
+
+#codeLines img {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#codeNums, #codeLines {
+	line-height: 21px;
+}
+
+input, button {
+	padding: 4px;
+	text-transform: uppercase;
+}
+
+#optionsNav {
+	float: right;
+	overflow: hidden;
+	width: 2em;
+	white-space: nowrap;
+	text-align: right;
+	margin-top: -5px;
+}
+
+#optionsNav:hover {
+	overflow: visible;
+}
+
+#optionsNav li a {
+	display: block;
+	text-decoration: none;
+	color: #fff;
+}
+
+#optionsNav li ul li a {
+	color: #000;
+	padding: 0.2rem 0.7rem 0.2rem 0.5rem;
+	text-align: left;
+}
+
+#optionsNav li ul li a:hover {
+	background-color: #bbb;
+}
+
+#optionsNav ul {
+	position: absolute;
+	display: none;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	z-index: 100;
+	overflow: visible;
+}
+
+#optionsNav li.showSub ul {
+	display: block;
+	bottom: 44px;
+	right: 0;
+}
+
+#optionsNav li span {
+	color: green;
+	font-weight: bold;
+	font-size: 90%;
+	margin-top: -2px;
+}
+
+a#menuIcon {
+	font-family: Arial, sans-serif;
+	text-align: right;
+	font-size: 24px;
+	padding: 2px 0 0 0;
+}
+
+.menuLine {
+	padding-top: 4px;
+	margin-top: 4px;
+	border-top: 1px solid #ccc;
+}
+
+#fileNav {
+	float: left;
+	z-index: 100;
+	padding-right: 1rem;
+	overflow: visible;
+	list-style-type: none;
+}
+
+#fileNav a {
+	display: block;
+	padding: 0.2rem 2rem 0.2rem 0.5rem;
+	text-decoration: none;
+	color: #000000;
+}
+
+#fileNav a:hover {
+	background-color: #bbb;
+}
+
+#fileNav ul {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	left: 0;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	z-index: 100;
+	overflow: visible;
+}
+
+#fileNav ul ul {
+	border-left: 1px solid #000;
+}
+
+#fileNav li {
+	float: left;
+	width: 100%;
+	white-space: nowrap;
+	overflow: visible;
+	cursor: pointer;
+}
+
+#fileNav li.hasSub::before {
+	content: ">";
+	width: 2rem;
+	text-align: right;
+	padding: 0.2rem;
+	float: right;
+	color: #777;
+}
+
+#fileNav li.hasSub li::before {
+	content: "";
+}
+
+#fileNav li.hasSub li.hasSub::before {
+	content: ">";
+}
+
+#fileNav li li {
+	clear: left;
+	width: 100%;
+}
+
+#fileNav ul,
+#fileNav li.showSub ul ul {
+	display: none;
+	position: absolute;
+}
+
+#fileNav li.showSub ul {
+	display: block;
+	position: absolute;
+	bottom: 44px;
+}
+
+#fileNav li.showSub li.showSub {
+	position: relative;			
+}
+
+#fileNav li.showSub li.showSub ul {
+	display: block;
+	left: 100%;
+	bottom: 0;
+}
+
+#fileNav li.showSub li.showSub ul ul {
+	display: none;
+}
+
+#fileNav li.showSub li.showSub li.showSub ul {
+	display: block;
+	left: 100%;
+	bottom: 0;
+}
+
+/* for loading screen */
+
+#loadingOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: calc(100vh - 44px);
+	background-color: rgba(128, 128, 128, 0.5);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+}
+
+body.isLoading #loadingOverlay {
+	display: flex;
+}
+
+#outerLoading {
+	position: relative;
+	width: 150px;
+	height: 150px;
+	background-color: #444;
+	border-radius: 50%;
+	text-align: center;
+	color: #fff;
+	overflow: hidden;
+}
+
+#innerLoading {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	border-radius: 50%;
+	z-index: 3;
+}
+
+body.isLoading #innerLoading {
+	animation: circleRotate 3s infinite linear;
+}
+
+@keyframes circleRotate {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(359deg); }
+}
+
+#innerCover {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 50%;
+	height: 100%;
+	background-image: linear-gradient(#444, #fff);
+	z-index: 5;
+}
+
+#innerDot {
+	position: absolute;
+	background-color: #fff;
+	width: 4%;
+	height: 4%;
+	bottom: 0;
+	left: 48%;
+	border-radius: 50%;
+	z-index: 6;
+}
+
+#innerContent {
+	position: absolute;
+	background-color: #444;
+	width: 92%;
+	height: 92%;
+	top: 4%;
+	left: 4%;
+	border-radius: 50%;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+@media only print {
+	#nav, #codeCols {
+		display: none;
+	}
+	#codeNums, #codeLines {
+		position: absolute;
+		overflow: visible;
+	}
+}
+
+/* default scrollbars to dark mode */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: #333; }
+::-webkit-scrollbar-thumb { background: #aaa; border-radius: 3px; }

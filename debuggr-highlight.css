@@ -1,0 +1,170 @@
+/*
+ * Custom highlight CSS for Debuggr.php, when using highlight.js
+ * v1.7
+ */
+
+.hljs a {
+	text-decoration: none;
+	border-bottom: 1px dotted #888;
+}
+
+.hljs a:hover {
+	border-bottom: 1px solid #888;
+}
+
+.hljs,
+.hljs-subst {
+	color: #525242;
+}
+
+.hljs-built_in,
+.hljs-selector-tag,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-section,
+.hljs-link {
+	color: #4291a1;
+}
+
+.hljs-keyword {
+	color: #d52feb;
+}
+
+.hljs-title,
+.hljs-params {
+	color: #9c5e24;
+}
+
+.hljs a, 
+.hljs-string {
+	color: #49910d;	
+}
+
+.hljs-keyword,
+.hljs-tag,
+.hljs-meta,
+.hljs-name,
+.hljs-type,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+	color: #47749e;
+}
+
+.hljs-attr,
+.hljs-attribute {
+	color: #878758;
+}
+
+a .hljs-comment,
+.hljs-comment {
+	color: #9e5555;	
+}
+
+.hljs-quote,
+.hljs-deletion {
+	color: #75715e;
+}
+
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-type,
+.hljs-name,
+.hljs-strong {
+	font-weight: bold;
+}
+
+.hljs-literal,
+.hljs-number {
+	color: #c251c0;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+
+/* highlight.js for dark mode */
+
+body.darkMode .hljs,
+body.darkMode .hljs-subst {
+	color: #f8f8f2;
+}
+
+body.darkMode .hljs-built_in,
+body.darkMode .hljs-selector-tag,
+body.darkMode .hljs-selector-id,
+body.darkMode .hljs-selector-class,
+body.darkMode .hljs-section,
+body.darkMode .hljs-link {
+	color: #66d8ef;
+}
+
+body.darkMode .hljs-keyword {
+	color: #d52feb;
+}
+
+body.darkMode .hljs-title,
+body.darkMode .hljs-params {
+	color: #ffd2a7;
+}
+
+body.darkMode .hljs a, 
+body.darkMode .hljs-string {
+	color: #a8ff60;	
+}
+
+body.darkMode .hljs-keyword,
+body.darkMode .hljs-tag,
+body.darkMode .hljs-meta,
+body.darkMode .hljs-name,
+body.darkMode .hljs-type,
+body.darkMode .hljs-symbol,
+body.darkMode .hljs-bullet,
+body.darkMode .hljs-addition,
+body.darkMode .hljs-variable,
+body.darkMode .hljs-template-tag,
+body.darkMode .hljs-template-variable {
+	color: #96cbfe;
+}
+
+body.darkMode .hljs-attr,
+body.darkMode .hljs-attribute {
+	color: #f7f7cd;
+}
+
+body.darkMode a .javascript .hljs-comment, 
+body.darkMode .hljs-comment {
+	color: #c28686;	
+}
+
+body.darkMode .hljs-quote,
+body.darkMode .hljs-deletion {
+	color: #75715e;
+}
+
+body.darkMode .hljs-selector-tag,
+body.darkMode .hljs-literal,
+body.darkMode .hljs-title,
+body.darkMode .hljs-section,
+body.darkMode .hljs-doctag,
+body.darkMode .hljs-type,
+body.darkMode .hljs-name,
+body.darkMode .hljs-strong {
+	font-weight: bold;
+}
+
+body.darkMode .hljs-literal,
+body.darkMode .hljs-number {
+	color: #ff73fd;
+}
+
+body.darkMode .hljs-emphasis {
+	font-style: italic;
+}
