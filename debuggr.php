@@ -455,7 +455,7 @@ if (!$isStillAuthorized) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
-	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7/debuggr-main.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-main.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<script>window.onload = function() { document.getElementById("pwd").focus(); };</script>
 </head>
@@ -576,9 +576,9 @@ if ($reqMode == "download") {
 		reloadTimer = false;
 		
 	</script>
-	<script src="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7/debuggr.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
-	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7/debuggr-main.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-main.css" rel="stylesheet">
 	<? if ($highlightCode) { ?><link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7/debuggr-highlight.css" rel="stylesheet"><? } ?>
 	<style></style>
 </head>
