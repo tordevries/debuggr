@@ -1,5 +1,5 @@
 /* Primary CSS for the Debuggr project
- * v1.7.2
+ * v1.8
  *
  * For more information: 
  * https://github.com/tordevries/debuggr
@@ -110,6 +110,11 @@ body.darkMode #codeNums {
 	color: #a9e3e8;
 }
 
+body #codeNums pre span.hi {
+	background-color: #ffa200;
+	color: #000;
+}
+
 #codeLines {
 	position: absolute;
 	top: 0;
@@ -195,7 +200,6 @@ body.linesOn #codeLines {
 
 input, button {
 	padding: 4px;
-	text-transform: uppercase;
 }
 
 #optionsNav {
@@ -205,10 +209,15 @@ input, button {
 	white-space: nowrap;
 	text-align: right;
 	margin-top: -5px;
+	cursor: pointer;
 }
 
 #optionsNav:hover {
 	overflow: visible;
+}
+
+#optionsNav li::marker {
+    content: '';
 }
 
 #optionsNav li a {

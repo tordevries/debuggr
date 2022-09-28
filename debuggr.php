@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.7.2-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.8-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -117,7 +117,7 @@ $certificatePathForCURL = '/etc/ssl/certs';
 // ********************************************************************************
 
 // version
-$debuggrVersion = "1.7.2-beta";
+$debuggrVersion = "1.8";
 
 // start timer
 if ($logTimings) {
@@ -160,6 +160,7 @@ function buildFileMenu($arr = null, $path = "", $depth = 0) {
 			"<li><a onclick='tidyCode()'>Reload and Tidy (beta)</a></li>" .
 			"<li><a onclick='window.open(baseFile);'>Execute File</a></li>" .
 			"<li><a onclick='downloadFile()'>Download File</a></li>" .
+			"<li><a onclick='copyShare()'>Copy Shareable Link</a></li>" .
 			"<li><a onclick='selectCode()'>Select All Text</a></li>" .
 			"<li><a onclick='lineJumper()'>Go to Line...</a>" .
 			"<li class='menuLine'><a onclick='openFile();'>Open File" . ($allowRemoteFileReading ? "/URL" : "") . "...</a></li>";
@@ -443,9 +444,8 @@ if (!$isStillAuthorized) {
 	} else {
 		// needs new authorization, so show the login page
 
-
 // ********************************************************************************
-// HTML PAGE #1: LOG IN
+// HTML PAGE #1: OUTPUT THE LOGIN PAGE
 // ********************************************************************************
 
 		?><!DOCTYPE html>
@@ -455,7 +455,7 @@ if (!$isStillAuthorized) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Debuggr: Log In</title>
 	<link rel="icon" type="image/png" href="<?= $_SERVER['PHP_SELF']; ?>?mode=favicon" />
-	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-main.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.8/debuggr-main.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
 	<script>window.onload = function() { document.getElementById("pwd").focus(); };</script>
 </head>
@@ -549,7 +549,7 @@ if ($reqMode == "download") {
 // if we got this far, output the whole page
 
 // ********************************************************************************
-// HTML PAGE #2: LOAD COMPLETE HTML AND JAVASCRIPT INTERFACE
+// HTML PAGE #2: LOAD MAIN INTERFACE
 // ********************************************************************************
 
 ?><!DOCTYPE html>
@@ -576,9 +576,9 @@ if ($reqMode == "download") {
 		reloadTimer = false;
 		
 	</script>
-	<script src="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.8/debuggr.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap" rel="stylesheet">
-	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-main.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.8/debuggr-main.css" rel="stylesheet">
 	<? if ($highlightCode) { ?><link href="https://cdn.jsdelivr.net/gh/tordevries/debuggr@1.7.2/debuggr-highlight.css" rel="stylesheet"><? } ?>
 	<style></style>
 </head>

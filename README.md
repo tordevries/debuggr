@@ -46,19 +46,24 @@ Debuggr's remote scraping will automatically follow most redirects. However, it 
 _Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
 
 
-#### Menus and Options
- 
-Debuggr's navigation bar along the bottom lists the current filename or URL with a reload icon. It also offers two menus: the Files menu in the lower left corner, and the Options menu in the lower right.
+#### Features
+
+After logging in, the main Debuggr interface shows the loaded code with line and column numbers (if enabled), with a navigation bar across the bottom.
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
 _Screenshot of Debuggr examining its own code, only possible when the setting_ preventAccessToThisFile _is_ false.
+
+Line numbers can be clicked to highlight them. These clicks are tracked in the hash of Debuggr's URL, thus making the Debuggr file and highlights shareable.
+
+Debuggr's navigation bar lists the current filename or URL with a reload icon. It also offers two menus: the Files menu in the lower left corner, and the Options menu in the lower right.
 
 The Files menu (left side of the nav bar) offers these commands:
 - **Reload File**. Checks if the file and/or menu has been updated, and if so, reloads new data via AJAX. Remote URLs are always reloaded.
 - **Reload and Tidy (beta)**. Reloads the current file and parses it with the PHP Tidy library in an attempt to beautify the code. Results may vary.
 - **Execute File**. Opens the file directly in a new browser tab, so your browser is reading/executing it directly.
 - **Download File**. Downloads the current file to your device as a text file.
+- **Copy Shareable Link**. Copies a shareable link to the currently-displayed Debuggr screen, preserving line highlights.
 - **Select All Text**. Selects all the text/code in the browser without selecting line numbers or other UI elements.
 - **Go To Line...**. Asks you for a line number, then scrolls to it.
 - **Open File/URL...**. Asks you for a file name or a complete URL (if _allowRemoteFileReading_ is set to true) to read.

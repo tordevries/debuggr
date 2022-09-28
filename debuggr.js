@@ -1,5 +1,5 @@
 /* JavaScript for the Debuggr project
- * v1.7.2
+ * v1.8
  *
  * For more information: 
  * https://github.com/tordevries/debuggr
@@ -135,6 +135,14 @@ function loadFile(fileToLoad = baseFile, historyUpdate = true, toTidy = false) {
 	closeMenus();
 	codeLinesPre = document.querySelector("#codeLines pre");
 	statusMessage("&#8857;");
+	
+	// prep for any passed highlight tags in URL
+	highlightSplit = fileToLoad.split("#:LX:");
+	fileToLoad = highlightSplit[0];
+	
+	// don't need to update the browser history if it's the same file reloaded
+	if (fileToLoad == baseFile) historyUpdate = false;
+
 	ajax = new XMLHttpRequest();
 	ajax.onreadystatechange = function() {
 		if ((this.readyState == 4) && (this.status == 200)) {
@@ -150,9 +158,12 @@ function loadFile(fileToLoad = baseFile, historyUpdate = true, toTidy = false) {
 			document.querySelector("#filenameRef span").innerHTML = fileToLoad;
 			if (historyUpdate) {
 				historyURL = urlToSelf + "?file=" + fileToLoad;
+				urlHighlightSplit = location.href.split("#:LX:");
+				if ((fileToLoad != baseFile) && (urlHighlightSplit.length > 1)) historyURL += "#:LX:" + urlHighlightSplit[1];
 				window.history.pushState( {}, "", historyURL);
 			}
 			statusMessage("");
+			readLineHighlights();
 			document.body.classList.remove("isLoading");
 		} else if ((this.readyState == 4) && (this.status != 200)) {
 			codeLinesPre.innerHTML = noFileMessage;
@@ -163,8 +174,9 @@ function loadFile(fileToLoad = baseFile, historyUpdate = true, toTidy = false) {
 	}
 	if (toTidy) addtidy = "&maketidy=true";
 	else addtidy = "";
+		
+	// prep final loading
 	urlToLoad = urlToSelf + "?mode=ajax" + addtidy + "&file=" + encodeURIComponent(fileToLoad);
-	console.log(urlToLoad);
 	ajax.open("POST", urlToLoad, true);
 	ajax.send();
 }
@@ -191,8 +203,13 @@ function prepCodeNumbers() {
   
 	// output line numbers and check line widths for column output
 	for (x=1; x<=numLines.length; x++) {
-		codeNumsPre.innerHTML += (x + ":").padStart(padTo, "0") + "\n";
+		codeNumsPre.innerHTML += "<span id='L" + x + "'>" + ( (x + ":").padStart(padTo, "0") ) + "</span>\n";
 		if ((x<numLines.length) && (numLines[x].length > maxWidth)) maxWidth = numLines[x].length;
+	}
+	
+	lineSpans = document.querySelectorAll("#codeNums pre span");
+	for (c=0; c<lineSpans.length; c++) {
+		lineSpans[c].onclick = function(){ markLineHighlights(this); }
 	}
 
 	// output columns based on maxWidth analysis
@@ -201,6 +218,49 @@ function prepCodeNumbers() {
 	codeCols.innerHTML = outputColumns;
 
 	return true;
+}
+
+// respond to highlights on line clicks
+function markLineHighlights(lineIn = null) {
+	if (lineIn != null) lineIn.classList.toggle("hi"); // if passed, adjust newly clicked line before 
+	lineList = "";
+	linesClicked = document.querySelectorAll("#codeNums pre span.hi");
+	if (linesClicked.length > 0) {
+		lineList = "#:LX"; // set up hashtag string for URL
+		for (lc=0; lc<linesClicked.length; lc++) {
+			lcID = Number( linesClicked[lc].id.slice(1) );
+			lineList += ":" + lcID; // build hashtag string
+		}
+	}
+	updateURL = historyURL = urlToSelf + "?file=" + baseFile + lineList;
+	window.history.replaceState( {}, "", updateURL);
+}
+
+// read passed highlights from URL and mark them
+function readLineHighlights() {
+	highlightSplit = location.href.split("#:LX:"); // check for highlights in loaded URL
+	if (highlightSplit.length > 1) {
+		lineSplit = highlightSplit[1].split(":");
+		for (ls=0; ls<lineSplit.length; ls++) {
+			lineFocus = document.getElementById("L"+lineSplit[ls]);
+			if (lineFocus) lineFocus.classList.add("hi");
+		}
+		markLineHighlights();
+	}
+}
+
+// clear all clicked line highlights
+function clearLineHighlights() {
+	linesClicked = document.querySelectorAll("#codeNums pre span.hi");
+	for (lc=0; lc<linesClicked.length; lc++) {
+		linesClicked[lc].classList.remove("hi");
+	}
+}
+
+function copyShare() {
+	copyLoc = location.href;
+	navigator.clipboard.writeText(copyLoc);
+	closeMenus();
 }
 
 // download a file
@@ -336,7 +396,10 @@ window.onload = function() {
 		historyParam = document.location.href.split( (basenameFile + "?file=") ).pop(); // get the file value passed to debuggr
 		loadFile(historyParam, false);
 	};
-
+	
+	// interpret incoming click highlights
+	readLineHighlights();
+	
 	// all done loading? remove the isLoading CSS class
 	document.body.classList.remove("isLoading");
 }		
