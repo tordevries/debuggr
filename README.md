@@ -141,7 +141,7 @@ A string variable for the format of the PHP date function used in the timing log
 A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will instruct cURL to load remote HTTPS pages without a complete SSL certificate check. _This is a security risk;_ you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. The default is true. If set to false, you should configure _certificatePathForCURL_ as noted below.
 
 #### certificatePathForCURL (advanced)
-A string variable containing an absolute path to your web server's SSL security certificate for use by cURL when _allowCURLtoBypassHTTPS_ is true. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
+A string variable containing an absolute path to your web server's SSL security certificate for use by cURL when _allowCURLtoBypassHTTPS_ is false. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
 ## Future Features
