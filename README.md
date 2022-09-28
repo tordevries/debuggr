@@ -22,6 +22,8 @@ To install, upload the debuggr.php file to your web hosting. Then, configure the
 
 Debuggr will show an error if these settings are unchanged from their defaults.
 
+Additional configuration options are described below.
+
 Once installed and configured, simply access debuggr.php at the URL to which you installed it.
 
 ---
