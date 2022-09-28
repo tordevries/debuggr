@@ -1,13 +1,12 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
 **A tool to allow reading the source code of HTML, CSS, JavaScript, and other web-accessible files, as well as coding and configuration files (PHP, etc.) available on its local web server.**
 
-Debuggr is a single PHP file with all the internal code necessary to accomplish its task, using the jsdelivr CDN to load its CSS and JavaScript files remotely. It even dynamically generates its own favicon. This makes it easier to install and manage, especially for beginner coders. It is mobile-friendly, and its ability to read remote files and URLs makes it useful for studying source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
+Debuggr is a single PHP file using CDNs to load CSS and JavaScript files remotely. This makes it easier to install and manage, especially for beginner coders such as programming students. It is mobile-friendly, and its ability to read remote files and URLs makes it useful for looking at source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
 
-Debuggr is licensed under the GNU General Public License, as [noted below](#license) and detailed in the LICENSE.txt file.
+Debuggr was originally developed by a programming instructor to enable remote reading of student server-side coding without administrative server access. Debuggr is licensed under the GNU General Public License, as [noted below](#license) and detailed in the LICENSE.txt file.
 
 #### Security Notice
 Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session (which requires use of a browser cookie). However, installing Debuggr may expose your server to security risks if someone is able read files that contain passwords or other sensitive information. As a result, it is meant to be installed for individual use, and not as a system-wide resource or on mission-critical systems. It should also be removed or disabled once it is no longer needed. As noted in the license, _your use of this code is entirely at your own risk_.
-
 
 ---
 ## Installation
