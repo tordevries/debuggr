@@ -135,7 +135,7 @@ A Boolean value which, if true, instructs Debuggr to record how long processing 
 #### logTimingsFilename
 A string variable for the path and filename of the log file, if logTimings is true. The default is "debuggr-timing.txt".
 
-#### $logTimingsTimestamp
+#### logTimingsTimestamp
 A string variable for the format of the PHP date function used in the timing logs, if logTimings is true. The default is month/day/year plus 24-hour hour:minute:second, or "m/d/Y H:i:s".
 
 #### allowCURLtoBypassHTTPS (advanced)
