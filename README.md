@@ -1,7 +1,7 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
-**A tool to allow reading of the source code of web-accessible files as well as coding and configuration files (PHP, etc.) locally available on the web server.**
+**A tool to allow reading the source code of HTML, CSS, JavaScript, and other web-accessible files, as well as coding and configuration files (PHP, etc.) available on its local web server.**
 
-Debuggr was originally created to allow a programming instructor to read server-side code written by his students after they had installed this. By design, it is a single PHP file with all the internal code necessary to accomplish its task, using the jsdelivr CDN to load its CSS and JavaScript files remotely. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and its ability to read browser source code makes it useful for studying client-side source code (HTML, CSS, JavaScript) via smartphones and other mobile devices.
+Debuggr is a single PHP file with all the internal code necessary to accomplish its task, using the jsdelivr CDN to load its CSS and JavaScript files remotely. It even dynamically generates its own favicon. This makes it easier to install and manage, especially for beginner coders. It is mobile-friendly, and its ability to read remote files and URLs makes it useful for studying source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
 
 Debuggr is licensed under the GNU General Public License, as [noted below](#license) and detailed in the LICENSE.txt file.
 
