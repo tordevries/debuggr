@@ -52,7 +52,7 @@ After logging in, the main Debuggr interface shows the loaded code with line and
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
-_Screenshot of Debuggr examining its own code, only possible when the setting_ preventAccessToThisFile _is_ false.
+_Screenshot of Debuggr examining its own JavaScript code, with a few line numbers highlighted._
 
 Line numbers can be clicked to highlight them. These clicks are tracked in the hash of Debuggr's URL, thus making the Debuggr file and highlights shareable.
 
