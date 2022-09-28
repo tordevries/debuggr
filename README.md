@@ -1,7 +1,7 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
 A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single file with all the HTML and PHP necessary to accomplish its task, using the jsdelivr CDN for its CSS and JavaScript files. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
 
-Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. However, this is meant to be installed for individual use, not as a system-wide resource, or for use on mission-critical systems.
+Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session (which requires use of a browser cookie). However, installing Debuggr may potentially expose your server to security risks if someone is able to use Debuggr to read files that contain passwords or other sensitive information. It is meant to be installed for individual use, and not as a system-wide resource or on mission-critical systems. It should also be removed or disabled once it is no longer needed.
 
 Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
 
@@ -51,19 +51,17 @@ The Options menu (right side of the nav bar) offers these commands:
 - **Log Out**. Logs you out, ending your session.
 - **Debuggr Info**. Links to this page on GitHub.
 
-When you access debuggr.php, you can add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
+When you access debuggr.php, you can add a parameter named "file" or "f" set to the filename (or pathname) of the file you want to read. For example, these URLs...
 
-https://yourdomain.com/debuggr.php?file=error\_log
+https://yourdomain.com/debuggr.php?file=error_log
 
-...would tell Debuggr to display PHP's protected "error\_log" file in the same directory as Debuggr, which normally cannot be read by a web browser.
+https://yourdomain.com/debuggr.php?f=error_log
 
-Debuggr also accepts "f" for the file parameter, like this:
-
-https://yourdomain.com/debuggr.php?f=error\_log
+...would tell Debuggr to display PHP's protected "error_log" file in the same directory as Debuggr, which normally cannot be read by a web browser.
 
 It also accepts just the file name after the question mark:
 
-https://yourdomain.com/debuggr.php?error\_log
+https://yourdomain.com/debuggr.php?error_log
 
 If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example, this URL would display the HTML source code of this project on GitHub:
 
@@ -75,7 +73,7 @@ Debuggr's remote scraping will automatically follow most redirects. However, it 
 
 In addition, the debuggr.php file can be renamed to any other .php filename. For example, you can rename it to index.php and place it in a directory, which allows a URL format like this:
 
-https://yourdomain.com/code/?error\_log
+https://yourdomain.com/code/?error_log
 
 
 ---
@@ -153,12 +151,9 @@ Some ideas on the future radar:
 
 Copyright (C) 2020-2022 Tor de Vries (tor.devries@wsu.edu)
 
-This program is free software: you can redistribute it and/or modify it under the terms of the 
-GNU General Public License as published by the Free Software Foundation, either version 3 of 
-the License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Your use of this code is entirely at your own risk. See the GNU General Public License for more details.
 
 The complete license is available in the LICENSE.txt file accompanying this project, or online
 at <https://www.gnu.org/licenses/gpl-3.0.en.html>.
