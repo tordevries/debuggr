@@ -1,9 +1,7 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
-**A tool to allow reading the source code of HTML, CSS, JavaScript, and other web-accessible files, as well as coding and configuration files (PHP, etc.) available on its local web server.**
+**A tool to read the source code of remote HTML, CSS, JavaScript, and other web-accessible files, as well as locally-available code and configuration files (PHP, etc.) also hosted by its web server.** It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
 
-Debuggr is a single self-contained PHP file (debuggr.php) that generates its own HTML and favicon, and uses CDNs to load its supporting CSS and JavaScript files. It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
-
-Debuggr was originally developed by a programming instructor to enable remote reading of student server-side coding without administrative server access. As a single file, it is easy to install and manage, especially for beginner coders such as programming students.
+Debuggr is a single self-contained PHP file (debuggr.php) that generates its own HTML and favicon, and uses CDNs to load its supporting CSS and JavaScript files. It was originally developed by a programming instructor to enable remote reading of student server-side coding without administrative server access. As a single file, it is easy to install and manage, especially for beginner coding students.
 
 Debuggr is licensed under the GNU General Public License, as [noted below](#license) and detailed in the LICENSE.txt file.
 
@@ -13,8 +11,6 @@ Debuggr includes basic security options such as simple password protection, file
 ---
 ## Installation
 
-Debuggr requires that your web server runs a recent version of PHP. Remote URL access additionally requires the cURL libraries, which are commonly available on PHP-enabled servers; however, local code reading will still be available even if cURL is not.
-
 To install, upload the debuggr.php file to your web hosting. Then, configure the variable options near the beginning of the document. If nothing else, you _must_ change the values of these settings:
 - **userName**: set to your name
 - **userEmail**: set to your email
@@ -22,7 +18,7 @@ To install, upload the debuggr.php file to your web hosting. Then, configure the
 
 Debuggr will show an error if these settings are unchanged from their defaults.
 
-Additional configuration options are described below.
+Additional configuration options are described further below. Note that Debuggr requires that your web server runs a recent version of PHP, and remote URL access additionally requires the cURL libraries, which are commonly available on PHP-enabled servers.
 
 Once installed and configured, simply access debuggr.php at the URL to which you installed it.
 
@@ -76,13 +72,13 @@ If the configuration _allowRemoteFileReading_ is set to true (which it is by def
 
 https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
 
-With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
-
-Debuggr's remote scraping will automatically follow most redirects. However, it may not follow HTTP to HTTPS redirects. If your URL is HTTP (e.g. not secure) and Debuggr returns a blank page, try it with HTTPS. _Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
+Debuggr's remote scraping will automatically follow most redirects. However, it may not follow HTTP to HTTPS redirects. If your URL is HTTP (e.g. not secure) and Debuggr returns a blank page, try it with HTTPS. _Note: Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
 
 In addition, the debuggr.php file can be renamed to any other .php filename. For example, you can rename it to index.php and place it in a directory, which allows a URL format like this:
 
 https://yourdomain.com/code/?error_log
+
+With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
 
 
 ---
@@ -142,10 +138,10 @@ A string variable for the path and filename of the log file, if logTimings is tr
 A string variable for the format of the PHP date function used in the timing logs, if logTimings is true. The default is month/day/year plus 24-hour hour:minute:second, or "m/d/Y H:i:s".
 
 #### allowCURLtoBypassHTTPS (advanced)
-A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will load remote HTTPS pages without a complete SSL certificate check. _This is a security risk;_ you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. The default is true. If set to false, you should configure _certificatePathForCURL_ as noted below.
+A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will instruct cURL to load remote HTTPS pages without a complete SSL certificate check. _This is a security risk;_ you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. The default is true. If set to false, you should configure _certificatePathForCURL_ as noted below.
 
 #### certificatePathForCURL (advanced)
-A string variable containing an absolute path to your web server's SSL security certificate. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
+A string variable containing an absolute path to your web server's SSL security certificate for use by cURL when _allowCURLtoBypassHTTPS_ is true. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
 
 ---
 ## Future Features
