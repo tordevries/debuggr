@@ -1,5 +1,5 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
-A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single self-contained file with all the HTML, CSS, JavaScript, and PHP necessary to accomplish its task. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
+A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single file with all the HTML and PHP necessary to accomplish its task, using the jsdelivr CDN for its CSS and JavaScript files. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
 
 Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session. As a result, this requires use of a cookie. However, this is meant to be installed for individual use, not as a system-wide resource, or for use on mission-critical systems.
 
@@ -7,6 +7,7 @@ Debuggr is licensed under the GNU General Public License, as noted below and det
 
 ---
 ## Installing Debuggr
+
 Upload the debuggr.php file to your hosting, and configure the variable options near the beginning of the document. If nothing else, you must change the values of these settings:
 - **userName**: set to your name
 - **userEmail**: set to your email
@@ -14,41 +15,12 @@ Upload the debuggr.php file to your hosting, and configure the variable options 
 
 Debuggr will show an error if these settings are unchanged from their defaults.
 
+Once installed, simply access debuggr.php at the URL you installed it.
+
 ---
 ## Using Debuggr
 
-When you access debuggr.php, add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
-
-https://yourdomain.com/debuggr.php?file=error_log
-
-...would tell Debuggr to display PHP's protected "error_log" file in the same directory as Debuggr, which normally cannot be read by a web browser.
-
-Debuggr also accepts "f" for the file parameter, like this:
-
-https://yourdomain.com/debuggr.php?f=error_log
-
-It also accepts just the file name after the question mark:
-
-https://yourdomain.com/debuggr.php?error_log
-
-In addition, the debuggr.php file can be renamed to any other .php filename. This means, for example, that you can rename it to index.php and place it in a directory, which allows a URL format like this:
-
-https://yourdomain.com/code/?error_log
-
-If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example, this URL would display the HTML source code of this project on GitHub:
-
-https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
-
-With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
-
-Debuggr's remote scraping will automatically follow most redirects. However, it may not follow HTTP to HTTPS redirects. If your URL is HTTP (e.g. not secure) and cURL returns a blank page, try it with HTTPS.
-
-_Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
-
-
-#### Features
-
-After logging in, the main Debuggr interface shows the loaded code with line and column numbers (if enabled), with a navigation bar across the bottom.
+The main Debuggr interface shows the loaded code with line and column numbers (if enabled), with a navigation bar across the bottom.
  
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
 
@@ -68,30 +40,56 @@ The Files menu (left side of the nav bar) offers these commands:
 - **Go To Line...**. Asks you for a line number, then scrolls to it.
 - **Open File/URL...**. Asks you for a file name or a complete URL (if _allowRemoteFileReading_ is set to true) to read.
 
-In addition, if _showFilesMenu_ is set to true, the Files menu will include a list of files in its same directory. And if _accessCurrentDirectoryOnly_ is set to false, the file list will include folders in a hierarchical menu.
+In addition, if the configuration setting _showFilesMenu_ is set to true, the Files menu will include a list of files in its same directory. And if _accessCurrentDirectoryOnly_ is set to false, the file list will include folders in a hierarchical menu.
 
 The Options menu (right side of the nav bar) offers these commands:
 - **Dark Mode**. Toggles the UI between Dark Mode and Lite Mode.
 - **Line Numbers**. Toggles the display of line numbers on the left margin.
 - **Column Markers**. Toggles the display of column markers every 10 characters.
-- **Auto-load Updates**. Enables an automatic reload check (see above) every 5 seconds.
+- **Auto-load updates**. Enables an automatic reload check (see above) every 5 seconds.
 - **Email User**. Provides a mailto link with the host's name and email, if configured in the options.
 - **Log Out**. Logs you out, ending your session.
 - **Debuggr Info**. Links to this page on GitHub.
+
+When you access debuggr.php, you can add a parameter named "file" set to the filename (or pathname) of the file you want to read. For example, this URL...
+
+https://yourdomain.com/debuggr.php?file=error\_log
+
+...would tell Debuggr to display PHP's protected "error\_log" file in the same directory as Debuggr, which normally cannot be read by a web browser.
+
+Debuggr also accepts "f" for the file parameter, like this:
+
+https://yourdomain.com/debuggr.php?f=error\_log
+
+It also accepts just the file name after the question mark:
+
+https://yourdomain.com/debuggr.php?error\_log
+
+If the configuration _allowRemoteFileReading_ is set to true (which it is by default), a complete URL can be substituted for the filename, and Debuggr will scrape its source. For example, this URL would display the HTML source code of this project on GitHub:
+
+https://yourdomain.com/debuggr.php?file=https://github.com/tordevries/debuggr
+
+With both local and remote files, Debuggr attempts to recognize and render image, audio, and video formats in a usable format: images and video are displayed visually, and audio and video are displayed with HTML5 player controls.
+
+Debuggr's remote scraping will automatically follow most redirects. However, it may not follow HTTP to HTTPS redirects. If your URL is HTTP (e.g. not secure) and Debuggr returns a blank page, try it with HTTPS. _Note: Remote scraping requires the PHP cURL libraries to be installed on your server, which they commonly are.  However, Debuggr can only scrape what is publicly accessible through any web browser, so it cannot read any server-side code remotely (e.g. PHP and other files); it cannot access pages/files that require passwords; and some sites block such scraping._
+
+In addition, the debuggr.php file can be renamed to any other .php filename. For example, you can rename it to index.php and place it in a directory, which allows a URL format like this:
+
+https://yourdomain.com/code/?error\_log
 
 
 ---
 ## Debuggr Options
 There are several PHP variables to configure access and output.
 
-#### userName
-A string variable for the host coder's name.
+#### userName (required)
+A string variable for the host coder's name. Debuggr will not operate if this is not changed from the default.
 
-#### userEmail
-A string variable for the host coder's email address, to enable the "Email" option.
+#### userEmail (required)
+A string variable for the host coder's email address, to enable the "Email" option. Debuggr will not operate if this is not changed from the default.
 
-#### pagePassword
-A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as [this one from LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it).
+#### pagePassword (required)
+A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as [this one from LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it). Debuggr will not operate if this is not changed from the default.
 
 #### passwordRequired
 A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. The default is true.
