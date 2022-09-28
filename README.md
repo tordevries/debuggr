@@ -1,4 +1,8 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
+
+<img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
+_Screenshot of Debuggr examining its own JavaScript code, with a few line numbers highlighted._
+
 **A tool to read the source code of remote HTML, CSS, JavaScript, and other web-accessible files, as well as locally-available code and configuration files (PHP, etc.) also hosted by its web server.** It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
 
 Debuggr is a single self-contained PHP file (debuggr.php) that generates its own HTML and favicon, and uses CDNs to load its supporting CSS and JavaScript files. It was originally developed by a programming instructor to enable remote reading of student server-side coding without administrative server access. As a single file, it is easy to install and manage, especially for beginner coding students.
@@ -27,10 +31,6 @@ Once installed and configured, simply access debuggr.php at the URL to which you
 
 The main Debuggr interface shows the loaded code with line and column numbers (if enabled), with a navigation bar across the bottom.
  
-<img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
-
-_Screenshot of Debuggr examining its own JavaScript code, with a few line numbers highlighted._
-
 Line numbers can be clicked to highlight them. These clicks are tracked in the hash of Debuggr's URL, thus making the Debuggr file and highlights shareable.
 
 Debuggr's navigation bar lists the current filename or URL with a reload icon. It also offers two menus: the Files menu in the lower left corner, and the Options menu in the lower right.
