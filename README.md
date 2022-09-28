@@ -4,7 +4,7 @@
 
 _Screenshot of Debuggr examining its own JavaScript code, with a few line numbers highlighted._
 
-**Debuggr is a tool to read the source code of remote HTML, CSS, JavaScript, and other web-accessible files, as well as locally-available code and configuration files (PHP, etc.) also hosted by its web server.** It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
+**Debuggr is a tool to read the source code of remote HTML, CSS, JavaScript, and other web-accessible files, as well as locally-available code and configuration files (PHP, etc.) also hosted by its web server.** It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices. It only reads and displays remote code; it does not edit or modify it.
 
 Debuggr is a single self-contained PHP file (debuggr.php) that generates its own HTML and favicon, and uses CDNs to load its supporting CSS and JavaScript files. It was originally developed by a programming instructor to enable remote reading of student server-side coding without administrative server access. As a single file, it is easy to install and manage, especially for beginner coding students.
 
