@@ -1,6 +1,7 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
 
 <img alt="Screenshot of Debuggr examining itself" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-screenshot.png" style="width: 100%; height: auto;" />
+
 _Screenshot of Debuggr examining its own JavaScript code, with a few line numbers highlighted._
 
 **A tool to read the source code of remote HTML, CSS, JavaScript, and other web-accessible files, as well as locally-available code and configuration files (PHP, etc.) also hosted by its web server.** It is mobile-friendly, which makes it useful for looking at remote source code (HTML, CSS, JavaScript, etc.) via smartphones and other mobile devices.
