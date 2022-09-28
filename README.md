@@ -1,24 +1,30 @@
 # <img alt="icon" src="https://raw.githubusercontent.com/tordevries/debuggr/main/images/debuggr-icon.png" />&nbsp;debuggr
-A PHP file to allow others to read server-side coding files on your server.  It was originally created to allow a programming instructor to read server-side code written by his students, once they had installed this. By design, it is a single file with all the HTML and PHP necessary to accomplish its task, using the jsdelivr CDN for its CSS and JavaScript files. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and has the option to read browser source code, making it a possible solution for studying client-side source code (HTML, CSS, JavaScript) via smartphones.
+**A tool to allow reading of the source code of web-accessible files as well as coding and configuration files (PHP, etc.) locally available on the web server.**
 
-Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session (which requires use of a browser cookie). However, installing Debuggr may potentially expose your server to security risks if someone is able to use Debuggr to read files that contain passwords or other sensitive information. It is meant to be installed for individual use, and not as a system-wide resource or on mission-critical systems. It should also be removed or disabled once it is no longer needed.
+Debuggr was originally created to allow a programming instructor to read server-side code written by his students after they had installed this. By design, it is a single PHP file with all the internal code necessary to accomplish its task, using the jsdelivr CDN to load its CSS and JavaScript files remotely. It even dynamically generates its own favicon. This makes it easier to install and manage, with less file clutter, especially for beginner coders. It is also mobile-friendly, and its ability to read browser source code makes it useful for studying client-side source code (HTML, CSS, JavaScript) via smartphones and other mobile devices.
 
-Debuggr is licensed under the GNU General Public License, as noted below and detailed in the LICENSE.txt file.
+Debuggr is licensed under the GNU General Public License, as [noted below](#license) and detailed in the LICENSE.txt file.
+
+#### Security Notice
+Debuggr includes basic security options such as simple password protection, file access restrictions, and forced SSL. If a password is required (and it should be!), access will be authorized via a session (which requires use of a browser cookie). However, installing Debuggr may expose your server to security risks if someone is able read files that contain passwords or other sensitive information. As a result, it is meant to be installed for individual use, and not as a system-wide resource or on mission-critical systems. It should also be removed or disabled once it is no longer needed. As noted in the license, _your use of this code is entirely at your own risk_.
+
 
 ---
-## Installing Debuggr
+## Installation
 
-Upload the debuggr.php file to your hosting, and configure the variable options near the beginning of the document. If nothing else, you must change the values of these settings:
+Debuggr requires that your web server runs a recent version of PHP. Remote URL access additionally requires the cURL libraries, which are commonly available on PHP-enabled servers; however, local code reading will still be available even if cURL is not.
+
+To install, upload the debuggr.php file to your web hosting. Then, configure the variable options near the beginning of the document. If nothing else, you _must_ change the values of these settings:
 - **userName**: set to your name
 - **userEmail**: set to your email
 - **pagePassword**: set to a secure password that you only share with trusted contacts
 
 Debuggr will show an error if these settings are unchanged from their defaults.
 
-Once installed, simply access debuggr.php at the URL you installed it.
+Once installed and configured, simply access debuggr.php at the URL to which you installed it.
 
 ---
-## Using Debuggr
+## Features and Use
 
 The main Debuggr interface shows the loaded code with line and column numbers (if enabled), with a navigation bar across the bottom.
  
@@ -77,7 +83,8 @@ https://yourdomain.com/code/?error_log
 
 
 ---
-## Debuggr Options
+## Configuration Options
+
 There are several PHP variables to configure access and output.
 
 #### userName (required)
