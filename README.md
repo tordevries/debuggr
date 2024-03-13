@@ -148,15 +148,17 @@ A string variable containing an absolute path to your web server's SSL security 
 ## Future Features
 
 Some ideas on the future radar:
+- **Secure password generation.** Offer an internal method of generating secure passwords for new installations.
+- **Accessibility.** Make the UI as Section 508 compliant as possible..
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
-- **Better security.** I'd like to add limits on wrong passwords, maybe IP velocity checks, to prevent brute-force hacks on the password.
+- **Better security.** I'd like to add limits on wrong passwords, password strength checks, IP velocity checks, etc., to prevent brute-force hacks on the password.
 - **Analytics.** Could be interesting to integrate with your own Google Analytics account so you could track usage.
 
 ---
 ## License
 
-Copyright (C) 2020-2022 Tor de Vries (tor.devries@wsu.edu)
+Copyright (C) 2020-2024 Tor de Vries (tor.devries@wsu.edu)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
