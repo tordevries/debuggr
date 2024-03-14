@@ -94,43 +94,43 @@ A string variable for the host coder's name. Debuggr will not operate if this is
 A string variable for the host coder's email address, to enable the "Email" option. Debuggr will not operate if this is not changed from the default.
 
 #### pagePassword (required)
-A string variable for the password. It's strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as [this one from LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it). Debuggr will not operate if this is not changed from the default.
+A string variable for the password. It is strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as [this one from LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it). Debuggr will not operate if this is not changed from the default.
 
-#### passwordRequired
-A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. The default is true.
+#### passwordRequired (default: true)
+A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. 
 
-#### forceSSL
-A Boolean value which, if true, will redirect all HTTP requests to HTTPS for security purposes. The default is true. (You really ought to have an SSL certificate installed and be using HTTPS!)
+#### forceSSL (default: true)
+A Boolean value which, if true, will redirect all HTTP requests to HTTPS for security purposes. (You really ought to have an SSL certificate installed and be using HTTPS!)
 
-#### accessCurrentDirectoryOnly
-A Boolean value which, if true, restricts user access to only files in this same directory as this file, with no subdirectories allowed in the parameter pathname. The default is true.
+#### accessCurrentDirectoryOnly (default: true)
+A Boolean value which, if true, restricts user access to only files in this same directory as this file, with no subdirectories allowed in the parameter pathname. 
 
-#### accessParentDirectories
-A Boolean value which, if true, allows users to enter pathnames to parent directories in the "?file=" parameter, using '../' to navigate directories. The default is false.
+#### accessParentDirectories (default: false)
+A Boolean value which, if true, allows users to enter pathnames to parent directories in the "?file=" parameter, using '../' to navigate directories. 
 
-#### preventAccessToThisFile
-A Boolean value which, if true, prevents users from reading this PHP file with itself. The default is true. The only scenario where you want this to be "false" is if you have configured a set of default values of this code that you want someone else to copy.
+#### preventAccessToThisFile (default: true)
+A Boolean value which, if true, prevents users from reading this PHP file with itself.  The only scenario where you want this to be "false" is if you have configured a set of default values of this code that you want someone else to copy.
 
-#### allowRemoteFileReading
-A Boolean value which, if true, allows Debuggr to attempt to scrape content from remote URLs. The default is true. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; not every web site responds consistently to cURL calls; and finally, this can only read publicly-available pages and not any remote web page that requires a password. Note that Debuggr copies your browser's user agent when accessing other sites.
+#### allowRemoteFileReading (default: true)
+A Boolean value which, if true, allows Debuggr to attempt to scrape content from remote URLs. There are some limitations: this requires your server's PHP to include standard cURL libraries (it probably does); this can only read the same source code you could see in a web browser (not any remote server-side code); by default this bypasses HTTPS security checks (so there is a chance of man-in-the middle attacks), but see the cURL options below; not every web site responds consistently to cURL calls; and finally, this can only read publicly-available pages and not any remote web page that requires a password. Note that Debuggr copies your browser's user agent when accessing other sites.
 
-#### showFilesMenu
-A Boolean value which, if true, will update the File menu with links to all the files in the current directory. The default is false. If _accessCurrentDirectoryOnly_ is false (see above), the "Files" menu will also include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
+#### showFilesMenu (default: false)
+A Boolean value which, if true, will update the File menu with links to all the files in the current directory. If _accessCurrentDirectoryOnly_ is false (see above), the "Files" menu will also include local folders and their files/subdirectories in hierarchical menu. Note that the reload and auto-reload functions will check and dynamically reload updated menu contents via AJAX.
 
-#### highlightCode
-A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. Debuggr also will attempt to hyperlink URLs in href and src attributes, with the links loading into Debuggr. The default is true.
+#### highlightCode (default: true)
+A Boolean value which, if true, will include references to load [Highlight.js](https://highlightjs.org/) (also on [Github](https://github.com/highlightjs/highlight.js)) and a collection of CSS to provide basic code syntax highlighting. Debuggr also will attempt to hyperlink URLs in href and src attributes, with the links loading into Debuggr. 
 
-#### startInDarkMode
-A Boolean value which, if true, will start the UI in dark mode by default, rather than lite mode. The default is true.
+#### startInDarkMode (default: true)
+A Boolean value which, if true, will start the UI in dark mode by default, rather than lite mode.
 
-#### startWithLinesOn
-A Boolean value which, if true, will start with the line numbers showing on the left, rather than hidden. The default is true.
+#### startWithLinesOn (default: true)
+A Boolean value which, if true, will start with the line numbers showing on the left, rather than hidden. 
 
-#### startWithColsOn
-A Boolean value which, if true, will start with the column markers showing every 10 characters, rather than hidden. The default is true.
+#### startWithColsOn (default: true)
+A Boolean value which, if true, will start with the column markers showing every 10 characters, rather than hidden. 
 
-#### logTimings
-A Boolean value which, if true, instructs Debuggr to record how long processing each request has taken. The default is false.
+#### logTimings (default: false)
+A Boolean value which, if true, instructs Debuggr to record how long processing each request has taken. 
 
 #### logTimingsFilename
 A string variable for the path and filename of the log file, if logTimings is true. The default is "debuggr-timing.txt".
@@ -138,8 +138,8 @@ A string variable for the path and filename of the log file, if logTimings is tr
 #### logTimingsTimestamp
 A string variable for the format of the PHP date function used in the timing logs, if logTimings is true. The default is month/day/year plus 24-hour hour:minute:second, or "m/d/Y H:i:s".
 
-#### allowCURLtoBypassHTTPS (advanced)
-A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will instruct cURL to load remote HTTPS pages without a complete SSL certificate check. _This is a security risk;_ you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. The default is true. If set to false, you should configure _certificatePathForCURL_ as noted below.
+#### allowCURLtoBypassHTTPS (advanced) (default: true)
+A Boolean value which, if true, and if _allowRemoteFileReading_ is true, will instruct cURL to load remote HTTPS pages without a complete SSL certificate check. _This is a security risk;_ you may be subject to a MITM (man in the middle) HTTPS attack. However, this is a low security risk as long as you are reading publicly-accessible URLs without passing usernames or other identifiable information. If set to false, you should configure _certificatePathForCURL_ as noted below.
 
 #### certificatePathForCURL (advanced)
 A string variable containing an absolute path to your web server's SSL security certificate for use by cURL when _allowCURLtoBypassHTTPS_ is false. The default is "/etc/ssl/certs", though it is impossible to predict if that will work for your server. This setting has no effect if _allowCURLtoBypassHTTPS_ is true.
@@ -149,7 +149,7 @@ A string variable containing an absolute path to your web server's SSL security 
 
 Some ideas on the future radar:
 - **Secure password generation.** Offer an internal method of generating secure passwords for new installations.
-- **Accessibility.** Make the UI as Section 508 compliant as possible..
+- **Accessibility.** Make the UI as Section 508 compliant as possible.
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
 - **Better security.** I'd like to add limits on wrong passwords, password strength checks, IP velocity checks, etc., to prevent brute-force hacks on the password.
