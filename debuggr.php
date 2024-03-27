@@ -1,7 +1,7 @@
 <? 
 /*
 
-Debuggr version 1.8-beta by Tor de Vries (tor.devries@wsu.edu)
+Debuggr version 1.9-beta by Tor de Vries (tor.devries@wsu.edu)
 
 Copy this PHP code into the root directory of your server-side coding project so others can study your code.
 You must configure the $userName, $userEmail, and $pagePassword variables, at the very least.
@@ -15,7 +15,7 @@ https://github.com/tordevries/debuggr
 
 -----
 
-Copyright (C) 2020-2022 Tor de Vries (tor.devries@wsu.edu)
+Copyright (C) 2020-2024 Tor de Vries (tor.devries@wsu.edu)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation, either version 3 of 
