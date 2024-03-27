@@ -41,7 +41,7 @@ $userName = "Host"; // default = "Host"
 // REQUIRED: your email address
 $userEmail = "your@email.com"; // default = "your@email.com"
 
-// REQUIRED: set a password
+// REQUIRED: set a password -- must be at least 8 characters, and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number
 $pagePassword = "default"; // default = "default"
 
 // if true, requires a password and temporary session authorization to view the file; you really should leave this as true
@@ -376,6 +376,15 @@ function outputFavicon() {
 }
 
 
+// function to test password strength -- must be at least 8 characters and contain at least 1 uppercase, 1 lowercase, and 1 number
+function testPasswordStrength($password) {
+	$upper = preg_match('@[A-Z]@', $password);
+	$lower = preg_match('@[a-z]@', $password);
+	$number = preg_match('@[0-9]@', $password);
+	return ( ( strlen($password) >= 8) && $upper && $lower && $number );
+}
+
+
 // ********************************************************************************
 // PHP PROCEDURES
 // ********************************************************************************
@@ -396,11 +405,36 @@ if ($reqMode == "favicon") {
 	die();
 }
 
-// for security, kill the output if the basic defaults have not been changed
-if (($userName == "Host") || ($userEmail == "your@email.com") || (($pagePassword == "default") && $passwordRequired) ) die("ERROR: name, email, and password must be configured.");
+// for security, kill the output if the basic defaults have not been changed, with suggested random passwords
+if (($userName == "Host") || ($userEmail == "your@email.com") || (($pagePassword == "default") && $passwordRequired) ) {
 
-// for security, kill the output if password is required but blank
-if ($passwordRequired && ($pagePassword == "")) die("ERROR: no password set.");
+	$dieMessage = "<p>ERROR: name, email, and password must be configured.</p>" .
+				  "<p>Five example random passwords to use:</p>" .
+				  "<ul>";
+
+	for ($x = 0; $x < 5; $x++) {
+		$randPass = substr( password_hash( bin2hex(random_bytes(5)) , PASSWORD_DEFAULT) , 8);
+		$dieMessage .= "<li>$randPass</li>";
+	}
+
+	$dieMessage .="</ul>";
+	die($dieMessage);
+}
+
+// for security, kill the output if password is required but not strong enough
+if ($passwordRequired && (!testPasswordStrength($pagePassword))) {
+	$dieMessage = "<p>ERROR: password does not meet requirements: at least 8 characters including at least 1 uppercase letter, 1 lowercase letter, and 1 number.</p>" .
+				  "<p>Five example random passwords to use:</p>" .
+				  "<ul>";
+
+	for ($x = 0; $x < 5; $x++) {
+		$randPass = substr( password_hash( bin2hex(random_bytes(5)) , PASSWORD_DEFAULT) , 8);
+		$dieMessage .= "<li>$randPass</li>";
+	}
+
+	$dieMessage .="</ul>";
+	die($dieMessage);
+}
 
 // for security, redirect to HTTPS if it's not HTTPS
 if ($forceSSL && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
