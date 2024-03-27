@@ -94,10 +94,10 @@ A string variable for the host coder's name. Debuggr will not operate if this is
 A string variable for the host coder's email address, to enable the "Email" option. Debuggr will not operate if this is not changed from the default.
 
 #### pagePassword (required)
-A string variable for the password. It is strongly suggested that you use this. Once authorized, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. However, if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. There are many password generators online, such as [this one from LastPass](https://www.lastpass.com/password-generator) (though no endorsement is implied by linking to it). Debuggr will not operate if this is not changed from the default.
+A string variable for the password. Passwords must be at least 8 characters and contain at least 1 uppercase letter, 1 lowercase letter, and 1 number. Debuggr will not operate if this is not changed from the default or does not meet the password requirements. In these cases, Debuggr will suggest 5 random passwords generated with PHP's cryptographic libraries. Once someone has logged in, PHP will set a session variable to keep the same user/browser authorized for awhile (typically ~24 minutes since the last access, for most PHP session settings). If you change the password, existing authorized sessions will have to reauthorize. Note: if you allow users to read this file directly (see _preventAccessToThisFile_ below) then they will be able to read your password. 
 
 #### passwordRequired (default: true)
-A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. 
+A Boolean value which, if true, requires the user to enter the password and, and then initiates temporary session authorization to view the file. It is very strongly advised that you use a password for Debuggr.
 
 #### forceSSL (default: true)
 A Boolean value which, if true, will redirect all HTTP requests to HTTPS for security purposes. (You really ought to have an SSL certificate installed and be using HTTPS!)
@@ -148,7 +148,6 @@ A string variable containing an absolute path to your web server's SSL security 
 ## Future Features
 
 Some ideas on the future radar:
-- **Secure password generation.** Offer an internal method of generating secure passwords for new installations.
 - **Accessibility.** Make the UI as Section 508 compliant as possible.
 - **Whitelisted or blacklisted file names for the Files menu.** Instead of reading all the local files, provide a list of specific files to be viewed, and prevent access outside that list. Useful within a distributed package.
 - **Timeout management.** Allow a specified timeout with a forced logout, not just passively relying on PHP's session timeout setting.
